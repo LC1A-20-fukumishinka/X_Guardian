@@ -6,7 +6,7 @@
 #include "Primitive.h"
 #include "Collision.h"
 #include <cstdlib>
-
+#include "Car.h"
 //test
 using namespace DxLib;
 void DrawAxis3D(const float length);
@@ -81,6 +81,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	float rotY = 0.0f;
 	float rotZ = 0.0f;
 	Vector3 frontVec = {0, 0, 1};
+
+	Car testCar;
+
+	testCar.Init(Vector3(), Vector3(0, 0, 1), 2, 3);
 	//ゲームループ
 	while (ProcessMessage() == 0 && CheckHitKey(KEY_INPUT_ESCAPE) == 0)
 	{
@@ -175,6 +179,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 		MV1DrawModel(model);
 		DrawKeyOperation();
 
+		testCar.Draw();
 		//フリップする
 		ScreenFlip();
 	}
