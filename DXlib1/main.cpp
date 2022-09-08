@@ -6,7 +6,7 @@
 #include "Primitive.h"
 #include "Collision.h"
 #include <cstdlib>
-#include "Car.h"
+#include "CarManager.h"
 //test
 using namespace DxLib;
 void DrawAxis3D(const float length);
@@ -36,11 +36,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
 	SetUseZBuffer3D(TRUE);
 	SetWriteZBuffer3D(TRUE);
-	Vector3 cameraOrgPosition(0.0f, 10.0f, 30.0f);
+	Vector3 cameraOrgPosition(10.0f, 200.0f, 30.0f);
 	Vector3 cameraPosition = cameraOrgPosition;
-	Vector3 cameraTarget(0.0f, 0.0f, 0.0f);
+	Vector3 cameraTarget(10.0f, 0.0f, 30.0f);
 
-	Vector3 cameraOrgUp(0.0f, 1.0f, 0.0f);
+	Vector3 cameraOrgUp(0.0f, 0.0f, 1.0f);
 	Vector3 cameraUp = cameraOrgUp;
 
 	float cameraRightAngle = 0.0f;
@@ -82,9 +82,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	float rotZ = 0.0f;
 	Vector3 frontVec = {0, 0, 1};
 
-	Car testCar;
+	CarManager testCar;
 
-	testCar.Init(Vector3(), Vector3(0, 0, 1), 2, 3);
+	int spawnTimer = 60;
 	//ÉQÅ[ÉÄÉãÅ[Év
 	while (ProcessMessage() == 0 && CheckHitKey(KEY_INPUT_ESCAPE) == 0)
 	{
@@ -117,25 +117,25 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 		//if (CheckHitKey(KEY_INPUT_UP))cameraUpAngle = -ROT_UNIT;
 		//if (CheckHitKey(KEY_INPUT_DOWN))cameraUpAngle = +ROT_UNIT;
 
-		Quaternion q = qLocal;
+		//Quaternion q = qLocal;
 
-		Quaternion qCameraPosition = quaternion(cameraOrgPosition.x, cameraOrgPosition.y, cameraOrgPosition.z, 0.0f);
+		//Quaternion qCameraPosition = quaternion(cameraOrgPosition.x, cameraOrgPosition.y, cameraOrgPosition.z, 0.0f);
 
-		Quaternion qq = conjugate(q);
+		//Quaternion qq = conjugate(q);
 
-		tmpQ = q * qCameraPosition;
-		 qCameraPosition = (tmpQ * qq);
+		//tmpQ = q * qCameraPosition;
+		// qCameraPosition = (tmpQ * qq);
 
-		cameraPosition = { qCameraPosition.x, qCameraPosition.y , qCameraPosition.z };
-		cameraPosition += BasePos;
-		Quaternion qCameraUp = quaternion(cameraUp.x, cameraUp.y, cameraUp.z, 0.0f);
+		//cameraPosition = { qCameraPosition.x, qCameraPosition.y , qCameraPosition.z };
+		//cameraPosition += BasePos;
+		//Quaternion qCameraUp = quaternion(cameraUp.x, cameraUp.y, cameraUp.z, 0.0f);
 
-		tmpQ = q * qCameraUp;
-		qCameraUp = (tmpQ * qq);
+		//tmpQ = q * qCameraUp;
+		//qCameraUp = (tmpQ * qq);
 
-		cameraUp = getAxis(qCameraUp);
+		//cameraUp = getAxis(qCameraUp);
 
-		SetCameraPositionAndTargetAndUpVec(cameraPosition, BasePos, cameraUp);
+		//SetCameraPositionAndTargetAndUpVec(cameraPosition, BasePos, cameraUp);
 
 
 
@@ -159,22 +159,21 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 			targetSphere.color = GetColor(255, 0, 0);
 		}
 
+		spawnTimer--;
+		if (spawnTimer <= 0)
+		{
+			spawnTimer = 300;
+			testCar.AddPlayerCar();
+			testCar.AddEnemyCar();
+		}
+
+		testCar.Update();
+
 		//ï`âÊ
 		ClearDrawScreen();
 		DrawAxis3D(200.0f);
 		DrawFloorLine();
 
-		targetCapsule.draw();
-		targetCapsule.drawInfo(WindowWidth / 2, 20 * 1, GetColor(255, 255, 255));
-
-		targetBox.draw();
-		targetBox.drawInfo(WindowWidth / 2, 20 * 2, GetColor(255, 255, 255));
-
-		targetSphere.draw();
-		targetSphere.drawInfo(WindowWidth / 2, 20 * 3, GetColor(255, 255, 255));
-
-		//sphere.draw();
-		sphere.drawInfo(WindowWidth / 2, 20 * 4, GetColor(255, 255, 255));
 		MV1SetMatrix(model, matWorld);
 		MV1DrawModel(model);
 		DrawKeyOperation();
