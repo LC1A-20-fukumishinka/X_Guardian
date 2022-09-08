@@ -38,9 +38,21 @@ public:
 	Vector3 GetFrontPos();
 
 	MoveType GetMoveType();
+
+	Capsule *GetCapsule();
 	void SetFrontCar(std::weak_ptr<Car> frontCar);
 
-	void SetSignal(bool isStopSignal);
+	void Dead();
+private:
+	static const float sTurnStartPos;
+	static const float sStopPos;
+	static MoveType sInputSignal;
+	static const int sMaxEnemyTimer;
+	static const float sCarDistanceLimit;
+	static const int sMaxDerayTimer_ = 30;
+
+public:
+	static void SetSignal(MoveType isStopSignal);
 private:
 
 	void CapsuleMove();
@@ -49,25 +61,27 @@ private:
 
 	void RightTurnMove();
 
+	bool JudgmentToStop(bool isCrossIn);
+
+
+	int enemyStopTimer_ = 60;
 	//カプセル状の当たり判定使わないかも
-std::unique_ptr<Capsule> colObject_;
-//車両の先頭部分の座標
-Vector3 frontPos_;
-//車両の方向
-Vector3 angle_;
+	std::unique_ptr<Capsule> colObject_;
+	//車両の先頭部分の座標
+	Vector3 frontPos_;
+	//車両の方向
+	Vector3 angle_;
 
-Vector3 centerPos_;
-float carLength_;
+	Vector3 centerPos_;
+	float carLength_;
 
-float speed_;
+	float speed_;
 
-bool isAlive_ = false;
-bool isPlayer_ = true;
+	bool isAlive_ = false;
+	bool isPlayer_ = true;
 
-//信号が赤かどうか
-bool isStopSignal_ = false;
-MoveType type_ = MoveType::STRAIGHT;
-
-std::weak_ptr<Car> frontCar_;
+	int derayTimer_ = 0;
+	MoveType type_ = MoveType::STRAIGHT;
+	std::weak_ptr<Car> frontCar_;
 };
 

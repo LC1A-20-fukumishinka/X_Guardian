@@ -1,5 +1,5 @@
 #include "CarManager.h"
-
+#include "Collision.h"
 using namespace std;
 CarManager::CarManager()
 {
@@ -28,6 +28,9 @@ void CarManager::Init()
 void CarManager::Update()
 {
 	SetSignal();
+
+	Collision();
+
 	for (auto &e : playerCars_)
 	{
 		if (e->GetIsAlive())
@@ -66,6 +69,48 @@ void CarManager::Draw()
 	}
 }
 
+void CarManager::SetSignal()
+{
+	if (CheckHitKey(KEY_INPUT_W))
+	{
+		inputSignal = MoveType::STRAIGHT;
+	}
+
+	if (CheckHitKey(KEY_INPUT_D))
+	{
+		inputSignal = MoveType::RIGHTTURN;
+	}
+
+	if (CheckHitKey(KEY_INPUT_S))
+	{
+		inputSignal = MoveType::STOP;
+	}
+
+	Car::SetSignal(inputSignal);
+}
+
+void CarManager::Collision()
+{
+	for (auto &pCar : playerCars_)
+	{
+		if (pCar->GetIsAlive())
+		{
+			for (auto &eCar : enemyCars_)
+			{
+				if (eCar->GetIsAlive())
+				{
+					bool isHit = Collision::testCapsuleCapsule(*pCar->GetCapsule(), *eCar->GetCapsule());
+					if (isHit)
+					{
+					pCar->Dead();
+					eCar->Dead();
+					}
+				}
+			}
+		}
+	}
+}
+
 bool CarManager::AddEnemyCar()
 {
 	CarInitializeDesc desc;
@@ -75,6 +120,16 @@ bool CarManager::AddEnemyCar()
 	desc.isPlayer = false;
 
 	desc.speed = 0.3f;
+	desc.type = testEnemy;
+
+	if (testEnemy == MoveType::STRAIGHT)
+	{
+		testEnemy = MoveType::RIGHTTURN;
+	}
+	else
+	{
+		testEnemy = MoveType::STRAIGHT;
+	}
 
 	for (auto &e : enemyCars_)
 	{
@@ -98,30 +153,6 @@ bool CarManager::AddEnemyCar()
 	return isSpawn;
 }
 
-void CarManager::SetSignal()
-{
-	if (CheckHitKey(KEY_INPUT_W))
-	{
-		inputSignal = MoveType::STRAIGHT;
-	}
-
-	if (CheckHitKey(KEY_INPUT_D))
-	{
-		inputSignal = MoveType::RIGHTTURN;
-	}
-
-	if (CheckHitKey(KEY_INPUT_S))
-	{
-		inputSignal = MoveType::STOP;
-	}
-
-	for (auto &e : playerCars_)
-	{
-		bool isStop = (e->GetMoveType() != inputSignal);
-		e->SetSignal(isStop);
-	}
-}
-
 bool CarManager::AddPlayerCar()
 {
 	CarInitializeDesc desc;
@@ -130,7 +161,16 @@ bool CarManager::AddPlayerCar()
 	desc.startPos = Vector3(0.0f, 0.0f, -100.0f);
 	desc.speed = 0.3f;
 	desc.isPlayer = true;
-	desc.type = MoveType::RIGHTTURN;
+	desc.type = testPlayer;
+	if (testPlayer == MoveType::STRAIGHT)
+	{
+		testPlayer = MoveType::RIGHTTURN;
+	}
+	else
+	{
+		testPlayer = MoveType::STRAIGHT;
+	}
+
 	for (auto &e : playerCars_)
 	{
 		if (!e->GetIsAlive())
