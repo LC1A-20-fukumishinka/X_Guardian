@@ -17,6 +17,8 @@ public:
 	bool AddEnemyCar();
 
 	void SetSignal();
+
+	void Collision();
 private:
 	std::vector<std::shared_ptr<Car>> playerCars_;
 	std::vector<std::shared_ptr<Car>> enemyCars_;
@@ -25,5 +27,9 @@ private:
 	std::weak_ptr<Car>enemyEndCar;
 
 	MoveType inputSignal = MoveType::STRAIGHT;
+
+	MoveType testPlayer = MoveType::STRAIGHT;
+	MoveType testEnemy = MoveType::STRAIGHT;
+
 };
 

@@ -2,6 +2,17 @@
 #include "DxLib.h"
 #include "Matrix4.h"
 using namespace std;
+
+const float Car::sTurnStartPos = 5.0f;
+const float Car::sStopPos = 15.0f + sTurnStartPos;
+
+MoveType Car::sInputSignal = MoveType::STRAIGHT;
+
+const int Car::sMaxEnemyTimer = 120;
+const 	int sMaxDerayTimer_ = 30;
+
+const float Car::sCarDistanceLimit = 5.0f;
+
 Car::Car()
 {
 	const unsigned int color = GetColor(255, 255, 255);
@@ -24,7 +35,7 @@ void Car::Init(Vector3 startPos, Vector3 angle, float length, float radius, floa
 	isPlayer_ = isPlayer;
 	type_ = type;
 
-
+	enemyStopTimer_ = 240;
 	//カプセルの初期化処理
 	colObject_->startPosition = frontPos_;
 	colObject_->endPosition = (frontPos_ + (-angle_ * carLength_));
@@ -43,6 +54,7 @@ void Car::Init(CarInitializeDesc desc)
 	isPlayer_ = desc.isPlayer;
 	type_ = desc.type;
 
+	enemyStopTimer_ = sMaxEnemyTimer;
 	//カプセルの初期化処理
 	colObject_->startPosition = frontPos_;
 	colObject_->endPosition = (frontPos_ + (-angle_ * carLength_));
@@ -54,25 +66,15 @@ void Car::Update()
 
 	//交差点に進入したか
 	bool isCrossIn;
-
-	bool isStopPosIn;
-	//交差点で曲がり始める位置
-	const float turnStartPos = 5.0f;
-
-	//停止する位置
-	const float stopPos = 10.0f + turnStartPos;
-
 	//交差点に進入しているかどうかの判断
 
 	if (isPlayer_)
 	{
-		isCrossIn = ( frontPos_.z >= -turnStartPos);
-		isStopPosIn = (!isCrossIn && frontPos_.z >= -stopPos);
+		isCrossIn = (frontPos_.z >= -sTurnStartPos);
 	}
 	else
 	{
-		isCrossIn = ( frontPos_.z <= turnStartPos);
-		isStopPosIn = (!isCrossIn && frontPos_.z <= stopPos);
+		isCrossIn = (frontPos_.z <= sTurnStartPos);
 	}
 	if (isCrossIn)
 	{
@@ -91,27 +93,16 @@ void Car::Update()
 	}
 
 
-	//信号が赤だった    交差点に未侵入 & 停止位置 &
-	bool isSignal = (isStopPosIn && isStopSignal_);
-
-	//前が詰まった
-	bool isTrafficJam = false;
-
-	//前の車両が存在していたら
-	if (!frontCar_.expired() && frontCar_.lock()->GetIsAlive())
-	{
-		//二台の車両の距離
-		Vector3 distance = (frontCar_.lock()->GetTailPos() - GetFrontPos());
-
-		float carDistanceLimit = 5.0f;
-
-		//距離が近すぎるか確認
-		isTrafficJam = (distance.length() <= carDistanceLimit);
-	}
-
 
 	//止まるかどうか
-	bool isStop = (isSignal || isTrafficJam);
+	bool isStop = JudgmentToStop(isCrossIn);
+
+	float inputSpeed = speed_;
+
+	if (isPlayer_ && !isCrossIn && sInputSignal == MoveType::STOP)
+	{
+		inputSpeed /= 2.0f;
+	}
 
 	if (isStop)
 	{
@@ -120,7 +111,7 @@ void Car::Update()
 	else
 	{
 		//前進処理
-		frontPos_ += angle_ * speed_;
+		frontPos_ += angle_ * inputSpeed;
 	}
 
 	CapsuleMove();
@@ -161,14 +152,24 @@ MoveType Car::GetMoveType()
 	return type_;
 }
 
+Capsule *Car::GetCapsule()
+{
+	return colObject_.get();
+}
+
 void Car::SetFrontCar(std::weak_ptr<Car> frontCar)
 {
 	frontCar_ = frontCar;
 }
 
-void Car::SetSignal(bool isStopSignal)
+void Car::Dead()
 {
-	isStopSignal_ = isStopSignal;
+	isAlive_ = false;
+}
+
+void Car::SetSignal(MoveType isStopSignal)
+{
+	sInputSignal = isStopSignal;
 }
 
 void Car::CapsuleMove()
@@ -208,4 +209,68 @@ void Car::RightTurnMove()
 		//旋回処理
 		angle_ = angle_ * rotationY(0.02f * (speed_ / 0.3f));
 	}
+}
+
+
+bool Car::JudgmentToStop(bool isCrossIn)
+{
+	bool isStopPosIn;
+
+	//交差点に進入しているかどうかの判断
+
+	if (isPlayer_)
+	{
+		isStopPosIn = (!isCrossIn && frontPos_.z >= -sStopPos);
+	}
+	else
+	{
+		isStopPosIn = (!isCrossIn && frontPos_.z <= sStopPos);
+	}
+
+	//停止指示中
+	bool isStopSignal = false;
+
+	if (isPlayer_)
+	{
+		//プレイヤーだったら
+		isStopSignal = !(type_ == sInputSignal);
+	}
+	else if (isStopPosIn && (enemyStopTimer_ > 0) && type_ == MoveType::RIGHTTURN)
+	{
+		enemyStopTimer_--;
+		isStopSignal = true;
+	}
+
+
+	//信号が赤だった    停止位置 & 停止指示中だった
+	bool isSignal = (isStopPosIn && isStopSignal);
+
+	//前が詰まった
+	bool isTrafficJam = false;
+
+	//前の車両が存在していたら
+	if (!frontCar_.expired() && frontCar_.lock()->GetIsAlive())
+	{
+		//二台の車両の距離
+		Vector3 distance = (frontCar_.lock()->GetTailPos() - GetFrontPos());
+
+
+		//距離が近すぎるか確認
+		if ((distance.length() <= sCarDistanceLimit))
+		{
+			derayTimer_ = sMaxDerayTimer_;
+		}
+
+		if (derayTimer_ > 0)
+		{
+			derayTimer_--;
+			isTrafficJam = true;
+		}
+	}
+
+
+	//止まるかどうか
+	bool isStop = (isSignal || isTrafficJam);
+
+	return isStop;
 }
