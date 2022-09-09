@@ -16,6 +16,21 @@ void GameManager::Init()
 
 void GameManager::Update()
 {
+	if (status_ != GameStatus::TITLE)
+	{
+		status_ = GameStatus::TITLE;
+	}
+
+	if (status_ != GameStatus::INGAME)
+	{
+		status_ = GameStatus::INGAME;
+	}
+
+	//if (status_ == GameStatus::INGAME)
+	//{
+	//	status_ = GameStatus::RESULT;
+	//}
+
 }
 
 void GameManager::Finalize()
@@ -41,4 +56,9 @@ void GameManager::StopCar()
 {
 
 combo = 0;
+}
+
+GameStatus GameManager::GetStatus()
+{
+	return status_;
 }

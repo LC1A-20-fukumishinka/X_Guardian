@@ -1,25 +1,37 @@
 #pragma once
+
+enum class GameStatus
+{
+	TITLE,
+	SELECT,
+	INGAME,
+	RESULT,
+	PAUSE,
+};
 class GameManager
 {
 public:
-GameManager();
-~GameManager();
-void Init();
-void Update();
-void Finalize();
-void Draw();
+	GameManager();
+	~GameManager();
+	void Init();
+	void Update();
+	void Finalize();
+	void Draw();
 
-void PassCar();
+	void PassCar();
 
-void StopCar();
+	void StopCar();
 
-public: 
-const int baseScore = 100;
+	GameStatus GetStatus();
+
+
+public:
+	const int baseScore = 100;
 private:
 
-int score = 0;
-int combo = 0;
+	int score = 0;
+	int combo = 0;
 
-
+	GameStatus status_ = GameStatus::TITLE;
 };
 

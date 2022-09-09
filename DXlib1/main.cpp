@@ -12,8 +12,6 @@
 using namespace DxLib;
 void DrawAxis3D(const float length);
 
-void DrawKeyOperation();
-
 void DrawFloorLine();
 
 
@@ -70,128 +68,73 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	Matrix4 matTrans = translate(BasePos);
 
 
-	Quaternion qLocal = quaternion(Vector3(0.0f, 1.0f, 0.0f),0);
-
-	Capsule targetCapsule(Vector3(-10, -20, 0), Vector3(+10, +20, 0), 10, GetColor(0, 0, 255));
-
-	Sphere targetSphere(Vector3(-30, 0, 0), 10, GetColor(0, 0, 255));
-
-	Box targetBox(Vector3(+10, -20, -10), Vector3(+30, +20, +10), GetColor(0, 255, 0));
+	Quaternion qLocal = quaternion(Vector3(0.0f, 1.0f, 0.0f), 0);
 
 
+	Quaternion tmpQ = quaternion(Vector3(0, 1, 0), qLocal);
+	Vector3 vUpAxis = getAxis(tmpQ);
+	tmpQ = quaternion(Vector3(0, 0, 1), qLocal);
+	Vector3 vForwordAxis = getAxis(tmpQ);
+	Quaternion rot = quaternion(Vector3(0, 1, 0), 0.0f);
+	qLocal = rot * qLocal;
 
-	const float MOVE_UNIT = 0.1f;
-	float moveX = 0.0f;
-	float moveY = 0.0f;
-	float moveZ = 0.0f;
+	Matrix4 matWorld = matScale;
+	matWorld *= rotate(qLocal);
+	BasePos += vForwordAxis *= (-1.0f * 0.0f);
+	matWorld *= translate(BasePos);
+	cameraUpAngle = 0.0f;
+	cameraRightAngle = 0.0f;
 
-	const float ROT_UNIT = 0.01f;
-	float rotX = 0.0f;
-	float rotY = 0.0f;
-	float rotZ = 0.0f;
-	Vector3 frontVec = {0, 0, 1};
 
 	Car::LoadModel();
 
 	CarManager carManager;
-	GameManager scoreManager;
-	scoreManager.Init();
+	GameManager gameManager;
+	gameManager.Init();
 	int spawnTimer = 60;
 
 	SetGlobalAmbientLight(GetColorF(1.0f, 0.3f, 0.3f, 0.5f));
 	//ゲームループ
 	while (ProcessMessage() == 0 && CheckHitKey(KEY_INPUT_ESCAPE) == 0)
 	{
+		int passCarCount =0;
 		//更新
-		moveX = moveY = moveZ = 0.0f;
-		rotX = rotY = rotZ = 0.0f;
-
-		float speedRate = 0.0f;
-		//if (CheckHitKey(KEY_INPUT_A)) rotY = -ROT_UNIT;
-		//if (CheckHitKey(KEY_INPUT_D)) rotY = +ROT_UNIT;
-		//if (CheckHitKey(KEY_INPUT_W)) speedRate = 1.0f;
-		//if (CheckHitKey(KEY_INPUT_S)) speedRate = -1.0f;
-
-		Quaternion tmpQ = quaternion(Vector3(0, 1, 0), qLocal);
-		Vector3 vUpAxis = getAxis(tmpQ);
-		tmpQ = quaternion(Vector3(0, 0, 1), qLocal);
-		Vector3 vForwordAxis = getAxis(tmpQ);
-		Quaternion rot = quaternion(Vector3(0, 1, 0), rotY);
-		qLocal = rot * qLocal;
-		Matrix4 matWorld = matScale;
-		matWorld *= rotate(qLocal);
-		BasePos += vForwordAxis *= (-1.0f * speedRate);
-		matWorld *= translate(BasePos);
-		cameraUpAngle = 0.0f;
-		cameraRightAngle = 0.0f;
-
-		//if (CheckHitKey(KEY_INPUT_A))cameraRightAngle = -ROT_UNIT;
-		//if (CheckHitKey(KEY_INPUT_D))cameraRightAngle = +ROT_UNIT;
-
-		//if (CheckHitKey(KEY_INPUT_UP))cameraUpAngle = -ROT_UNIT;
-		//if (CheckHitKey(KEY_INPUT_DOWN))cameraUpAngle = +ROT_UNIT;
-
-		//Quaternion q = qLocal;
-
-		//Quaternion qCameraPosition = quaternion(cameraOrgPosition.x, cameraOrgPosition.y, cameraOrgPosition.z, 0.0f);
-
-		//Quaternion qq = conjugate(q);
-
-		//tmpQ = q * qCameraPosition;
-		// qCameraPosition = (tmpQ * qq);
-
-		//cameraPosition = { qCameraPosition.x, qCameraPosition.y , qCameraPosition.z };
-		//cameraPosition += BasePos;
-		//Quaternion qCameraUp = quaternion(cameraUp.x, cameraUp.y, cameraUp.z, 0.0f);
-
-		//tmpQ = q * qCameraUp;
-		//qCameraUp = (tmpQ * qq);
-
-		//cameraUp = getAxis(qCameraUp);
-
-		//SetCameraPositionAndTargetAndUpVec(cameraPosition, BasePos, cameraUp);
-
-
-
-
-
-		sphere.position = BasePos;
-
-		targetCapsule.color = GetColor(0, 0, 255);
-		if (Collision::testSphereCapsule(sphere, targetCapsule))
+		switch (gameManager.GetStatus())
 		{
-			targetCapsule.color = GetColor(255, 0, 0);
-		}
-		targetBox.color = GetColor(0, 255, 0);
-		if (Collision::testSphereBox(sphere, targetBox))
-		{
-			targetBox.color = GetColor(255, 0, 0);
-		}
-		targetSphere.color = GetColor(255, 255, 0);
-		if (Collision::testSphereSphere(sphere, targetSphere))
-		{
-			targetSphere.color = GetColor(255, 0, 0);
-		}
+		case GameStatus::TITLE:
+			break;
+		case GameStatus::SELECT:
+			break;
+		case GameStatus::INGAME:
 
-		spawnTimer--;
-		if (spawnTimer <= 0)
-		{
-			spawnTimer = 180;
-			carManager.AddPlayerCar();
-			carManager.AddEnemyCar();
-		}
+			spawnTimer--;
+			if (spawnTimer <= 0)
+			{
+				spawnTimer = 180;
+				carManager.AddPlayerCar();
+				carManager.AddEnemyCar();
+			}
 
-		carManager.Update();
-		int passCarCount = carManager.GetPassCars();
-		for (int i = 0; i < passCarCount; i++)
-		{
-			scoreManager.PassCar();
-		}
+			carManager.Update();
+			passCarCount = carManager.GetPassCars();
+			for (int i = 0; i < passCarCount; i++)
+			{
+				gameManager.PassCar();
+			}
 
-		if (carManager.GetAnyCarStop())
-		{
-			scoreManager.StopCar();
+			if (carManager.GetAnyCarStop())
+			{
+				gameManager.StopCar();
+			}
+			break;
+		case GameStatus::RESULT:
+			break;
+		case GameStatus::PAUSE:
+			break;
+		default:
+			break;
 		}
+		gameManager.Update();
 		//描画
 		ClearDrawScreen();
 		DrawAxis3D(200.0f);
@@ -199,11 +142,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
 		MV1SetMatrix(model, matWorld);
 		MV1DrawModel(model);
-		DrawKeyOperation();
 
 		carManager.Draw();
 
-		scoreManager.Draw();
+		gameManager.Draw();
 		//フリップする
 		ScreenFlip();
 	}
@@ -218,15 +160,6 @@ void DrawAxis3D(const float length)
 	DrawLine3D(Vector3(0, 0, -length), Vector3(0, 0, +length), GetColor(0, 0, 255));
 }
 
-void DrawKeyOperation()
-{
-	const unsigned white = GetColor(255, 255, 255);
-
-	DrawFormatString(10, 20 * 1, white, "  [W]       A / D:カプセルのY軸回転");
-	DrawFormatString(10, 20 * 2, white, "[A][S][D]   W / S:カプセルの前後移動");
-	//DrawFormatString(10, 20 * 3, white, "               W / S:カプセルの前後移動");
-	//DrawFormatString(10, 20 * 4, white, "               E / Z:カプセルの上下移動");
-}
 
 void DrawFloorLine()
 {
