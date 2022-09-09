@@ -4,15 +4,21 @@
 using namespace std;
 
 const float Car::sTurnStartPos = 5.0f;
-const float Car::sStopPos = 15.0f + sTurnStartPos;
+const float Car::sStopPos = 20.0f + sTurnStartPos;
+const float Car::sStopLength = 10.0f;
+
+const float Car::sPassWidth = sStopPos;
+const float Car::sEraseWidth = 100.0f;
+const float Car::sEraseDepth = 600.0f;
+
 
 MoveType Car::sInputSignal = MoveType::STRAIGHT;
 
-const int Car::sMaxEnemyTimer = 120;
-const 	int sMaxDerayTimer_ = 30;
+const int Car::sMaxEnemyStopTimer = 120;
+const int Car::sMaxDerayTimer = 30;
 
-const float Car::sCarDistanceLimit = 5.0f;
-
+const float Car::sCarDistanceLimit = 10.0f;
+int Car::sNormalCarModelHandle = -1;
 Car::Car()
 {
 	const unsigned int color = GetColor(255, 255, 255);
@@ -40,6 +46,8 @@ void Car::Init(Vector3 startPos, Vector3 angle, float length, float radius, floa
 	colObject_->startPosition = frontPos_;
 	colObject_->endPosition = (frontPos_ + (-angle_ * carLength_));
 	centerPos_ = (frontPos_ + (-angle_ * (carLength_ / 2)));
+	isCrossIn_ = false;
+	isCounted_ = false;
 }
 
 void Car::Init(CarInitializeDesc desc)
@@ -54,16 +62,17 @@ void Car::Init(CarInitializeDesc desc)
 	isPlayer_ = desc.isPlayer;
 	type_ = desc.type;
 
-	enemyStopTimer_ = sMaxEnemyTimer;
+	enemyStopTimer_ = sMaxEnemyStopTimer;
 	//カプセルの初期化処理
 	colObject_->startPosition = frontPos_;
 	colObject_->endPosition = (frontPos_ + (-angle_ * carLength_));
 	centerPos_ = (frontPos_ + (-angle_ * (carLength_ / 2)));
+	isCrossIn_ = false;
+	isCounted_ = false;
 }
 
 void Car::Update()
 {
-
 	//交差点に進入したか
 	bool isCrossIn;
 	//交差点に進入しているかどうかの判断
@@ -78,6 +87,7 @@ void Car::Update()
 	}
 	if (isCrossIn)
 	{
+		isCrossIn_ = true;
 		switch (type_)
 		{
 		case MoveType::STRAIGHT:
@@ -114,6 +124,11 @@ void Car::Update()
 		frontPos_ += angle_ * inputSpeed;
 	}
 
+	bool isCrossTheIntersection = (isCrossIn_ && (abs(frontPos_.x) >= sEraseWidth || abs(frontPos_.z) >= sEraseDepth));
+	if (isCrossTheIntersection)
+	{
+		Dead();
+	}
 	CapsuleMove();
 }
 
@@ -123,6 +138,15 @@ void Car::Finalize()
 
 void Car::Draw()
 {
+	Matrix4 worldMat;
+	worldMat = scale(Vector3(0.04f, 0.04f, 0.04f));
+
+	Vector3 carAngle = (colObject_->endPosition - frontPos_);
+	worldMat *= Posture(carAngle, Vector3(0.0f, 1.0f, 0.0f));
+	worldMat *= rotationY(3.14);
+	worldMat *= translate(centerPos_);
+	MV1SetMatrix(sNormalCarModelHandle, worldMat);
+	MV1DrawModel(sNormalCarModelHandle);
 	colObject_->draw();
 }
 
@@ -167,9 +191,58 @@ void Car::Dead()
 	isAlive_ = false;
 }
 
+void Car::Count()
+{
+	isCounted_ = true;
+}
+
+bool Car::GetIsPass()
+{
+	bool isPass = false;
+	if (isCrossIn_ && !isCounted_)
+	{
+		if (isPlayer_)
+		{
+			isPass = (abs(frontPos_.x) >= sPassWidth || abs(frontPos_.z) > sStopPos);
+		}
+		else
+		{
+			isPass = (abs(frontPos_.x) >= sPassWidth || abs(frontPos_.z) > sStopPos);
+		}
+	}
+	return isPass;
+}
+
+bool Car::GetIsSignalStop()
+{
+	bool isStopSignal = false;
+
+
+	if (isPlayer_)
+	{
+		bool isStopPosIn;
+
+		bool inAria = (frontPos_.z >= -sStopPos && frontPos_.z < (-sStopPos + sStopLength));
+		isStopPosIn = (!isCrossIn_ && inAria);
+
+		//停止位置 && 自分の進行方向と指示が一致していなかったら
+		if (isStopPosIn && (type_ != sInputSignal))
+		{
+			isStopSignal = true;
+		}
+	}
+
+	return isStopSignal;
+}
+
 void Car::SetSignal(MoveType isStopSignal)
 {
 	sInputSignal = isStopSignal;
+}
+
+void Car::LoadModel()
+{
+	sNormalCarModelHandle = MV1LoadModel("car/car.mv1");
 }
 
 void Car::CapsuleMove()
@@ -220,11 +293,13 @@ bool Car::JudgmentToStop(bool isCrossIn)
 
 	if (isPlayer_)
 	{
-		isStopPosIn = (!isCrossIn && frontPos_.z >= -sStopPos);
+		bool inAria = (frontPos_.z >= -sStopPos && frontPos_.z < (-sStopPos + sStopLength));
+		isStopPosIn = (!isCrossIn && inAria);
 	}
 	else
 	{
-		isStopPosIn = (!isCrossIn && frontPos_.z <= sStopPos);
+		bool inAria = (frontPos_.z <= sStopPos && frontPos_.z > (sStopPos - sStopLength));
+		isStopPosIn = (!isCrossIn && inAria);
 	}
 
 	//停止指示中
@@ -258,7 +333,7 @@ bool Car::JudgmentToStop(bool isCrossIn)
 		//距離が近すぎるか確認
 		if ((distance.length() <= sCarDistanceLimit))
 		{
-			derayTimer_ = sMaxDerayTimer_;
+			derayTimer_ = sMaxDerayTimer;
 		}
 
 		if (derayTimer_ > 0)

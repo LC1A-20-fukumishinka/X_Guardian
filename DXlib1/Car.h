@@ -43,16 +43,26 @@ public:
 	void SetFrontCar(std::weak_ptr<Car> frontCar);
 
 	void Dead();
+	void Count();
+	//’Ê‰ß‚µ‚«‚Á‚½ƒtƒ‰ƒO
+	bool GetIsPass();
+
+	bool GetIsSignalStop();
 private:
 	static const float sTurnStartPos;
 	static const float sStopPos;
-	static MoveType sInputSignal;
-	static const int sMaxEnemyTimer;
 	static const float sCarDistanceLimit;
-	static const int sMaxDerayTimer_ = 30;
-
+	static const float sStopLength;
+	static const float sPassWidth;
+	static const float sEraseWidth;
+	static const float sEraseDepth;
+	static MoveType sInputSignal;
+	static const int sMaxEnemyStopTimer;
+	static const int sMaxDerayTimer;
+	static int sNormalCarModelHandle;
 public:
 	static void SetSignal(MoveType isStopSignal);
+	static void LoadModel();
 private:
 
 	void CapsuleMove();
@@ -79,7 +89,8 @@ private:
 
 	bool isAlive_ = false;
 	bool isPlayer_ = true;
-
+	bool isCrossIn_ = false;
+	bool isCounted_ = false;
 	int derayTimer_ = 0;
 	MoveType type_ = MoveType::STRAIGHT;
 	std::weak_ptr<Car> frontCar_;

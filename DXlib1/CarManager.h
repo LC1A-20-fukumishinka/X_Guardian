@@ -19,6 +19,14 @@ public:
 	void SetSignal();
 
 	void Collision();
+
+	int GetPassCars();
+
+	bool GetAnyCarStop();
+private:
+	static const float sCarWidthPos;
+
+	static CarInitializeDesc normalCar;
 private:
 	std::vector<std::shared_ptr<Car>> playerCars_;
 	std::vector<std::shared_ptr<Car>> enemyCars_;

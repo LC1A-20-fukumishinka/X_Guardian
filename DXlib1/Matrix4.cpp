@@ -13,6 +13,7 @@ Matrix4 identity()
 	return result;
 }
 
+
 Matrix4 scale(const Vector3 &s)
 {
 	Matrix4 result
@@ -23,6 +24,24 @@ Matrix4 scale(const Vector3 &s)
 		0.0f, 0.0f, 0.0f, 1.0f
 	};
 	return result;
+}
+
+Matrix4 Posture(Vector3 v1, Vector3 v2)
+{
+	Vector3 v3;
+	v2.normalaize();
+	v1.normalaize();
+	v3 = v2.cross(v1);
+	v2 = v1.cross(v3);
+
+	Matrix4 returnMat
+	{
+		v3.x, v3.y, v3.z, 0.0f,
+		v2.x, v2.y, v2.z, 0.0f,
+		v1.x, v1.y, v1.z, 0.0f,
+		0.0f, 0.0f, 0.0f, 1.0f,
+	};
+	return returnMat;
 }
 
 Matrix4 rotationX(float angle)
@@ -98,7 +117,7 @@ Vector3 transform(const Vector3 &v, const Matrix4 &m)
 
 Matrix4 &operator*=(Matrix4 &m1, const Matrix4 &m2)
 {
-	Matrix4 result { 0 };
+	Matrix4 result{ 0 };
 
 	for (int i = 0; i < 4; i++)
 	{

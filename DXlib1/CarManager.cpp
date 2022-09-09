@@ -1,6 +1,9 @@
 #include "CarManager.h"
 #include "Collision.h"
 using namespace std;
+
+const float CarManager::sCarWidthPos = 10.0f;
+CarInitializeDesc CarManager::normalCar;
 CarManager::CarManager()
 {
 	playerCars_.reserve(30);
@@ -15,6 +18,9 @@ CarManager::CarManager()
 	{
 		e = make_shared<Car>();
 	}
+
+	normalCar.length = 11.0f;
+	normalCar.radius = 4.0f;
 }
 
 CarManager::~CarManager()
@@ -102,8 +108,8 @@ void CarManager::Collision()
 					bool isHit = Collision::testCapsuleCapsule(*pCar->GetCapsule(), *eCar->GetCapsule());
 					if (isHit)
 					{
-					pCar->Dead();
-					eCar->Dead();
+						pCar->Dead();
+						eCar->Dead();
 					}
 				}
 			}
@@ -111,15 +117,61 @@ void CarManager::Collision()
 	}
 }
 
+int CarManager::GetPassCars()
+{
+	int passCarCount = 0;
+	for (auto &e : playerCars_)
+	{
+		if (e->GetIsAlive())
+		{
+			if (e->GetIsPass())
+			{
+				e->Count();
+				passCarCount++;
+			}
+		}
+	}
+	for (auto &e : enemyCars_)
+	{
+		if (e->GetIsAlive())
+		{
+
+			if (e->GetIsPass())
+			{
+				e->Count();
+				passCarCount++;
+			}
+		}
+	}
+	return passCarCount;
+}
+
+bool CarManager::GetAnyCarStop()
+{
+	bool isStop = false;
+	for (auto &e : playerCars_)
+	{
+		if (e->GetIsAlive())
+		{
+			if (e->GetIsSignalStop())
+			{
+			isStop = true;
+			break;
+			}
+		}
+	}
+	return isStop;
+}
+
 bool CarManager::AddEnemyCar()
 {
-	CarInitializeDesc desc;
+	CarInitializeDesc desc = normalCar;
 	bool isSpawn = false;
 	desc.angle = Vector3(0, 0, -1);
-	desc.startPos = Vector3(20.0f, 0.0f, 100.0f);
+	desc.startPos = Vector3(sCarWidthPos, 0.0f, 500.0f);
 	desc.isPlayer = false;
 
-	desc.speed = 0.3f;
+	desc.speed = 0.6f;
 	desc.type = testEnemy;
 
 	if (testEnemy == MoveType::STRAIGHT)
@@ -155,11 +207,11 @@ bool CarManager::AddEnemyCar()
 
 bool CarManager::AddPlayerCar()
 {
-	CarInitializeDesc desc;
+	CarInitializeDesc desc = normalCar;
 	bool isSpawn = false;
 	desc.angle = Vector3(0, 0, 1);
-	desc.startPos = Vector3(0.0f, 0.0f, -100.0f);
-	desc.speed = 0.3f;
+	desc.startPos = Vector3(-sCarWidthPos, 0.0f, -300.0f);
+	desc.speed = 1.0f;
 	desc.isPlayer = true;
 	desc.type = testPlayer;
 	if (testPlayer == MoveType::STRAIGHT)

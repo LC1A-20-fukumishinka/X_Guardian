@@ -7,6 +7,7 @@
 #include "Collision.h"
 #include <cstdlib>
 #include "CarManager.h"
+#include "GameManager.h"
 //test
 using namespace DxLib;
 void DrawAxis3D(const float length);
@@ -24,8 +25,8 @@ enum class Mode
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	LPSTR lpCmdLine, int nCmdShow)
 {
-	const int WindowWidth = 1600;
-	const int WindowHeight = 900;
+	const int WindowWidth = 1280;
+	const int WindowHeight = 720;
 
 	ChangeWindowMode(true);
 	SetGraphMode(WindowWidth, WindowHeight, 32);
@@ -36,11 +37,19 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
 	SetUseZBuffer3D(TRUE);
 	SetWriteZBuffer3D(TRUE);
-	Vector3 cameraOrgPosition(10.0f, 200.0f, 30.0f);
-	Vector3 cameraPosition = cameraOrgPosition;
-	Vector3 cameraTarget(10.0f, 0.0f, 30.0f);
+	//通常
 
-	Vector3 cameraOrgUp(0.0f, 0.0f, 1.0f);
+	float camZPos = -50;
+	Vector3 cameraOrgPosition(0.0f, 70.0f, -130.0f + camZPos);
+	Vector3 cameraOrgUp(0.0f, 1.0f, 0.0f);
+
+	//デバッグ
+	//Vector3 cameraOrgPosition(0.0f, 200.0f, 0.0f);
+	//Vector3 cameraOrgUp(0.0f, 0.0f, 1.0f);
+
+	Vector3 cameraPosition = cameraOrgPosition;
+	Vector3 cameraTarget(0.0f, 0.0f, 0.0f + camZPos);
+
 	Vector3 cameraUp = cameraOrgUp;
 
 	float cameraRightAngle = 0.0f;
@@ -50,24 +59,24 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	SetCameraScreenCenter(WindowWidth / 2.0f, WindowHeight / 2.0f);
 	SetCameraPositionAndTargetAndUpVec(cameraPosition, cameraTarget, cameraUp);
 
-	int model = MV1LoadModel("car/car.mqo");
+	int model = MV1LoadModel("cross_road/cross_road.mv1");
+	//int model = MV1LoadModel("city/city.mv1");
 
-	Vector3 BasePos(-30, 0, -30);
+	Vector3 BasePos(0, 0, 225);
 	Sphere sphere(BasePos, 5, GetColor(0, 0, 255));
 
-	Matrix4 matScale = scale(Vector3(0.02f, 0.02f, 0.01f));
+	Matrix4 matScale = scale(Vector3(0.08f, 0.08f, 0.08f));
 	Matrix4 matRot = rotate(quaternion(Vector3(0, 1, 0), 3.14));
 	Matrix4 matTrans = translate(BasePos);
 
 
-	Quaternion qLocal = quaternion(Vector3(0.0f, 1.0f, 0.0f),3.14f);
+	Quaternion qLocal = quaternion(Vector3(0.0f, 1.0f, 0.0f),0);
 
 	Capsule targetCapsule(Vector3(-10, -20, 0), Vector3(+10, +20, 0), 10, GetColor(0, 0, 255));
 
 	Sphere targetSphere(Vector3(-30, 0, 0), 10, GetColor(0, 0, 255));
 
 	Box targetBox(Vector3(+10, -20, -10), Vector3(+30, +20, +10), GetColor(0, 255, 0));
-
 
 
 
@@ -82,9 +91,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	float rotZ = 0.0f;
 	Vector3 frontVec = {0, 0, 1};
 
-	CarManager testCar;
+	Car::LoadModel();
 
+	CarManager carManager;
+	GameManager scoreManager;
+	scoreManager.Init();
 	int spawnTimer = 60;
+
+	SetGlobalAmbientLight(GetColorF(1.0f, 0.3f, 0.3f, 0.5f));
 	//ゲームループ
 	while (ProcessMessage() == 0 && CheckHitKey(KEY_INPUT_ESCAPE) == 0)
 	{
@@ -93,10 +107,10 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 		rotX = rotY = rotZ = 0.0f;
 
 		float speedRate = 0.0f;
-		if (CheckHitKey(KEY_INPUT_A)) rotY = -ROT_UNIT;
-		if (CheckHitKey(KEY_INPUT_D)) rotY = +ROT_UNIT;
-		if (CheckHitKey(KEY_INPUT_W)) speedRate = 1.0f;
-		if (CheckHitKey(KEY_INPUT_S)) speedRate = -1.0f;
+		//if (CheckHitKey(KEY_INPUT_A)) rotY = -ROT_UNIT;
+		//if (CheckHitKey(KEY_INPUT_D)) rotY = +ROT_UNIT;
+		//if (CheckHitKey(KEY_INPUT_W)) speedRate = 1.0f;
+		//if (CheckHitKey(KEY_INPUT_S)) speedRate = -1.0f;
 
 		Quaternion tmpQ = quaternion(Vector3(0, 1, 0), qLocal);
 		Vector3 vUpAxis = getAxis(tmpQ);
@@ -162,13 +176,22 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 		spawnTimer--;
 		if (spawnTimer <= 0)
 		{
-			spawnTimer = 300;
-			testCar.AddPlayerCar();
-			testCar.AddEnemyCar();
+			spawnTimer = 180;
+			carManager.AddPlayerCar();
+			carManager.AddEnemyCar();
 		}
 
-		testCar.Update();
+		carManager.Update();
+		int passCarCount = carManager.GetPassCars();
+		for (int i = 0; i < passCarCount; i++)
+		{
+			scoreManager.PassCar();
+		}
 
+		if (carManager.GetAnyCarStop())
+		{
+			scoreManager.StopCar();
+		}
 		//描画
 		ClearDrawScreen();
 		DrawAxis3D(200.0f);
@@ -178,7 +201,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 		MV1DrawModel(model);
 		DrawKeyOperation();
 
-		testCar.Draw();
+		carManager.Draw();
+
+		scoreManager.Draw();
 		//フリップする
 		ScreenFlip();
 	}
@@ -211,16 +236,16 @@ void DrawFloorLine()
 	DrawLine3D(Vector3(0, 0, -lineLength), Vector3(0, 0, +lineLength), color);
 	DrawLine3D(Vector3(-lineLength, 0, 0), Vector3(+lineLength, 0, 0), color);
 
-	for (int i = 1; i * width < 500; i++)
-	{
-		float linePos = i * width;
-		//Z軸線
-		DrawLine3D(Vector3(linePos, 0, -lineLength), Vector3(linePos, 0, +lineLength), color);
-		DrawLine3D(Vector3(-linePos, 0, -lineLength), Vector3(-linePos, 0, +lineLength), color);
-		//
-		DrawLine3D(Vector3(-lineLength, 0, linePos), Vector3(+lineLength, 0, linePos), color);
-		DrawLine3D(Vector3(-lineLength, 0, -linePos), Vector3(+lineLength, 0, -linePos), color);
+	//for (int i = 1; i * width < 500; i++)
+	//{
+	//	float linePos = i * width;
+	//	//Z軸線
+	//	DrawLine3D(Vector3(linePos, 0, -lineLength), Vector3(linePos, 0, +lineLength), color);
+	//	DrawLine3D(Vector3(-linePos, 0, -lineLength), Vector3(-linePos, 0, +lineLength), color);
+	//	//
+	//	DrawLine3D(Vector3(-lineLength, 0, linePos), Vector3(+lineLength, 0, linePos), color);
+	//	DrawLine3D(Vector3(-lineLength, 0, -linePos), Vector3(+lineLength, 0, -linePos), color);
 
-	}
+	//}
 
 }
