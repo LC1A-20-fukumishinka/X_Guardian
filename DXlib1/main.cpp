@@ -21,6 +21,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 		game.Draw();
 		//ƒtƒŠƒbƒv‚·‚é
 		ScreenFlip();
+		WaitTimer(20);
+
 	}
 	game.Finalize();
 	DxLib_End();

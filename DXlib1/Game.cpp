@@ -55,7 +55,7 @@ Game::Game()
 
 
 	gameManager.Init();
-
+	gameManager.SetCameraPos(cameraOrgPosition, cameraTarget);
 	OldScene = gameManager.GetStatus();
 }
 
@@ -93,7 +93,10 @@ void Game::Draw()
 	case GameStatus::SELECT:
 		break;
 	case GameStatus::INGAME:
+		if (!carManager.GetDeadAnimation())
+		{
 		carManager.DrwaHud();
+		}
 		break;
 	case GameStatus::RESULT:
 		break;
@@ -143,10 +146,17 @@ void Game::TitleUpdate()
 
 void Game::IngameUpdate()
 {
-	spawnTimer--;
+	if (carManager.GetDeadAnimation())
+	{
+		spawnTimer = 90;
+	}
+	else
+	{
+		spawnTimer--;
+	}
 	if (spawnTimer <= 0)
 	{
-		spawnTimer = 180;
+		spawnTimer = 90;
 		carManager.AddPlayerCar();
 		carManager.AddEnemyCar();
 	}
@@ -164,6 +174,8 @@ void Game::IngameUpdate()
 	{
 		gameManager.StopCar();
 	}
+
+	gameManager.SetIsDeadAnimation(carManager.GetDeadAnimation());
 }
 
 
@@ -228,10 +240,10 @@ void Game::SceneChange()
 	case GameStatus::SELECT:
 		break;
 	case GameStatus::INGAME:
-	carManager.Init();
+		carManager.Init();
 		break;
 	case GameStatus::RESULT:
-	carManager.EndGame();
+		carManager.EndGame();
 		break;
 	case GameStatus::PAUSE:
 		break;

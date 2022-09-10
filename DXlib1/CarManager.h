@@ -32,6 +32,8 @@ public:
 	void DrwaHud();
 
 	void LoadGraphics();
+
+	bool GetDeadAnimation();
 private:
 	void IngameUpdate();
 

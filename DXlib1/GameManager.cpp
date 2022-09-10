@@ -1,5 +1,8 @@
 #include "GameManager.h"
 #include "DxLib.h"
+#include "EaseClass.h"
+#include <algorithm>
+#include "Matrix4.h"
 GameManager::GameManager()
 {
 }
@@ -12,13 +15,21 @@ void GameManager::Init()
 {
 	score = 0;
 	combo = 0;
+	cameraDeadAnimationPos_ = Vector3(0.0f, 30.0f, -20.0f);
 }
 
 void GameManager::Update()
 {
 
 	bool isGameOver = false;
+	float easeRate = Easing::easeOutQuad(animationRate);
 
+
+	Vector3 angle;
+	Vector3 animationEndPos;
+	Vector3 distance;
+	Vector3 easePos;
+	Vector3 easeTargetPos;
 	switch (status_)
 	{
 	case GameStatus::TITLE:
@@ -40,6 +51,30 @@ void GameManager::Update()
 		{
 			ToResult();
 		}
+
+
+		if (isDeadAnimation_)
+		{
+			animationRate += 0.1f;
+			rotation += 0.002f;
+		}
+		else
+		{
+			animationRate -= 0.1f;
+			rotation = 0.0f;
+		}
+
+		animationRate = std::clamp(animationRate, 0.0f, 1.0f);
+
+		angle = transform(cameraDeadAnimationPos_, rotationY(rotation));
+
+		easeTargetPos = (cameraBaseTargetPos_ * (1 - animationRate));
+		animationEndPos = angle + easeTargetPos;
+		distance = animationEndPos - cameraBasePos_;
+
+
+		easePos = cameraBasePos_ + (distance * animationRate);
+		SetCameraPositionAndTargetAndUpVec(easePos, easeTargetPos, Vector3(0.0f, 1.0f, 0.0f));
 
 		break;
 	case GameStatus::RESULT:
@@ -126,6 +161,18 @@ GameStatus GameManager::GetStatus()
 void GameManager::NormaCount()
 {
 	normaCars++;
+}
+
+void GameManager::SetCameraPos(Vector3 camPos, Vector3 targetPos)
+{
+	cameraBasePos_ = camPos;
+	cameraBaseTargetPos_ = targetPos;
+
+}
+
+void GameManager::SetIsDeadAnimation(bool isDeadAnimation)
+{
+	isDeadAnimation_ = isDeadAnimation;
 }
 
 void GameManager::ToIngame()

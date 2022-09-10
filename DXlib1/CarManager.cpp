@@ -6,7 +6,7 @@ using namespace std;
 const float CarManager::sCarWidthPos = 10.0f;
 CarInitializeDesc CarManager::normalCar;
 float CarManager::sGameSpeed = 1.0f;
-const int CarManager::sDeadAnimationTimerMax = 120;
+const int CarManager::sDeadAnimationTimerMax = 150;
 
 int CarManager::up, CarManager::right, CarManager::down, CarManager::left;
 
@@ -294,6 +294,11 @@ void CarManager::LoadGraphics()
 	left = LoadGraph("Resources/Texture/leftArrow.png");
 }
 
+bool CarManager::GetDeadAnimation()
+{
+return isDeadAnimation_;
+}
+
 void CarManager::IngameUpdate()
 {
 
@@ -359,7 +364,7 @@ bool CarManager::AddEnemyCar()
 	desc.startPos = Vector3(sCarWidthPos, 0.0f, 500.0f);
 	desc.isPlayer = false;
 
-	desc.speed = 0.6f;
+	desc.speed = 1.8f;
 	desc.type = testEnemy;
 
 	if (testEnemy == MoveType::STRAIGHT)
@@ -401,7 +406,7 @@ bool CarManager::AddPlayerCar()
 	bool isSpawn = false;
 	desc.angle = Vector3(0, 0, 1);
 	desc.startPos = Vector3(-sCarWidthPos, 0.0f, -300.0f);
-	desc.speed = 1.0f;
+	desc.speed = 3.0f;
 	desc.isPlayer = true;
 	desc.type = testPlayer;
 	if (testPlayer == MoveType::STRAIGHT)

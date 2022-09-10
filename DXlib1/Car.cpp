@@ -14,8 +14,8 @@ float Car::sGameSpeed = 1.0f;
 
 MoveType Car::sInputSignal = MoveType::STRAIGHT;
 
-const int Car::sMaxEnemyStopTimer = 120;
-const int Car::sMaxDerayTimer = 30;
+const int Car::sMaxEnemyStopTimer = 60;
+const int Car::sMaxDerayTimer = 20;
 
 const float Car::sCarDistanceLimit = 10.0f;
 int Car::sNormalCarModelHandle = -1;
