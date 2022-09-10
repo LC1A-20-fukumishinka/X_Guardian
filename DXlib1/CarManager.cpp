@@ -4,6 +4,8 @@ using namespace std;
 
 const float CarManager::sCarWidthPos = 10.0f;
 CarInitializeDesc CarManager::normalCar;
+float CarManager::sGameSpeed = 1.0f;
+const int CarManager::sDeadAnimationTimerMax = 120;
 CarManager::CarManager()
 {
 	playerCars_.reserve(30);
@@ -35,22 +37,43 @@ void CarManager::Init()
 
 void CarManager::Update()
 {
-	Collision();
+	Car::SetGameSpeed(sGameSpeed);
 
-	for (auto &e : playerCars_)
+
+	if (isDeadAnimation_)
 	{
-		if (e->GetIsAlive())
+		deadAnimationTimer_++;
+		deadPlayerCar_.lock()->Update();
+		deadEnemyCar_.lock()->Update();
+
+		if (deadAnimationTimer_ >= sDeadAnimationTimerMax)
 		{
-			e->Update();
+		isDeadAnimation_ = false;
+		deadPlayerCar_.lock()->Dead();
+		deadEnemyCar_.lock()->Dead();
+		sGameSpeed = 1.0f;
 		}
 	}
-	for (auto &e : enemyCars_)
+	else
 	{
-		if (e->GetIsAlive())
+		Collision();
+
+		for (auto &e : playerCars_)
 		{
-			e->Update();
+			if (e->GetIsAlive())
+			{
+				e->Update();
+			}
+		}
+		for (auto &e : enemyCars_)
+		{
+			if (e->GetIsAlive())
+			{
+				e->Update();
+			}
 		}
 	}
+
 }
 
 void CarManager::Finalize()
@@ -108,8 +131,12 @@ void CarManager::Collision()
 					bool isHit = Collision::testCapsuleCapsule(*pCar->GetCapsule(), *eCar->GetCapsule());
 					if (isHit)
 					{
-						pCar->Dead();
-						eCar->Dead();
+						deadPlayerCar_ = pCar;
+						deadEnemyCar_ = eCar;
+						isDeadAnimation_ = true;
+						deadAnimationTimer_ = 0;
+						sGameSpeed = 0.01f;
+						break;
 					}
 				}
 			}
@@ -155,8 +182,8 @@ bool CarManager::GetAnyCarStop()
 		{
 			if (e->GetIsSignalStop())
 			{
-			isStop = true;
-			break;
+				isStop = true;
+				break;
 			}
 		}
 	}

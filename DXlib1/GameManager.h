@@ -39,7 +39,7 @@ private:
 	int score = 0;
 	int combo = 0;
 
-	int maxNormaCount = 5;
+	int maxNormaCount = 50;
 
 	int normaCars = 0;
 	int TimeLimit = 6500;

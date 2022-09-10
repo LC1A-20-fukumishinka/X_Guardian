@@ -24,7 +24,7 @@ Game::Game()
 	float cameraUpAngle = 0.0f;
 
 
-	model = MV1LoadModel("cross_road/cross_road.mv1");
+	model = MV1LoadModel("Resources/cross_road/cross_road.mv1");
 	//int model = MV1LoadModel("city/city.mv1");
 
 	Vector3 BasePos(0, 0, 225);

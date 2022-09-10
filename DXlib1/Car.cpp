@@ -8,9 +8,9 @@ const float Car::sStopPos = 20.0f + sTurnStartPos;
 const float Car::sStopLength = 10.0f;
 
 const float Car::sPassWidth = sStopPos;
-const float Car::sEraseWidth = 100.0f;
+const float Car::sEraseWidth = 200.0f;
 const float Car::sEraseDepth = 600.0f;
-
+float Car::sGameSpeed = 1.0f;
 
 MoveType Car::sInputSignal = MoveType::STRAIGHT;
 
@@ -109,6 +109,7 @@ void Car::Update()
 
 	float inputSpeed = speed_;
 
+	 inputSpeed *= sGameSpeed;
 	if (isPlayer_ && !isCrossIn && sInputSignal == MoveType::STOP )
 	{
 		inputSpeed /= 2.0f;
@@ -240,9 +241,14 @@ void Car::SetSignal(MoveType isStopSignal)
 	sInputSignal = isStopSignal;
 }
 
+void Car::SetGameSpeed(float speed)
+{
+	sGameSpeed = speed;
+}
+
 void Car::LoadModel()
 {
-	sNormalCarModelHandle = MV1LoadModel("car/car.mv1");
+	sNormalCarModelHandle = MV1LoadModel("Resources/car/car.mv1");
 }
 
 void Car::CapsuleMove()
@@ -279,8 +285,9 @@ void Car::RightTurnMove()
 	}
 	else
 	{
+		float inputspeed = speed_* sGameSpeed;
 		//ê˘âÒèàóù
-		angle_ = angle_ * rotationY(0.02f * (speed_ / 0.3f));
+		angle_ = angle_ * rotationY(0.02f * (inputspeed / 0.3f));
 	}
 }
 
