@@ -17,21 +17,33 @@ public:
 	Game();
 	~Game();
 	void Init();
-	void Update();
 	void Finalize();
 	void Draw();
+	void Update();
 private:
+	void TitleUpdate();
+	void IngameUpdate();
+private:
+	void BaseInitialize();
+
 	void DrawAxis3D(const float length);
 
 	void DrawFloorLine();
 
+	void SceneChange();
 public:
 	int model;
 	int spawnTimer = 60;
-
+	float camZPos = -50;
 	Matrix4 matWorld;
 
 	CarManager carManager;
 	GameManager gameManager;
+	Vector3 cameraPosition;
+	Vector3 cameraTarget;
+
+	Vector3 cameraUp;
+
+	GameStatus OldScene;
 };
 

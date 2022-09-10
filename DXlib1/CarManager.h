@@ -23,6 +23,8 @@ public:
 	int GetPassCars();
 
 	bool GetAnyCarStop();
+
+	void EndGame();
 private:
 	static const float sCarWidthPos;
 

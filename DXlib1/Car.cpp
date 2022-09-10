@@ -109,7 +109,7 @@ void Car::Update()
 
 	float inputSpeed = speed_;
 
-	if (isPlayer_ && !isCrossIn && sInputSignal == MoveType::STOP)
+	if (isPlayer_ && !isCrossIn && sInputSignal == MoveType::STOP )
 	{
 		inputSpeed /= 2.0f;
 	}
@@ -305,10 +305,10 @@ bool Car::JudgmentToStop(bool isCrossIn)
 	//停止指示中
 	bool isStopSignal = false;
 
-	if (isPlayer_)
+	if (isPlayer_ )
 	{
 		//プレイヤーだったら
-		isStopSignal = !(type_ == sInputSignal);
+		isStopSignal = !(type_ == sInputSignal || sInputSignal == MoveType::ALLOK);
 	}
 	else if (isStopPosIn && (enemyStopTimer_ > 0) && type_ == MoveType::RIGHTTURN)
 	{

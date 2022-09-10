@@ -2,21 +2,8 @@
 
 Game::Game()
 {
-	const int WindowWidth = 1280;
-	const int WindowHeight = 720;
-
-	ChangeWindowMode(true);
-	SetGraphMode(WindowWidth, WindowHeight, 32);
-	SetBackgroundColor(0, 0, 64);
-	SetWindowText(_T("十字路の守護神"));
-	if (DxLib_Init() == -1)return;
-	SetDrawScreen(DX_SCREEN_BACK);
-
-	SetUseZBuffer3D(TRUE);
-	SetWriteZBuffer3D(TRUE);
 
 	//通常
-	float camZPos = -50;
 	Vector3 cameraOrgPosition(0.0f, 70.0f, -130.0f + camZPos);
 	Vector3 cameraOrgUp(0.0f, 1.0f, 0.0f);
 
@@ -24,17 +11,18 @@ Game::Game()
 	//Vector3 cameraOrgPosition(0.0f, 200.0f, 0.0f);
 	//Vector3 cameraOrgUp(0.0f, 0.0f, 1.0f);
 
-	Vector3 cameraPosition = cameraOrgPosition;
-	Vector3 cameraTarget(0.0f, 0.0f, 0.0f + camZPos);
+	cameraPosition = cameraOrgPosition;
+	cameraTarget = Vector3(0.0f, 0.0f, 0.0f + camZPos);
 
-	Vector3 cameraUp = cameraOrgUp;
+	cameraUp = cameraOrgUp;
+
+	BaseInitialize();
+
+
 
 	float cameraRightAngle = 0.0f;
 	float cameraUpAngle = 0.0f;
-	//クリップ面
-	SetCameraNearFar(1.0f, 10000.0f);
-	SetCameraScreenCenter(WindowWidth / 2.0f, WindowHeight / 2.0f);
-	SetCameraPositionAndTargetAndUpVec(cameraPosition, cameraTarget, cameraUp);
+
 
 	model = MV1LoadModel("cross_road/cross_road.mv1");
 	//int model = MV1LoadModel("city/city.mv1");
@@ -68,7 +56,7 @@ Game::Game()
 
 	gameManager.Init();
 
-	SetGlobalAmbientLight(GetColorF(1.0f, 0.3f, 0.3f, 0.5f));
+	OldScene = gameManager.GetStatus();
 }
 
 Game::~Game()
@@ -78,49 +66,6 @@ Game::~Game()
 void Game::Init()
 {
 	Car::LoadModel();
-
-}
-
-void Game::Update()
-{
-	int passCarCount = 0;
-	//更新
-	switch (gameManager.GetStatus())
-	{
-	case GameStatus::TITLE:
-		break;
-	case GameStatus::SELECT:
-		break;
-	case GameStatus::INGAME:
-
-		spawnTimer--;
-		if (spawnTimer <= 0)
-		{
-			spawnTimer = 180;
-			carManager.AddPlayerCar();
-			carManager.AddEnemyCar();
-		}
-
-		carManager.Update();
-		passCarCount = carManager.GetPassCars();
-		for (int i = 0; i < passCarCount; i++)
-		{
-			gameManager.PassCar();
-		}
-
-		if (carManager.GetAnyCarStop())
-		{
-			gameManager.StopCar();
-		}
-		break;
-	case GameStatus::RESULT:
-		break;
-	case GameStatus::PAUSE:
-		break;
-	default:
-		break;
-	}
-	gameManager.Update();
 }
 
 void Game::Finalize()
@@ -139,6 +84,90 @@ void Game::Draw()
 	carManager.Draw();
 
 	gameManager.Draw();
+}
+
+void Game::Update()
+{
+	//更新
+	switch (gameManager.GetStatus())
+	{
+	case GameStatus::TITLE:
+		carManager.Update();
+		break;
+	case GameStatus::SELECT:
+		break;
+	case GameStatus::INGAME:
+		IngameUpdate();
+		break;
+	case GameStatus::RESULT:
+		carManager.Update();
+		break;
+	case GameStatus::PAUSE:
+		break;
+	default:
+		break;
+	}
+	gameManager.Update();
+
+
+	if (OldScene != gameManager.GetStatus())
+	{
+		SceneChange();
+	}
+	OldScene = gameManager.GetStatus();
+
+}
+
+void Game::TitleUpdate()
+{
+	carManager.Update();
+}
+
+void Game::IngameUpdate()
+{
+	spawnTimer--;
+	if (spawnTimer <= 0)
+	{
+		spawnTimer = 180;
+		carManager.AddPlayerCar();
+		carManager.AddEnemyCar();
+	}
+
+
+	carManager.SetSignal();
+	carManager.Update();
+	int passCarCount = carManager.GetPassCars();
+	for (int i = 0; i < passCarCount; i++)
+	{
+		gameManager.PassCar();
+	}
+
+	if (carManager.GetAnyCarStop())
+	{
+		gameManager.StopCar();
+	}
+}
+
+
+void Game::BaseInitialize()
+{
+	const int WindowWidth = 1280;
+	const int WindowHeight = 720;
+
+	ChangeWindowMode(true);
+	SetGraphMode(WindowWidth, WindowHeight, 32);
+	SetBackgroundColor(0, 0, 64);
+	SetWindowText(_T("十字路の守護神"));
+	if (DxLib_Init() == -1)return;
+	SetDrawScreen(DX_SCREEN_BACK);
+
+	SetUseZBuffer3D(TRUE);
+	SetWriteZBuffer3D(TRUE);
+
+	//クリップ面
+	SetCameraNearFar(1.0f, 10000.0f);
+	SetCameraScreenCenter(WindowWidth / 2.0f, WindowHeight / 2.0f);
+	SetCameraPositionAndTargetAndUpVec(cameraPosition, cameraTarget, cameraUp);
 }
 
 void Game::DrawAxis3D(const float length)
@@ -170,3 +199,26 @@ void Game::DrawFloorLine()
 	//}
 
 }
+
+void Game::SceneChange()
+{
+	//シーン切り替え処理
+	switch (gameManager.GetStatus())
+	{
+	case GameStatus::TITLE:
+		break;
+	case GameStatus::SELECT:
+		break;
+	case GameStatus::INGAME:
+	carManager.Init();
+		break;
+	case GameStatus::RESULT:
+	carManager.EndGame();
+		break;
+	case GameStatus::PAUSE:
+		break;
+	default:
+		break;
+	}
+}
+

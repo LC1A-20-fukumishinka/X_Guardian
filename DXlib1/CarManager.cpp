@@ -29,12 +29,12 @@ CarManager::~CarManager()
 
 void CarManager::Init()
 {
+	Car::SetSignal(MoveType::STRAIGHT);
+
 }
 
 void CarManager::Update()
 {
-	SetSignal();
-
 	Collision();
 
 	for (auto &e : playerCars_)
@@ -161,6 +161,11 @@ bool CarManager::GetAnyCarStop()
 		}
 	}
 	return isStop;
+}
+
+void CarManager::EndGame()
+{
+	Car::SetSignal(MoveType::ALLOK);
 }
 
 bool CarManager::AddEnemyCar()

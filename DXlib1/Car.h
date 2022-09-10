@@ -7,6 +7,7 @@ enum class MoveType
 	STRAIGHT,
 	RIGHTTURN,
 	STOP,
+	ALLOK,
 };
 
 struct CarInitializeDesc
