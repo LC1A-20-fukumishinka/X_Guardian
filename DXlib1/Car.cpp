@@ -19,6 +19,7 @@ const int Car::sMaxDerayTimer = 30;
 
 const float Car::sCarDistanceLimit = 10.0f;
 int Car::sNormalCarModelHandle = -1;
+
 Car::Car()
 {
 	const unsigned int color = GetColor(255, 255, 255);
@@ -249,6 +250,7 @@ void Car::SetGameSpeed(float speed)
 void Car::LoadModel()
 {
 	sNormalCarModelHandle = MV1LoadModel("Resources/car/car.mv1");
+
 }
 
 void Car::CapsuleMove()

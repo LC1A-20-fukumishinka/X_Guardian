@@ -66,6 +66,7 @@ Game::~Game()
 void Game::Init()
 {
 	Car::LoadModel();
+	carManager.LoadGraphics();
 }
 
 void Game::Finalize()
@@ -84,6 +85,23 @@ void Game::Draw()
 	carManager.Draw();
 
 	gameManager.Draw();
+
+	switch (gameManager.GetStatus())
+	{
+	case GameStatus::TITLE:
+		break;
+	case GameStatus::SELECT:
+		break;
+	case GameStatus::INGAME:
+		carManager.DrwaHud();
+		break;
+	case GameStatus::RESULT:
+		break;
+	case GameStatus::PAUSE:
+		break;
+	default:
+		break;
+	}
 }
 
 void Game::Update()

@@ -1,11 +1,15 @@
 #include "CarManager.h"
 #include "Collision.h"
+#include "DxLib.h"
 using namespace std;
 
 const float CarManager::sCarWidthPos = 10.0f;
 CarInitializeDesc CarManager::normalCar;
 float CarManager::sGameSpeed = 1.0f;
 const int CarManager::sDeadAnimationTimerMax = 120;
+
+int CarManager::up, CarManager::right, CarManager::down, CarManager::left;
+
 CarManager::CarManager()
 {
 	playerCars_.reserve(30);
@@ -23,6 +27,7 @@ CarManager::CarManager()
 
 	normalCar.length = 11.0f;
 	normalCar.radius = 4.0f;
+
 }
 
 CarManager::~CarManager()
@@ -32,48 +37,41 @@ CarManager::~CarManager()
 void CarManager::Init()
 {
 	Car::SetSignal(MoveType::STRAIGHT);
-
+	isIngame_ = true;
+	SetGameSpeed(1.0f);
 }
 
 void CarManager::Update()
 {
 	Car::SetGameSpeed(sGameSpeed);
 
-
-	if (isDeadAnimation_)
+	if (isIngame_)
 	{
-		deadAnimationTimer_++;
-		deadPlayerCar_.lock()->Update();
-		deadEnemyCar_.lock()->Update();
-
-		if (deadAnimationTimer_ >= sDeadAnimationTimerMax)
-		{
-		isDeadAnimation_ = false;
-		deadPlayerCar_.lock()->Dead();
-		deadEnemyCar_.lock()->Dead();
-		sGameSpeed = 1.0f;
-		}
+		IngameUpdate();
 	}
 	else
 	{
-		Collision();
-
-		for (auto &e : playerCars_)
-		{
-			if (e->GetIsAlive())
-			{
-				e->Update();
-			}
-		}
-		for (auto &e : enemyCars_)
-		{
-			if (e->GetIsAlive())
-			{
-				e->Update();
-			}
-		}
+		OutGameUpdate();
 	}
 
+	alivePlayerCars_.remove_if([](std::weak_ptr<Car> &x)
+		{
+			bool test = (!x.lock()->GetIsAlive() || x.lock()->GetIsPass());
+
+			if (test)
+			{
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+
+		});
+	aliveEnemyCars_.remove_if([](std::weak_ptr<Car> &x)
+		{
+			return (!x.lock()->GetIsAlive() || x.lock()->GetIsPass());
+		});
 }
 
 void CarManager::Finalize()
@@ -135,7 +133,8 @@ void CarManager::Collision()
 						deadEnemyCar_ = eCar;
 						isDeadAnimation_ = true;
 						deadAnimationTimer_ = 0;
-						sGameSpeed = 0.01f;
+						SetGameSpeed(0.01f);
+						Car::SetSignal(MoveType::STOP);
 						break;
 					}
 				}
@@ -193,6 +192,163 @@ bool CarManager::GetAnyCarStop()
 void CarManager::EndGame()
 {
 	Car::SetSignal(MoveType::ALLOK);
+
+	SetGameSpeed(3.0f);
+
+	isIngame_ = false;
+}
+
+void CarManager::SetGameSpeed(float speed)
+{
+	sGameSpeed = speed;
+}
+
+void CarManager::DrwaHud()
+{
+	if (!alivePlayerCars_.empty())
+	{
+		bool isNotFirst = false;
+		int carsCount = 0;
+		for (auto &e : alivePlayerCars_)
+		{
+			int drawHandle = -1;
+			if (e.lock()->GetMoveType() == MoveType::STRAIGHT)
+			{
+				drawHandle = up;
+			}
+			else
+			{
+				drawHandle = right;
+			}
+			int x = 200, y = 300;
+			
+			if (isNotFirst)
+			{
+				DrawExtendGraph(x-23, y + (20 * (carsCount - 1)), x - 3, y + (20 * (carsCount)), drawHandle, TRUE);
+
+			}
+			else
+			{
+				DrawExtendGraph(x, y, x + 100, y + 100, drawHandle, TRUE);
+				isNotFirst = true;
+			}
+			carsCount++;
+		}
+	}
+
+	if (!aliveEnemyCars_.empty())
+	{
+		bool isNotFirst = false;
+		int carsCount = 0;
+		for (auto &e : aliveEnemyCars_)
+		{
+			int drawHandle = -1;
+			if (e.lock()->GetMoveType() == MoveType::STRAIGHT)
+			{
+				drawHandle = down;
+			}
+			else
+			{
+				drawHandle = left;
+			}
+
+			int x = 700, y = 100;
+			if (isNotFirst)
+			{
+				DrawExtendGraph(x + 3 + 100, y + (20 * (carsCount - 1)), x  + 23 + 100, y + (20 * (carsCount)), drawHandle, TRUE);
+
+			}
+			else
+			{
+				DrawExtendGraph(x, y, x + 100, y + 100, drawHandle, TRUE);
+				isNotFirst = true;
+			}
+			carsCount++;
+		}
+	}
+
+	int inputDrawHandle = -1;
+	if (inputSignal == MoveType::STRAIGHT)
+	{
+		inputDrawHandle = up;
+	}
+	else if(inputSignal == MoveType::RIGHTTURN)
+	{
+		inputDrawHandle = right;
+	}
+	else
+	{
+		inputDrawHandle = down;
+	}
+
+	int x = 700, y = 300;
+	DrawExtendGraph(x, y, x + 100, y + 100, inputDrawHandle, TRUE);
+
+}
+
+void CarManager::LoadGraphics()
+{
+	up = LoadGraph("Resources/Texture/upArrow.png");
+	right = LoadGraph("Resources/Texture/rightArrow.png");
+	down = LoadGraph("Resources/Texture/dawnArrow.png");
+	left = LoadGraph("Resources/Texture/leftArrow.png");
+}
+
+void CarManager::IngameUpdate()
+{
+
+	if (isDeadAnimation_)
+	{
+		deadAnimationTimer_++;
+		deadPlayerCar_.lock()->Update();
+		deadEnemyCar_.lock()->Update();
+
+		if (deadAnimationTimer_ >= sDeadAnimationTimerMax)
+		{
+			isDeadAnimation_ = false;
+			deadPlayerCar_.lock()->Dead();
+			deadEnemyCar_.lock()->Dead();
+			SetGameSpeed(1.0f);
+		}
+	}
+	else
+	{
+		Collision();
+
+		for (auto &e : playerCars_)
+		{
+			if (e->GetIsAlive())
+			{
+				e->Update();
+			}
+		}
+		for (auto &e : enemyCars_)
+		{
+			if (e->GetIsAlive())
+			{
+				e->Update();
+			}
+		}
+	}
+
+}
+
+void CarManager::OutGameUpdate()
+{
+	for (auto &e : playerCars_)
+	{
+		if (e->GetIsAlive())
+		{
+			e->Update();
+		}
+	}
+	for (auto &e : enemyCars_)
+	{
+		if (e->GetIsAlive())
+		{
+			e->Update();
+		}
+	}
 }
 
 bool CarManager::AddEnemyCar()
@@ -230,6 +386,8 @@ bool CarManager::AddEnemyCar()
 			}
 			//©•ª‚ªÅŒã”öÔ—¼‚É‚È‚é
 			enemyEndCar = e;
+
+			aliveEnemyCars_.emplace_back(e);
 			break;
 		}
 	}
@@ -269,6 +427,7 @@ bool CarManager::AddPlayerCar()
 			}
 			//©•ª‚ªÅŒã”öÔ—¼‚É‚È‚é
 			playerEndCar = e;
+			alivePlayerCars_.emplace_back(e);
 
 			break;
 		}

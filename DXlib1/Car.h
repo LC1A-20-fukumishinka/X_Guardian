@@ -62,6 +62,8 @@ private:
 	static const int sMaxDerayTimer;
 	static int sNormalCarModelHandle;
 	static float sGameSpeed;
+
+
 public:
 	static void SetSignal(MoveType isStopSignal);
 	static void LoadModel();
