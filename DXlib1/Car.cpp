@@ -19,6 +19,7 @@ const int Car::sMaxDerayTimer = 20;
 
 const float Car::sCarDistanceLimit = 10.0f;
 int Car::sNormalCarModelHandle = -1;
+int Car::sTrackCarModelHandle = -1;
 
 Car::Car()
 {
@@ -41,7 +42,7 @@ void Car::Init(Vector3 startPos, Vector3 angle, float length, float radius, floa
 	isAlive_ = true;
 	isPlayer_ = isPlayer;
 	type_ = type;
-
+	model_ = ModelType::NORMAL;
 	enemyStopTimer_ = 240;
 	//カプセルの初期化処理
 	colObject_->startPosition = frontPos_;
@@ -62,7 +63,7 @@ void Car::Init(CarInitializeDesc desc)
 	isAlive_ = true;
 	isPlayer_ = desc.isPlayer;
 	type_ = desc.type;
-
+	model_ = desc.model;
 	enemyStopTimer_ = sMaxEnemyStopTimer;
 	//カプセルの初期化処理
 	colObject_->startPosition = frontPos_;
@@ -140,6 +141,18 @@ void Car::Finalize()
 
 void Car::Draw()
 {
+
+	int drawModelHandle = -1;
+
+	if (model_ == ModelType::NORMAL)
+	{
+		drawModelHandle = sNormalCarModelHandle;
+	}
+	else
+	{
+		drawModelHandle = sTrackCarModelHandle;
+	}
+
 	Matrix4 worldMat;
 	worldMat = scale(Vector3(0.04f, 0.04f, 0.04f));
 
@@ -147,8 +160,10 @@ void Car::Draw()
 	worldMat *= Posture(carAngle, Vector3(0.0f, 1.0f, 0.0f));
 	worldMat *= rotationY(3.14);
 	worldMat *= translate(centerPos_);
-	MV1SetMatrix(sNormalCarModelHandle, worldMat);
-	MV1DrawModel(sNormalCarModelHandle);
+
+
+	MV1SetMatrix(drawModelHandle, worldMat);
+	MV1DrawModel(drawModelHandle);
 	colObject_->draw();
 }
 
@@ -176,6 +191,11 @@ Vector3 Car::GetFrontPos()
 MoveType Car::GetMoveType()
 {
 	return type_;
+}
+
+ModelType Car::GetModelType()
+{
+	return model_;
 }
 
 Capsule *Car::GetCapsule()
@@ -250,7 +270,7 @@ void Car::SetGameSpeed(float speed)
 void Car::LoadModel()
 {
 	sNormalCarModelHandle = MV1LoadModel("Resources/car/car.mv1");
-
+	sTrackCarModelHandle = MV1LoadModel("Resources/track/track.mv1");
 }
 
 void Car::CapsuleMove()
@@ -321,10 +341,9 @@ bool Car::JudgmentToStop(bool isCrossIn)
 	}
 	else if (isStopPosIn && (enemyStopTimer_ > 0) && type_ == MoveType::RIGHTTURN)
 	{
-		enemyStopTimer_--;
+		enemyStopTimer_-= static_cast<int>(1.0f * sGameSpeed);
 		isStopSignal = true;
 	}
-
 
 	//信号が赤だった    停止位置 & 停止指示中だった
 	bool isSignal = (isStopPosIn && isStopSignal);

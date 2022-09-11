@@ -45,5 +45,6 @@ public:
 	Vector3 cameraUp;
 
 	GameStatus OldScene;
+
 };
 

@@ -4,7 +4,8 @@
 using namespace std;
 
 const float CarManager::sCarWidthPos = 10.0f;
-CarInitializeDesc CarManager::normalCar;
+CarInitializeDesc CarManager::sNormalCar;
+CarInitializeDesc CarManager::sTrackCar;
 float CarManager::sGameSpeed = 1.0f;
 const int CarManager::sDeadAnimationTimerMax = 150;
 
@@ -25,9 +26,13 @@ CarManager::CarManager()
 		e = make_shared<Car>();
 	}
 
-	normalCar.length = 11.0f;
-	normalCar.radius = 4.0f;
+	sNormalCar.length = 11.0f;
+	sNormalCar.radius = 4.0f;
+	sNormalCar.model = ModelType::NORMAL;
 
+	sTrackCar.length = 15.0f;
+	sTrackCar.radius = 4.2f;
+	sTrackCar.model = ModelType::TRACK;
 }
 
 CarManager::~CarManager()
@@ -56,22 +61,19 @@ void CarManager::Update()
 
 	alivePlayerCars_.remove_if([](std::weak_ptr<Car> &x)
 		{
-			bool test = (!x.lock()->GetIsAlive() || x.lock()->GetIsPass());
-
-			if (test)
-			{
-				return true;
-			}
-			else
-			{
-				return false;
-			}
-
+			return (!x.lock()->GetIsAlive() || x.lock()->GetIsPass());
 		});
+
+
+
+
 	aliveEnemyCars_.remove_if([](std::weak_ptr<Car> &x)
 		{
 			return (!x.lock()->GetIsAlive() || x.lock()->GetIsPass());
 		});
+
+	playerBlast.Update();
+	enemyBlast.Update();
 }
 
 void CarManager::Finalize()
@@ -94,6 +96,8 @@ void CarManager::Draw()
 			e->Draw();
 		}
 	}
+	playerBlast.Draw();
+	enemyBlast.Draw();
 }
 
 void CarManager::SetSignal()
@@ -134,7 +138,7 @@ void CarManager::Collision()
 						isDeadAnimation_ = true;
 						deadAnimationTimer_ = 0;
 						SetGameSpeed(0.01f);
-						Car::SetSignal(MoveType::STOP);
+						inputSignal = MoveType::STOP;
 						break;
 					}
 				}
@@ -193,7 +197,7 @@ void CarManager::EndGame()
 {
 	Car::SetSignal(MoveType::ALLOK);
 
-	SetGameSpeed(3.0f);
+	SetGameSpeed(5.0f);
 
 	isIngame_ = false;
 }
@@ -221,10 +225,10 @@ void CarManager::DrwaHud()
 				drawHandle = right;
 			}
 			int x = 200, y = 300;
-			
+
 			if (isNotFirst)
 			{
-				DrawExtendGraph(x-23, y + (20 * (carsCount - 1)), x - 3, y + (20 * (carsCount)), drawHandle, TRUE);
+				DrawExtendGraph(x - 23, y + (20 * (carsCount - 1)), x - 3, y + (20 * (carsCount)), drawHandle, TRUE);
 
 			}
 			else
@@ -255,7 +259,7 @@ void CarManager::DrwaHud()
 			int x = 700, y = 100;
 			if (isNotFirst)
 			{
-				DrawExtendGraph(x + 3 + 100, y + (20 * (carsCount - 1)), x  + 23 + 100, y + (20 * (carsCount)), drawHandle, TRUE);
+				DrawExtendGraph(x + 3 + 100, y + (20 * (carsCount - 1)), x + 23 + 100, y + (20 * (carsCount)), drawHandle, TRUE);
 
 			}
 			else
@@ -272,7 +276,7 @@ void CarManager::DrwaHud()
 	{
 		inputDrawHandle = up;
 	}
-	else if(inputSignal == MoveType::RIGHTTURN)
+	else if (inputSignal == MoveType::RIGHTTURN)
 	{
 		inputDrawHandle = right;
 	}
@@ -290,13 +294,13 @@ void CarManager::LoadGraphics()
 {
 	up = LoadGraph("Resources/Texture/upArrow.png");
 	right = LoadGraph("Resources/Texture/rightArrow.png");
-	down = LoadGraph("Resources/Texture/dawnArrow.png");
+	down = LoadGraph("Resources/Texture/downArrow.png");
 	left = LoadGraph("Resources/Texture/leftArrow.png");
 }
 
 bool CarManager::GetDeadAnimation()
 {
-return isDeadAnimation_;
+	return isDeadAnimation_;
 }
 
 void CarManager::IngameUpdate()
@@ -314,6 +318,9 @@ void CarManager::IngameUpdate()
 			deadPlayerCar_.lock()->Dead();
 			deadEnemyCar_.lock()->Dead();
 			SetGameSpeed(1.0f);
+
+			playerBlast.Init(deadPlayerCar_.lock()->GetModelType(), deadPlayerCar_.lock()->GetFrontPos());
+			enemyBlast.Init(deadEnemyCar_.lock()->GetModelType(), deadEnemyCar_.lock()->GetFrontPos());
 		}
 	}
 	else
@@ -358,23 +365,21 @@ void CarManager::OutGameUpdate()
 
 bool CarManager::AddEnemyCar()
 {
-	CarInitializeDesc desc = normalCar;
+	int carType = rand() % 2;
+	CarInitializeDesc desc = sNormalCar;
+	desc.type = MoveType::STRAIGHT;
+	if (carType == 1)
+	{
+		desc = sTrackCar;
+		desc.type = MoveType::RIGHTTURN;
+	}
 	bool isSpawn = false;
 	desc.angle = Vector3(0, 0, -1);
 	desc.startPos = Vector3(sCarWidthPos, 0.0f, 500.0f);
 	desc.isPlayer = false;
 
-	desc.speed = 1.8f;
-	desc.type = testEnemy;
+	desc.speed = 1.4f;
 
-	if (testEnemy == MoveType::STRAIGHT)
-	{
-		testEnemy = MoveType::RIGHTTURN;
-	}
-	else
-	{
-		testEnemy = MoveType::STRAIGHT;
-	}
 
 	for (auto &e : enemyCars_)
 	{
@@ -402,41 +407,42 @@ bool CarManager::AddEnemyCar()
 
 bool CarManager::AddPlayerCar()
 {
-	CarInitializeDesc desc = normalCar;
-	bool isSpawn = false;
-	desc.angle = Vector3(0, 0, 1);
-	desc.startPos = Vector3(-sCarWidthPos, 0.0f, -300.0f);
-	desc.speed = 3.0f;
-	desc.isPlayer = true;
-	desc.type = testPlayer;
-	if (testPlayer == MoveType::STRAIGHT)
-	{
-		testPlayer = MoveType::RIGHTTURN;
-	}
-	else
-	{
-		testPlayer = MoveType::STRAIGHT;
-	}
+	bool isSpawn = (alivePlayerCars_.size() < 6);
 
-	for (auto &e : playerCars_)
+	if (isSpawn)
 	{
-		if (!e->GetIsAlive())
+		int carType = rand() % 2;
+		CarInitializeDesc desc = sNormalCar;
+		desc.type = MoveType::STRAIGHT;
+		if (carType == 1)
 		{
-			e->Init(desc);
-			isSpawn = true;
+			desc = sTrackCar;
+			desc.type = MoveType::RIGHTTURN;
+		}
+		desc.angle = Vector3(0, 0, 1);
+		desc.startPos = Vector3(-sCarWidthPos, 0.0f, -300.0f);
+		desc.speed = 3.0f;
+		desc.isPlayer = true;
 
-			//Ç–Ç∆Ç¬ëOÇÃé‘óºÇ™ë∂ç›Ç∑ÇÈÇ»ÇÁ
-			if (!playerEndCar.expired())
+
+		for (auto &e : playerCars_)
+		{
+			if (!e->GetIsAlive())
 			{
-				e->SetFrontCar(playerEndCar);
-			}
-			//é©ï™Ç™ç≈å„îˆé‘óºÇ…Ç»ÇÈ
-			playerEndCar = e;
-			alivePlayerCars_.emplace_back(e);
+				e->Init(desc);
 
-			break;
+				//Ç–Ç∆Ç¬ëOÇÃé‘óºÇ™ë∂ç›Ç∑ÇÈÇ»ÇÁ
+				if (!playerEndCar.expired())
+				{
+					e->SetFrontCar(playerEndCar);
+				}
+				//é©ï™Ç™ç≈å„îˆé‘óºÇ…Ç»ÇÈ
+				playerEndCar = e;
+				alivePlayerCars_.emplace_back(e);
+
+				break;
+			}
 		}
 	}
-
 	return isSpawn;
 }

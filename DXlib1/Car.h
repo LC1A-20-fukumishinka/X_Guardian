@@ -10,6 +10,11 @@ enum class MoveType
 	ALLOK,
 };
 
+enum class ModelType
+{
+	NORMAL,
+	TRACK,
+};
 struct CarInitializeDesc
 {
 	Vector3 startPos = Vector3();
@@ -19,6 +24,7 @@ struct CarInitializeDesc
 	float speed = 0.05f;
 	bool isPlayer = true;
 	MoveType type = MoveType::STRAIGHT;
+	ModelType model = ModelType::NORMAL;
 };
 class Car
 {
@@ -40,6 +46,8 @@ public:
 
 	MoveType GetMoveType();
 
+	ModelType GetModelType();
+
 	Capsule *GetCapsule();
 	void SetFrontCar(std::weak_ptr<Car> frontCar);
 
@@ -60,7 +68,11 @@ private:
 	static MoveType sInputSignal;
 	static const int sMaxEnemyStopTimer;
 	static const int sMaxDerayTimer;
+
+	//Modelƒnƒ“ƒhƒ‹
 	static int sNormalCarModelHandle;
+	static int sTrackCarModelHandle;
+
 	static float sGameSpeed;
 
 
@@ -99,6 +111,8 @@ private:
 	bool isCounted_ = false;
 	int derayTimer_ = 0;
 	MoveType type_ = MoveType::STRAIGHT;
+	ModelType model_ = ModelType::NORMAL;
+
 	std::weak_ptr<Car> frontCar_;
 };
 

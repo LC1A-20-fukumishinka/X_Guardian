@@ -1,5 +1,6 @@
 #pragma once
 #include "Car.h"
+#include "CarBlastParticle.h"
 #include <memory>
 #include <vector>
 #include <list>
@@ -41,8 +42,9 @@ private:
 private:
 	static const float sCarWidthPos;
 
-	static CarInitializeDesc normalCar;
+	static CarInitializeDesc sNormalCar;
 
+	static CarInitializeDesc sTrackCar;
 	static float sGameSpeed;
 
 	static int up, right, down, left;
@@ -63,13 +65,12 @@ private:
 
 	MoveType inputSignal = MoveType::STRAIGHT;
 
-	MoveType testPlayer = MoveType::STRAIGHT;
-	MoveType testEnemy = MoveType::STRAIGHT;
 
 
 	bool isDeadAnimation_ = false;
 	bool isIngame_ = false;
 	int deadAnimationTimer_ = 0;
-
+	CarBlastParticle playerBlast;
+	CarBlastParticle enemyBlast;
 };
 
