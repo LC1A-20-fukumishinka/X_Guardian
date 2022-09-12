@@ -7,8 +7,14 @@ enum class MoveType
 	STRAIGHT,
 	RIGHTTURN,
 	STOP,
+	ALLOK,
 };
 
+enum class ModelType
+{
+	NORMAL,
+	TRACK,
+};
 struct CarInitializeDesc
 {
 	Vector3 startPos = Vector3();
@@ -18,6 +24,7 @@ struct CarInitializeDesc
 	float speed = 0.05f;
 	bool isPlayer = true;
 	MoveType type = MoveType::STRAIGHT;
+	ModelType model = ModelType::NORMAL;
 };
 class Car
 {
@@ -39,20 +46,41 @@ public:
 
 	MoveType GetMoveType();
 
+	ModelType GetModelType();
+
 	Capsule *GetCapsule();
 	void SetFrontCar(std::weak_ptr<Car> frontCar);
 
 	void Dead();
+	void Count();
+	//通過しきったフラグ
+	bool GetIsPass();
+
+	bool GetIsSignalStop();
 private:
 	static const float sTurnStartPos;
 	static const float sStopPos;
-	static MoveType sInputSignal;
-	static const int sMaxEnemyTimer;
 	static const float sCarDistanceLimit;
-	static const int sMaxDerayTimer_ = 30;
+	static const float sStopLength;
+	static const float sPassWidth;
+	static const float sEraseWidth;
+	static const float sEraseDepth;
+	static MoveType sInputSignal;
+	static const int sMaxEnemyStopTimer;
+	static const int sMaxDerayTimer;
+
+	//Modelハンドル
+	static int sNormalCarModelHandle;
+	static int sTrackCarModelHandle;
+
+	static float sGameSpeed;
+
 
 public:
 	static void SetSignal(MoveType isStopSignal);
+	static void LoadModel();
+
+	static void SetGameSpeed(float speed);
 private:
 
 	void CapsuleMove();
@@ -79,9 +107,12 @@ private:
 
 	bool isAlive_ = false;
 	bool isPlayer_ = true;
-
+	bool isCrossIn_ = false;
+	bool isCounted_ = false;
 	int derayTimer_ = 0;
 	MoveType type_ = MoveType::STRAIGHT;
+	ModelType model_ = ModelType::NORMAL;
+
 	std::weak_ptr<Car> frontCar_;
 };
 
