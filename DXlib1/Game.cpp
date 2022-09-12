@@ -168,11 +168,19 @@ void Game::Update()
 	}
 	else
 	{
-		cityAnimationRate += 1.0f / 30.0f;
+		float moveRate = (1.0f / 30.0f);
+		if (carManager.GetDeadAnimation())
+		{
+			moveRate *= 0.01f;
+		}
+
+		cityAnimationRate += moveRate;
 	}
 
 	//’¬‚Õ‚É‚Õ‚ÉON/OFF
 	//cityAnimationRate = 1.0f;
+
+	Car::SetPressAnimationRate(cityAnimationRate);
 	float easeRate = Easing::easeOutCubic(cityAnimationRate);
 
 	cityAnimationScale *= (1.0f - easeRate);

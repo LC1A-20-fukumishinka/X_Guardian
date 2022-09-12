@@ -23,6 +23,7 @@ const float Car::sCarDistanceLimit = 10.0f;
 int Car::sNormalCarModelHandle = -1;
 int Car::sTrackCarModelHandle = -1;
 
+float Car::pressAnimationRate = 0.0f;
 Car::Car()
 {
 	const unsigned int color = GetColor(255, 255, 255);
@@ -164,7 +165,13 @@ void Car::Draw()
 	}
 
 	Matrix4 worldMat;
-	worldMat = scale(Vector3(0.04f, 0.04f, 0.04f));
+
+	float carScale = 0.04f;
+	float pressEaseRate = Easing::easeOutCubic(pressAnimationRate);
+	float pressScale = 0.01f;
+
+	pressScale *= (1 - pressEaseRate);
+	worldMat = scale(Vector3(carScale, carScale - pressScale, carScale));
 
 	Vector3 carAngle = (colObject_->endPosition - frontPos_);
 
@@ -325,6 +332,11 @@ void Car::LoadModel()
 	sTrackCarModelHandle = MV1LoadModel("Resources/track/track.mv1");
 }
 
+void Car::SetPressAnimationRate(float rate)
+{
+	pressAnimationRate = rate;
+}
+
 void Car::CapsuleMove()
 {
 	colObject_->startPosition = frontPos_;
@@ -418,7 +430,7 @@ bool Car::JudgmentToStop(bool isCrossIn)
 
 		if (derayTimer_ > 0)
 		{
-			derayTimer_-= 1 * sGameSpeed;
+			derayTimer_ -= 1 * sGameSpeed;
 			isTrafficJam = true;
 		}
 	}

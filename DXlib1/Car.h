@@ -75,12 +75,14 @@ private:
 
 	static float sGameSpeed;
 
-
+	static float pressAnimationRate;
 public:
 	static void SetSignal(MoveType isStopSignal);
 	static void LoadModel();
 
 	static void SetGameSpeed(float speed);
+
+	static void SetPressAnimationRate(float rate);
 private:
 
 	void CapsuleMove();
