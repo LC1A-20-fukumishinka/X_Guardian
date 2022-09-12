@@ -20,7 +20,7 @@ const int Car::sMaxEnemyStopTimer = 60;
 const int Car::sMaxDerayTimer = 35;
 
 const float Car::sCarDistanceLimit = 10.0f;
-int Car::sNormalCarModelHandle = -1;
+vector<int> Car::sNormalCarModelHandles;
 int Car::sTrackCarModelHandle = -1;
 
 float Car::pressAnimationRate = 0.0f;
@@ -75,6 +75,8 @@ void Car::Init(CarInitializeDesc desc)
 	isCrossIn_ = false;
 	isCounted_ = false;
 	clearAnimationRate_ = 0.0f;
+
+	color_ = rand() % static_cast<int>(sNormalCarModelHandles.size());
 }
 
 void Car::Update()
@@ -157,7 +159,7 @@ void Car::Draw()
 
 	if (model_ == ModelType::NORMAL)
 	{
-		drawModelHandle = sNormalCarModelHandle;
+		drawModelHandle = sNormalCarModelHandles[color_];
 	}
 	else
 	{
@@ -277,6 +279,11 @@ void Car::Count()
 	isCounted_ = true;
 }
 
+int Car::GetCarColor()
+{
+	return color_;
+}
+
 bool Car::GetIsPass()
 {
 	bool isPass = false;
@@ -328,7 +335,13 @@ void Car::SetGameSpeed(float speed)
 
 void Car::LoadModel()
 {
-	sNormalCarModelHandle = MV1LoadModel("Resources/car/car.mv1");
+	sNormalCarModelHandles.resize(5);
+	sNormalCarModelHandles[0] = MV1LoadModel("Resources/cars/light blue/car.mv1");
+	sNormalCarModelHandles[1] = MV1LoadModel("Resources/cars/light green/car.mv1");
+	sNormalCarModelHandles[2] = MV1LoadModel("Resources/cars/pink/car.mv1");
+	sNormalCarModelHandles[3] = MV1LoadModel("Resources/cars/purple/car.mv1");
+	sNormalCarModelHandles[4] = MV1LoadModel("Resources/cars/yellow/car.mv1");
+
 	sTrackCarModelHandle = MV1LoadModel("Resources/track/track.mv1");
 }
 

@@ -469,6 +469,8 @@ void CarManager::LoadGraphics()
 	sStop = MV1LoadModel("Resources/UI/stop.mv1");
 	sStraight = MV1LoadModel("Resources/UI/straight.mv1");
 	sRight = MV1LoadModel("Resources/UI/turn_right.mv1");
+
+	CarBlastParticle::InitializeColor();
 }
 
 bool CarManager::GetDeadAnimation()
@@ -523,8 +525,8 @@ void CarManager::IngameUpdate()
 			deadEnemyCar_.lock()->Dead();
 			SetGameSpeed(1.0f);
 
-			playerBlast.Init(deadPlayerCar_.lock()->GetModelType(), deadPlayerCar_.lock()->GetFrontPos());
-			enemyBlast.Init(deadEnemyCar_.lock()->GetModelType(), deadEnemyCar_.lock()->GetFrontPos());
+			playerBlast.Init(deadPlayerCar_.lock()->GetModelType(), deadPlayerCar_.lock()->GetFrontPos(), deadPlayerCar_.lock()->GetCarColor());
+			enemyBlast.Init(deadEnemyCar_.lock()->GetModelType(), deadEnemyCar_.lock()->GetFrontPos(), deadEnemyCar_.lock()->GetCarColor());
 		}
 	}
 	else

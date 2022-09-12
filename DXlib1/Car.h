@@ -53,10 +53,14 @@ public:
 
 	void Dead();
 	void Count();
+
+	int GetCarColor();
+
 	//通過しきったフラグ
 	bool GetIsPass();
 
 	bool GetIsSignalStop();
+
 private:
 	static const float sTurnStartPos;
 	static const float sStopPos;
@@ -70,7 +74,7 @@ private:
 	static const int sMaxDerayTimer;
 
 	//Modelハンドル
-	static int sNormalCarModelHandle;
+	static std::vector<int> sNormalCarModelHandles;
 	static int sTrackCarModelHandle;
 
 	static float sGameSpeed;
@@ -112,6 +116,8 @@ private:
 	bool isCrossIn_ = false;
 	bool isCounted_ = false;
 	int derayTimer_ = 0;
+
+	int color_ = 0;
 	MoveType type_ = MoveType::STRAIGHT;
 	ModelType model_ = ModelType::NORMAL;
 
