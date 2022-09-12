@@ -114,5 +114,8 @@ private:
 	ModelType model_ = ModelType::NORMAL;
 
 	std::weak_ptr<Car> frontCar_;
+
+private:
+	float clearAnimationRate_ = 0.0f;
 };
 

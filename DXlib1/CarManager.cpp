@@ -1,15 +1,17 @@
 #include "CarManager.h"
 #include "Collision.h"
 #include "DxLib.h"
+#include "EaseClass.h"
 using namespace std;
 
-const float CarManager::sCarWidthPos = 10.0f;
+const float CarManager::sCarWidthPos = 13.0f;
 CarInitializeDesc CarManager::sNormalCar;
 CarInitializeDesc CarManager::sTrackCar;
 float CarManager::sGameSpeed = 1.0f;
-const int CarManager::sDeadAnimationTimerMax = 150;
+const int CarManager::sDeadAnimationTimerMax = 90;
 
-int CarManager::up, CarManager::right, CarManager::down, CarManager::left;
+int CarManager::up, CarManager::right, CarManager::down, CarManager::left, CarManager::stop;
+int CarManager::sNextModel, CarManager::sStraight, CarManager::sStop, CarManager::sRight;
 
 CarManager::CarManager()
 {
@@ -30,9 +32,15 @@ CarManager::CarManager()
 	sNormalCar.radius = 4.0f;
 	sNormalCar.model = ModelType::NORMAL;
 
-	sTrackCar.length = 15.0f;
-	sTrackCar.radius = 4.2f;
+	sTrackCar.length = 13.0f;
+	sTrackCar.radius = 4.0f;
 	sTrackCar.model = ModelType::TRACK;
+
+	camMat_ = identity();
+
+	nextFrameObject_ = Vector3(-25.0f, 34.0f, -120.0f);
+	nextObject_ = nextFrameObject_ + Vector3(3, 0.0f, 0.0f);
+	nextnextObject_ = nextObject_ + Vector3(-7, 4.0f, 0.0f);
 }
 
 CarManager::~CarManager()
@@ -197,7 +205,7 @@ void CarManager::EndGame()
 {
 	Car::SetSignal(MoveType::ALLOK);
 
-	SetGameSpeed(5.0f);
+	SetGameSpeed(10.0f);
 
 	isIngame_ = false;
 }
@@ -213,6 +221,8 @@ void CarManager::DrwaHud()
 	{
 		bool isNotFirst = false;
 		int carsCount = 0;
+
+
 		for (auto &e : alivePlayerCars_)
 		{
 			int drawHandle = -1;
@@ -224,10 +234,13 @@ void CarManager::DrwaHud()
 			{
 				drawHandle = right;
 			}
-			int x = 200, y = 300;
+			int x = 400, y = 300;
 
 			if (isNotFirst)
 			{
+
+
+
 				DrawExtendGraph(x - 23, y + (20 * (carsCount - 1)), x - 3, y + (20 * (carsCount)), drawHandle, TRUE);
 
 			}
@@ -282,25 +295,161 @@ void CarManager::DrwaHud()
 	}
 	else
 	{
-		inputDrawHandle = down;
+		inputDrawHandle = stop;
 	}
 
 	int x = 700, y = 300;
 	DrawExtendGraph(x, y, x + 100, y + 100, inputDrawHandle, TRUE);
 
+#pragma region frameDraw
+	Matrix4 worldMat;
+
+	float frameScale = 0.023f;
+	worldMat = scale(Vector3(frameScale, frameScale, frameScale));
+
+	worldMat *= camMat_;
+
+	Vector3 easePos = nextFrameObject_;
+
+	Vector3 moveVec(0.0f, -100.0f, 0.0f);
+
+	nextAnimationRate_ = 1.0f;
+	moveVec = transform(moveVec, camMat_);
+	float easeRate = Easing::easeOutBack(nextAnimationRate_);
+	easePos += (moveVec * (1 - easeRate));
+	worldMat *= translate(easePos);
+	MV1SetMatrix(sNextModel, worldMat);
+	MV1DrawModel(sNextModel);
+#pragma endregion
+
+#pragma region nextDraw
+	bool isNotFirst = false;
+	int carsCount = 0;
+	if (!alivePlayerCars_.empty())
+	{
+		for (auto &e : alivePlayerCars_)
+		{
+			int drawHandle = -1;
+			if (e.lock()->GetMoveType() == MoveType::STRAIGHT)
+			{
+				drawHandle = sStraight;
+			}
+			else
+			{
+				drawHandle = sRight;
+			}
+
+			if (isNotFirst)
+			{
+#pragma region nextnext
+				Matrix4 worldMat;
+
+				float frameScale = 0.006f;
+				worldMat = scale(Vector3(frameScale, frameScale, frameScale));
+
+				worldMat *= camMat_;
+
+				Vector3 easePos = nextnextObject_ + (Vector3(0.0f, -3.4f, -1.7f) * (carsCount - 1));
+
+				Vector3 moveVec(0.0f, -100.0f, 0.0f);
+
+				nextAnimationRate_ = 1.0f;
+				moveVec = transform(moveVec, camMat_);
+				float easeRate = Easing::easeOutBack(nextAnimationRate_);
+				easePos += (moveVec * (1 - easeRate));
+				worldMat *= translate(easePos);
+				MV1SetMatrix(drawHandle, worldMat);
+				MV1DrawModel(drawHandle);
+#pragma endregion
+			}
+			else
+			{
+#pragma region next
+				Matrix4 worldMat;
+
+				float frameScale = 0.020f;
+				worldMat = scale(Vector3(frameScale, frameScale, frameScale));
+
+				worldMat *= camMat_;
+
+				Vector3 easePos = nextObject_;
+
+				Vector3 moveVec(0.0f, -100.0f, 0.0f);
+
+				nextAnimationRate_ = 1.0f;
+				moveVec = transform(moveVec, camMat_);
+				float easeRate = Easing::easeOutBack(nextAnimationRate_);
+				easePos += (moveVec * (1 - easeRate));
+				worldMat *= translate(easePos);
+				MV1SetMatrix(drawHandle, worldMat);
+				MV1DrawModel(drawHandle);
+#pragma endregion
+				isNotFirst = true;
+			}
+			carsCount++;
+
+			if (carsCount >= 4)
+			{
+				break;
+			}
+		}
+	}
+#pragma endregion
+
 }
 
 void CarManager::LoadGraphics()
 {
-	up = LoadGraph("Resources/Texture/upArrow.png");
-	right = LoadGraph("Resources/Texture/rightArrow.png");
-	down = LoadGraph("Resources/Texture/downArrow.png");
-	left = LoadGraph("Resources/Texture/leftArrow.png");
+	//up = LoadGraph("Resources/Texture/upArrow.png");
+	//right = LoadGraph("Resources/Texture/rightArrow.png");
+	//down = LoadGraph("Resources/Texture/downArrow.png");
+	//left = LoadGraph("Resources/Texture/leftArrow.png");
+	up = LoadGraph("Resources/Texture/UP.png");
+	right = LoadGraph("Resources/Texture/RIGHT.png");
+	down = LoadGraph("Resources/Texture/DOWN.png");
+	left = LoadGraph("Resources/Texture/LEFT.png");
+	stop = LoadGraph("Resources/Texture/STOP.png");
+
+	sNextModel = MV1LoadModel("Resources/UI/next.mv1");
+	sStop = MV1LoadModel("Resources/UI/stop.mv1");
+	sStraight = MV1LoadModel("Resources/UI/straight.mv1");
+	sRight = MV1LoadModel("Resources/UI/turn_right.mv1");
 }
 
 bool CarManager::GetDeadAnimation()
 {
 	return isDeadAnimation_;
+}
+
+bool CarManager::GetIsAllCarDead()
+{
+	bool isAllDead = true;
+
+	for (auto &e : playerCars_)
+	{
+		if (e->GetIsAlive())
+		{
+			isAllDead = false;
+			break;
+		}
+	}
+	if (isAllDead)
+	{
+		for (auto &e : enemyCars_)
+		{
+			if (e->GetIsAlive())
+			{
+				isAllDead = false;
+				break;
+			}
+		}
+	}
+	return isAllDead;
+}
+
+void CarManager::SetCamMat(Matrix4 mat)
+{
+	camMat_ = mat;
 }
 
 void CarManager::IngameUpdate()
@@ -378,7 +527,7 @@ bool CarManager::AddEnemyCar()
 	desc.startPos = Vector3(sCarWidthPos, 0.0f, 500.0f);
 	desc.isPlayer = false;
 
-	desc.speed = 1.4f;
+	desc.speed = 1.0f;
 
 
 	for (auto &e : enemyCars_)
