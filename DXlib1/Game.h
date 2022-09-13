@@ -9,6 +9,8 @@
 #include <cstdlib>
 #include "CarManager.h"
 #include "GameManager.h"
+#include "SoundManager.h"
+#include <memory>
 using namespace DxLib;
 
 class Game
@@ -52,6 +54,6 @@ public:
 	Vector3 cameraUp;
 
 	GameStatus OldScene;
-
+	std::unique_ptr<SoundManager> sounds;
 };
 

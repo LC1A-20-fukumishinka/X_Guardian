@@ -2,6 +2,8 @@
 #include "Vector3.h"
 #include <array>
 #include "Matrix4.h"
+
+class SoundManager;
 enum class GameStatus
 {
 	TITLE,
@@ -50,6 +52,8 @@ public:
 	void CheckCarAllDead(bool isAllDead);
 
 	Matrix4 GetCamMat();
+
+	void SetSoundManager(SoundManager *sound);
 private:
 	//sceneˆÚ“®ŠÖ”
 	void ToIngame();
@@ -116,5 +120,7 @@ private:
 	Vector3 cameraBaseTargetPos_;
 
 	Vector3 cameraDeadAnimationPos_;
-};
+
+	SoundManager *sounds_ = nullptr;
+	};
 

@@ -2,6 +2,8 @@
 #include "Vector3.h"
 #include "Primitive.h"
 #include <memory>
+#include "SoundManager.h"
+
 enum class MoveType
 {
 	STRAIGHT,
@@ -9,7 +11,6 @@ enum class MoveType
 	STOP,
 	ALLOK,
 };
-
 enum class ModelType
 {
 	NORMAL,
@@ -60,7 +61,6 @@ public:
 	bool GetIsPass();
 
 	bool GetIsSignalStop();
-
 private:
 	static const float sTurnStartPos;
 	static const float sStopPos;
@@ -72,7 +72,7 @@ private:
 	static MoveType sInputSignal;
 	static const int sMaxEnemyStopTimer;
 	static const int sMaxDerayTimer;
-
+	static SoundManager *sSounds;
 	//Modelƒnƒ“ƒhƒ‹
 	static std::vector<int> sNormalCarModelHandles;
 	static int sTrackCarModelHandle;
@@ -87,6 +87,8 @@ public:
 	static void SetGameSpeed(float speed);
 
 	static void SetPressAnimationRate(float rate);
+
+	static void SetSoundManager(SoundManager *sounds);
 private:
 
 	void CapsuleMove();
