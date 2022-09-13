@@ -717,6 +717,8 @@ void GameManager::ToIngame()
 	combo = 0;
 	normaCars = 0;
 	gameTimer_ = 0;
+	sounds_->Enter();
+	sounds_->BGM();
 	status_ = GameStatus::INGAME;
 }
 
@@ -729,6 +731,8 @@ void GameManager::ToResult()
 
 void GameManager::ToTitle()
 {
+	sounds_->BGMStop();
+	sounds_->Enter();
 	status_ = GameStatus::TITLE;
 }
 

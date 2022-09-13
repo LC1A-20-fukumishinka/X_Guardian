@@ -1,5 +1,6 @@
 #include "Game.h"
 #include "EaseClass.h"
+#include <algorithm>
 Game::Game()
 {
 
@@ -76,7 +77,6 @@ Game::Game()
 	carManager.SetSoundManager(sounds.get());
 	gameManager.SetSoundManager(sounds.get());
 
-	//sounds->BGM();
 }
 
 Game::~Game()
@@ -169,20 +169,23 @@ void Game::Update()
 
 	float cityAnimationScale = 0.05f;
 
-	if (cityAnimationRate >= 1.0f)
+	if (cityAnimationRate >= 1.0f && (gameManager.GetStatus() == GameStatus::INGAME))
 	{
 		cityAnimationRate = 0.0f;
 	}
 	else
 	{
-		float moveRate = (1.0f / 30.0f);
+		float moveRate = (1.0f / 23.25f);
+		
 		if (carManager.GetDeadAnimation())
 		{
 			moveRate *= 0.01f;
 		}
-
 		cityAnimationRate += moveRate;
 	}
+
+
+	cityAnimationRate = std::clamp(cityAnimationRate, 0.0f, 1.0f);
 
 	//’¬‚Õ‚É‚Õ‚ÉON/OFF
 	//cityAnimationRate = 1.0f;

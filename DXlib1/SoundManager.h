@@ -9,6 +9,9 @@ public:
 
 	void Action();
 	void BGM();
+	void BGMStop();
+	void ContinueBGM();
+
 	void Brake();
 	void Enter();
 	void Explosion(int num = -1);

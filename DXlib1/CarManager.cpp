@@ -123,6 +123,8 @@ void CarManager::Draw()
 
 void CarManager::SetSignal()
 {
+
+	MoveType oldSignal = inputSignal;
 	if (CheckHitKey(KEY_INPUT_W))
 	{
 		inputSignal = MoveType::STRAIGHT;
@@ -138,6 +140,10 @@ void CarManager::SetSignal()
 		inputSignal = MoveType::STOP;
 	}
 
+	if (oldSignal != inputSignal)
+	{
+		sounds_->Action();
+	}
 	Car::SetSignal(inputSignal);
 }
 
@@ -159,6 +165,8 @@ void CarManager::Collision()
 						isDeadAnimation_ = true;
 						deadAnimationTimer_ = 0;
 						SetGameSpeed(0.01f);
+						sounds_->BGMStop();
+						sounds_->Slow();
 						inputSignal = MoveType::STOP;
 						break;
 					}
@@ -537,7 +545,8 @@ void CarManager::IngameUpdate()
 			deadPlayerCar_.lock()->Dead();
 			deadEnemyCar_.lock()->Dead();
 			SetGameSpeed(1.0f);
-
+			sounds_->ContinueBGM();
+			sounds_->Explosion();
 			playerBlast.Init(deadPlayerCar_.lock()->GetModelType(), deadPlayerCar_.lock()->GetFrontPos(), deadPlayerCar_.lock()->GetCarColor());
 			enemyBlast.Init(deadEnemyCar_.lock()->GetModelType(), deadEnemyCar_.lock()->GetFrontPos(), deadEnemyCar_.lock()->GetCarColor());
 		}

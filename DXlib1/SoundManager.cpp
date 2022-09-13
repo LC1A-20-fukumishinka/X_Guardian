@@ -33,14 +33,20 @@ void SoundManager::Action()
 
 void SoundManager::BGM()
 {
+		PlaySoundMem(BGM_, DX_PLAYTYPE_LOOP);
+}
+
+void SoundManager::BGMStop()
+{
 	if (CheckSoundMem(BGM_))
 	{
 		StopSoundMem(BGM_);
 	}
-	else
-	{
-		PlaySoundMem(BGM_, DX_PLAYTYPE_LOOP);
-	}
+}
+
+void SoundManager::ContinueBGM()
+{
+	PlaySoundMem(BGM_, DX_PLAYTYPE_LOOP, FALSE);
 }
 
 void SoundManager::Brake()

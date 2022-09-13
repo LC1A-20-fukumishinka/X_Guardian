@@ -42,7 +42,7 @@ public:
 	Matrix4 skyMat;
 
 
-	float cityAnimationRate = 0.0f;
+	float cityAnimationRate = 1.0f;
 	int leftLightHandle;
 	int rightLightHandle;
 
