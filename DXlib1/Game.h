@@ -55,6 +55,7 @@ private:
 	int SetRandTimer(TimerRange range);
 public:
 	int model;
+	int ground;
 	int skyModel;
 	int spawnTimer = 60;
 	float camZPos = -50;

@@ -25,7 +25,8 @@ Game::Game()
 	float cameraUpAngle = 0.0f;
 
 
-	model = MV1LoadModel("Resources/city/city.mv1");
+	model = MV1LoadModel("Resources/city/city_object.mv1");
+	ground = MV1LoadModel("Resources/city/city_ground.mv1");
 	skyModel = MV1LoadModel("Resources/skydome/sky_dome.mv1");
 
 	Vector3 BasePos(-20, 0.1, 302);
@@ -50,6 +51,8 @@ Game::Game()
 	matWorld = matScale;
 	matWorld *= matRot;
 	matWorld *= translate(BasePos);
+	MV1SetMatrix(ground, matWorld);
+
 	cameraUpAngle = 0.0f;
 	cameraRightAngle = 0.0f;
 
@@ -115,7 +118,7 @@ void Game::Draw()
 
 	MV1SetMatrix(model, matWorld);
 	MV1DrawModel(model);
-
+	MV1DrawModel(ground);
 	MV1SetMatrix(skyModel, skyMat);
 
 	MV1DrawModel(skyModel);
@@ -216,6 +219,7 @@ void Game::Update()
 	matWorld = matScale;
 	matWorld *= matRot;
 	matWorld *= translate(BasePos);
+
 }
 
 void Game::TitleUpdate()
