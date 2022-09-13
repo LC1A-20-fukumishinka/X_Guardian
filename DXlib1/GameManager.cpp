@@ -18,18 +18,23 @@ void GameManager::Init()
 	score = 0;
 	combo = 0;
 	cameraDeadAnimationPos_ = Vector3(0.0f, 30.0f, -20.0f);
-	scoreObjectPos_ = Vector3(-150.0f, 65.0f, 0.0f);
-	scoreNumberObjectPos_ = scoreObjectPos_ + Vector3(-5.0f, -10.0f, 0.0f);
 
 
+	scoreObjectPos_ = Vector3(50.0f, 9.5f, -130.0f);
+	scoreNumberObjectPos_ = scoreObjectPos_ + Vector3(-5.0f, -7.0f, 0.0f);
+
+	Vector3 comboObjectMovePos = Vector3(-30.0f, 0.3f, 0.0f);
+	comboObjectPos_ = scoreObjectPos_ + comboObjectMovePos;
+	comboNumberObjectPos_ = comboObjectPos_ + Vector3(6.5f, -7.0f, 0.0f);
+	comboObjectAnimationRate_ = 0.0f;
+
+
+#pragma region result
 	scoreResultObjectPos_ = Vector3(0.0f, 60.0f, -70.0f);
 	scoreResultNumberObjectPos_ = scoreResultObjectPos_ + Vector3(-35.0f, -40.0f, -30.0f);
 	scoreObjectAnimationRate_ = 0.0f;
+#pragma endregion
 
-	Vector3 comboObjectMovePos = Vector3(0.0f, -30.0f, 0.0f);
-	comboObjectPos_ = scoreObjectPos_ + comboObjectMovePos;
-	comboNumberObjectPos_ = comboObjectPos_ + Vector3(20.0f, -10.0f, -30.0f);
-	comboObjectAnimationRate_ = 0.0f;
 
 	titleObjectPos_ = Vector3(5, 50.0f, -120.0f);
 	titleObjectAnimationRate_ = 1.0f;
@@ -348,8 +353,8 @@ void GameManager::scoreDraw()
 	moveVec = transform(moveVec, cameraPosture);
 
 
-	float scoreScale = 0.06f;
-	float comboScale = 0.1f;
+	float scoreScale = 0.03f;
+	float comboScale = 0.03f;
 	float timeScale = 0.03f;
 
 #pragma region scoreNumber
@@ -376,7 +381,10 @@ void GameManager::scoreDraw()
 			worldMat *= cameraPosture;
 
 
-			Vector3 easePos = scoreNumberObjectPos_ + Vector3(-10.0f + (7.0f * deget), 0.0f, 0.0f);
+			Vector3 easePos = scoreNumberObjectPos_ + Vector3(-10.0f + ((125.0f * scoreScale) * deget), 0.0f, 0.0f);
+
+			easePos = transform(easePos, cameraPosture);
+
 
 			float easeRate = Easing::easeOutBack(rate[deget]);
 			easePos += (moveVec * (1 - easeRate));
@@ -399,7 +407,7 @@ void GameManager::scoreDraw()
 		worldMat *= cameraPosture;
 
 
-		Vector3 easePos = scoreObjectPos_;
+		Vector3 easePos = transform(scoreObjectPos_, cameraPosture);
 
 
 		float easeRate = Easing::easeOutBack(rate[10]);
@@ -436,7 +444,9 @@ void GameManager::scoreDraw()
 			worldMat *= cameraPosture;
 
 
-			Vector3 easePos = comboNumberObjectPos_ + Vector3(-10.0f + (10.0f * (deget)), 0.0f, 0.0f);
+			Vector3 easePos = comboNumberObjectPos_ + Vector3(-10.0f + ((125.0f * comboScale) * (deget)), 0.0f, 0.0f);
+
+			easePos = transform(easePos, cameraPosture);
 
 			float easeRate = Easing::easeOutBack(rate[deget + 11]);
 			easePos += (moveVec * (1 - easeRate));
@@ -460,7 +470,7 @@ void GameManager::scoreDraw()
 		worldMat *= cameraPosture;
 
 
-		Vector3 easePos = comboObjectPos_;
+		Vector3 easePos = easePos = transform(comboObjectPos_, cameraPosture);
 
 
 		float easeRate = Easing::easeOutBack(rate[14]);
