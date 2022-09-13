@@ -39,11 +39,16 @@ CarManager::CarManager()
 
 	camMat_ = identity();
 
-	nextFrameObject_ = Vector3(-30.0f, 34.0f, -120.0f);
+	actFrameObject_ = Vector3(-30.0f, 34.0f, -120.0f);
+	actObject = actFrameObject_ + +Vector3(3, 0.0f, 0.0f);
+
+
+	nextFrameObject_ = actFrameObject_ + Vector3(0.0f, -20.0f, -10.0f);
 	nextObject_ = nextFrameObject_ + Vector3(3, 0.0f, 0.0f);
 	nextnextObject_ = nextObject_ + Vector3(-7, 4.0f, 0.0f);
-	actFrameObject_ = nextFrameObject_ + Vector3(0.0f, -20.0f, -10.0f);
-	actObject = actFrameObject_ + +Vector3(3, 0.0f, 0.0f);
+
+
+
 
 	guideObject_ = Vector3(20.0f, 35.0f, -160.0f);
 }
