@@ -132,7 +132,7 @@ void GameManager::Update()
 
 	if (CheckHitKeyAll() && !isInput_)
 	{
-	int a = 2;
+		int a = 2;
 		if (CheckHitKey(KEY_INPUT_1))
 		{
 			sounds_->Action();
@@ -718,6 +718,7 @@ void GameManager::ToIngame()
 	combo = 0;
 	normaCars = 0;
 	gameTimer_ = 0;
+	sounds_->IngameVolume();
 	sounds_->Enter();
 	sounds_->BGM();
 	status_ = GameStatus::INGAME;
@@ -726,12 +727,14 @@ void GameManager::ToIngame()
 
 void GameManager::ToResult()
 {
+	sounds_->ResultVolume();
 	status_ = GameStatus::RESULT;
 }
 
 
 void GameManager::ToTitle()
 {
+	sounds_->TitleVolume();
 	sounds_->BGMStop();
 	sounds_->Enter();
 	status_ = GameStatus::TITLE;

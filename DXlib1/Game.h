@@ -13,6 +13,22 @@
 #include <memory>
 using namespace DxLib;
 
+enum class TimerName
+{
+	WHISTLE,
+	BRAKE,
+	HORN,
+	ENGINE,
+	BROKEN,
+};
+
+struct TimerRange
+{
+int min = 100;
+int max = 1000;
+
+void Set(int min,int max);
+};
 class Game
 {
 public:
@@ -33,6 +49,10 @@ private:
 	void DrawFloorLine();
 
 	void SceneChange();
+
+	void SoundUpdate();
+
+	int SetRandTimer(TimerRange range);
 public:
 	int model;
 	int skyModel;
@@ -41,6 +61,13 @@ public:
 	Matrix4 matWorld;
 	Matrix4 skyMat;
 
+	std::vector<int> soundTimers_;
+	std::vector<TimerRange> soundTimersMax_;
+	int whistleTimer_;
+	int brakeTimer_;
+	int hornTimer_;
+	int engineTimer_;
+	int brokenTimer_;
 
 	float cityAnimationRate = 1.0f;
 	int leftLightHandle;

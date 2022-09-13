@@ -6,10 +6,15 @@ public:
 	~SoundManager();
 
 	void Load();
-	void ChangeVolume();
+	void ChangeInitializeVolume();
 
+	void TitleVolume();
 
+	void IngameVolume();
+
+	void ResultVolume();
 	void Action();
+	void Whistle();
 	void BGM();
 	void BGMStop();
 	void ContinueBGM();
