@@ -12,9 +12,9 @@ SoundManager::~SoundManager()
 void SoundManager::Load()
 {
 	action_ = LoadSoundMem("Resources/sound/action.wav");
-	BGM_ = LoadSoundMem("Resources/sound/BGM.wav");
+	BGM_ = LoadSoundMem("Resources/sound/BGM.mp3");
 	brake_ = LoadSoundMem("Resources/sound/brake.wav");
-	enter_ = LoadSoundMem("Resources/sound/enter.wav");
+	enter_ = LoadSoundMem("Resources/sound/enter.mp3");
 	explosion1_ = LoadSoundMem("Resources/sound/explosion_01.wav");
 	explosion2_ = LoadSoundMem("Resources/sound/explosion_02.wav");
 	explosion3_ = LoadSoundMem("Resources/sound/explosion_03.wav");
