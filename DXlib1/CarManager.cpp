@@ -547,6 +547,8 @@ void CarManager::IngameUpdate()
 			SetGameSpeed(1.0f);
 			sounds_->ContinueBGM();
 			sounds_->Explosion();
+			sounds_->Broken();
+
 			playerBlast.Init(deadPlayerCar_.lock()->GetModelType(), deadPlayerCar_.lock()->GetFrontPos(), deadPlayerCar_.lock()->GetCarColor());
 			enemyBlast.Init(deadEnemyCar_.lock()->GetModelType(), deadEnemyCar_.lock()->GetFrontPos(), deadEnemyCar_.lock()->GetCarColor());
 		}
@@ -669,7 +671,6 @@ bool CarManager::AddPlayerCar()
 				//©•ª‚ªÅŒã”öÔ—¼‚É‚È‚é
 				playerEndCar = e;
 				alivePlayerCars_.emplace_back(e);
-
 				break;
 			}
 		}

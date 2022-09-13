@@ -83,6 +83,7 @@ void GameManager::Update()
 
 		if (isGameOver)
 		{
+			sounds_->TimeUp();
 			ToResult();
 		}
 

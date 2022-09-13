@@ -117,6 +117,10 @@ private:
 	bool isPlayer_ = true;
 	bool isCrossIn_ = false;
 	bool isCounted_ = false;
+	bool isCrossSound_ = false;
+
+	bool isNowStop_ =false;
+	bool isOldStop_ = false;
 	int derayTimer_ = 0;
 
 	int color_ = 0;

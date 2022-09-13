@@ -79,6 +79,11 @@ void Car::Init(CarInitializeDesc desc)
 	clearAnimationRate_ = 0.0f;
 
 	color_ = rand() % static_cast<int>(sNormalCarModelHandles.size());
+	isCrossSound_ = false;
+
+
+	bool isNowStop_ = false;
+	bool isOldStop_ = false;
 }
 
 void Car::Update()
@@ -112,11 +117,11 @@ void Car::Update()
 		}
 	}
 
-
-
+	isOldStop_ = isNowStop_;
 	//Ž~‚Ü‚é‚©‚Ç‚¤‚©
 	bool isStop = JudgmentToStop(isCrossIn);
 
+	isNowStop_ = isStop;
 	float inputSpeed = speed_;
 
 	inputSpeed *= sGameSpeed;
@@ -127,7 +132,11 @@ void Car::Update()
 
 	if (isStop)
 	{
-
+		if (isPlayer_ && isNowStop_ && !isOldStop_)
+		{
+			sSounds->EngineStop();
+			sSounds->Brake(1);
+		}
 	}
 	else
 	{
@@ -135,6 +144,16 @@ void Car::Update()
 		frontPos_ += angle_ * inputSpeed;
 	}
 
+
+	float underFrame = -200.0f;
+	bool isEnemySound = ((frontPos_.z <= underFrame + 70) && !isPlayer_ && !isCrossSound_);
+	bool isPlayerSound = ((frontPos_.z >= underFrame) && isPlayer_ && !isCrossSound_);
+
+	if (isPlayerSound || isEnemySound)
+	{
+		isCrossSound_ = true;
+		sSounds->Engine(2);
+	}
 	bool isCrossTheIntersection = (isCrossIn_ && (abs(frontPos_.x) >= sEraseWidth || abs(frontPos_.z) >= sEraseDepth));
 	if (isCrossTheIntersection)
 	{
@@ -279,6 +298,7 @@ void Car::Dead()
 void Car::Count()
 {
 	isCounted_ = true;
+	sSounds->Combo();
 }
 
 int Car::GetCarColor()
