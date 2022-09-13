@@ -4,6 +4,7 @@
 #include <algorithm>
 #include "Matrix4.h"
 #include <string>
+#include "SoundManager.h"
 using namespace std;
 GameManager::GameManager()
 {
@@ -42,8 +43,8 @@ void GameManager::Init()
 	pressAnyKeyObjectPos_ = Vector3(0.0f, 10.0f, -120.0f);
 	pressAnyKeyObjectAnimationRate_ = 1.0f;
 
-	timeObjectPos_ = Vector3(2.5f, 70.0f, -70.0f);
-	timeNumberObjectPos_ = timeObjectPos_ + Vector3(3.8f, -10.0f, 0.0f);
+	timeObjectPos_ = Vector3(0.0f, 70.0f, -70.0f);
+	timeNumberObjectPos_ = timeObjectPos_ + Vector3(6.3f, -10.0f, 0.0f);
 	timeObjectAnimationRate_ = 0.0f;
 }
 
@@ -127,6 +128,46 @@ void GameManager::Update()
 	TitleObjectUpdate();
 	scoreObjectUpdate();
 	PressAnyKeyUpdate();
+
+	if (CheckHitKeyAll() && !isInput_)
+	{
+	int a = 2;
+		if (CheckHitKey(KEY_INPUT_1))
+		{
+			sounds_->Action();
+		}
+		if (CheckHitKey(KEY_INPUT_2))
+		{
+			sounds_->Brake();
+		}
+		if (CheckHitKey(KEY_INPUT_3))
+		{
+			sounds_->Engine(a);
+		}
+		if (CheckHitKey(KEY_INPUT_4))
+		{
+			sounds_->Slow();
+		}
+		if (CheckHitKey(KEY_INPUT_5))
+		{
+			sounds_->Explosion(a);
+		}
+		if (CheckHitKey(KEY_INPUT_6))
+		{
+			sounds_->Horn(a);
+		}
+
+
+		if (CheckHitKey(KEY_INPUT_9))
+		{
+			sounds_->Enter();
+		}
+		if (CheckHitKey(KEY_INPUT_0))
+		{
+			sounds_->BGM();
+		}
+	}
+
 	isInput_ = (CheckHitKeyAll() || isNotAnimationEnd_);
 }
 
@@ -304,7 +345,7 @@ void GameManager::Load()
 	comboTextObject_ = MV1LoadModel("Resources/combo/combo.mv1");
 	TitleObject_ = MV1LoadModel("Resources/title/title.mv1");
 	pressAnyKeyHandle_ = MV1LoadModel("Resources/press_any_key/press_any_key.mv1");
-	timeTextObjectHandle_ = MV1LoadModel("Resources/time/time.mv1");
+	timeTextObjectHandle_ = MV1LoadModel("Resources/time_ui/time_ui.mv1");
 }
 
 void GameManager::TitleDraw()
@@ -492,7 +533,7 @@ void GameManager::scoreDraw()
 		timeNums.resize(2);
 		int tmpTime = TimeLimit - gameTimer_;
 		tmpTime /= 60;
-		tmpTime ++;
+		tmpTime++;
 		for (int i = 1; i <= timeNums.size(); i++)
 		{
 			int tmpDegit = tmpTime % 10;
@@ -528,7 +569,7 @@ void GameManager::scoreDraw()
 #pragma region timeText
 	{
 		Matrix4 worldMat;
-		worldMat = scale(Vector3(timeScale * 2, timeScale, timeScale));
+		worldMat = scale(Vector3(timeScale, timeScale, timeScale));
 
 		worldMat *= cameraPosture;
 
@@ -663,6 +704,11 @@ void GameManager::CheckCarAllDead(bool isAllDead)
 Matrix4 GameManager::GetCamMat()
 {
 	return  Posture((cameraBaseTargetPos_ - cameraBasePos_), Vector3(0.0f, 1.0f, 0.0f));
+}
+
+void GameManager::SetSoundManager(SoundManager *sound)
+{
+	sounds_ = sound;
 }
 
 void GameManager::ToIngame()

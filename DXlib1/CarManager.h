@@ -5,6 +5,7 @@
 #include <vector>
 #include <list>
 #include "Matrix4.h"
+class SoundManager;
 class CarManager
 {
 public:
@@ -40,6 +41,8 @@ public:
 	bool GetIsAllCarDead();
 
 	void SetCamMat(Matrix4 mat);
+
+	void SetSoundManager(SoundManager *sounds);
 private:
 	void IngameUpdate();
 
@@ -90,5 +93,7 @@ private:
 	int deadAnimationTimer_ = 0;
 	CarBlastParticle playerBlast;
 	CarBlastParticle enemyBlast;
+
+	SoundManager *sounds_ = nullptr;
 };
 

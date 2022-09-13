@@ -70,6 +70,13 @@ Game::Game()
 	leftLightHandle = CreateDirLightHandle(VGet(1.0f, -0.2f, 0.0f));
 	rightLightHandle = CreateDirLightHandle(VGet(-1.0f, -0.2f, 0.0f));
 
+	sounds = std::make_unique<SoundManager>();
+	sounds->Load();
+
+	carManager.SetSoundManager(sounds.get());
+	gameManager.SetSoundManager(sounds.get());
+
+	//sounds->BGM();
 }
 
 Game::~Game()

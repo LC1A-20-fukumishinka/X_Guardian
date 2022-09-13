@@ -24,6 +24,8 @@ vector<int> Car::sNormalCarModelHandles;
 int Car::sTrackCarModelHandle = -1;
 
 float Car::pressAnimationRate = 0.0f;
+
+SoundManager *Car::sSounds = nullptr;
 Car::Car()
 {
 	const unsigned int color = GetColor(255, 255, 255);
@@ -350,6 +352,10 @@ void Car::SetPressAnimationRate(float rate)
 	pressAnimationRate = rate;
 }
 
+void Car::SetSoundManager(SoundManager *sounds)
+{
+	sSounds = sounds;
+}
 void Car::CapsuleMove()
 {
 	colObject_->startPosition = frontPos_;

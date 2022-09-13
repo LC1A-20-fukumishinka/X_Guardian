@@ -3,6 +3,8 @@
 #include "DxLib.h"
 #include "EaseClass.h"
 #include <algorithm>
+#include "SoundManager.h"
+
 using namespace std;
 
 const float CarManager::sCarWidthPos = 13.0f;
@@ -269,7 +271,7 @@ void CarManager::DrwaHud()
 	nextRate = std::clamp(allRate, 0.0f, 1.0f);
 	inputRate = std::clamp((allRate - lag), 0.0f, 1.0f);
 
-	
+
 	int inputDrawHandle = -1;
 	if (inputSignal == MoveType::STRAIGHT)
 	{
@@ -334,24 +336,24 @@ void CarManager::DrwaHud()
 	}
 
 	{
-	Matrix4 worldMat;
+		Matrix4 worldMat;
 
-	float frameScale = 0.020f;
-	worldMat = scale(Vector3(frameScale, frameScale, frameScale));
+		float frameScale = 0.020f;
+		worldMat = scale(Vector3(frameScale, frameScale, frameScale));
 
-	worldMat *= camMat_;
+		worldMat *= camMat_;
 
-	Vector3 easePos = actObject;
+		Vector3 easePos = actObject;
 
-	Vector3 moveVec(0.0f, -100.0f, 0.0f);
+		Vector3 moveVec(0.0f, -100.0f, 0.0f);
 
-	moveVec = transform(moveVec, camMat_);
-	float easeRate = Easing::easeOutBack(inputRate);
-	easePos += (moveVec * (1 - easeRate));
-	worldMat *= translate(easePos);
-	MV1SetMatrix(inputDrawHandle, worldMat);
-	MV1DrawModel(inputDrawHandle);
-	DrawExtendGraph(x, y, x + 100, y + 100, inputDrawHandle, TRUE);
+		moveVec = transform(moveVec, camMat_);
+		float easeRate = Easing::easeOutBack(inputRate);
+		easePos += (moveVec * (1 - easeRate));
+		worldMat *= translate(easePos);
+		MV1SetMatrix(inputDrawHandle, worldMat);
+		MV1DrawModel(inputDrawHandle);
+		DrawExtendGraph(x, y, x + 100, y + 100, inputDrawHandle, TRUE);
 	}
 #pragma endregion
 
@@ -512,6 +514,12 @@ bool CarManager::GetIsAllCarDead()
 void CarManager::SetCamMat(Matrix4 mat)
 {
 	camMat_ = mat;
+}
+
+void CarManager::SetSoundManager(SoundManager *sounds)
+{
+	sounds_ = sounds;
+	Car::SetSoundManager(sounds);
 }
 
 void CarManager::IngameUpdate()
