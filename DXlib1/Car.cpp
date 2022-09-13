@@ -1,10 +1,12 @@
 #include "Car.h"
 #include "DxLib.h"
 #include "Matrix4.h"
+#include <algorithm>
+#include "EaseClass.h"
 using namespace std;
 
-const float Car::sTurnStartPos = 5.0f;
-const float Car::sStopPos = 20.0f + sTurnStartPos;
+const float Car::sTurnStartPos = 4.0f;
+const float Car::sStopPos = 50.0f + sTurnStartPos;
 const float Car::sStopLength = 10.0f;
 
 const float Car::sPassWidth = sStopPos;
@@ -15,12 +17,13 @@ float Car::sGameSpeed = 1.0f;
 MoveType Car::sInputSignal = MoveType::STRAIGHT;
 
 const int Car::sMaxEnemyStopTimer = 60;
-const int Car::sMaxDerayTimer = 20;
+const int Car::sMaxDerayTimer = 35;
 
 const float Car::sCarDistanceLimit = 10.0f;
-int Car::sNormalCarModelHandle = -1;
+vector<int> Car::sNormalCarModelHandles;
 int Car::sTrackCarModelHandle = -1;
 
+float Car::pressAnimationRate = 0.0f;
 Car::Car()
 {
 	const unsigned int color = GetColor(255, 255, 255);
@@ -68,9 +71,12 @@ void Car::Init(CarInitializeDesc desc)
 	//カプセルの初期化処理
 	colObject_->startPosition = frontPos_;
 	colObject_->endPosition = (frontPos_ + (-angle_ * carLength_));
-	centerPos_ = (frontPos_ + (-angle_ * (carLength_ / 2)));
+	centerPos_ = (frontPos_ + (-angle_ * (carLength_ * 0.55f)));
 	isCrossIn_ = false;
 	isCounted_ = false;
+	clearAnimationRate_ = 0.0f;
+
+	color_ = rand() % static_cast<int>(sNormalCarModelHandles.size());
 }
 
 void Car::Update()
@@ -111,8 +117,8 @@ void Car::Update()
 
 	float inputSpeed = speed_;
 
-	 inputSpeed *= sGameSpeed;
-	if (isPlayer_ && !isCrossIn && sInputSignal == MoveType::STOP )
+	inputSpeed *= sGameSpeed;
+	if (isPlayer_ && !isCrossIn && sInputSignal == MoveType::STOP || (isPlayer_ && isCounted_))
 	{
 		inputSpeed /= 2.0f;
 	}
@@ -133,6 +139,13 @@ void Car::Update()
 		Dead();
 	}
 	CapsuleMove();
+
+	if (isCounted_)
+	{
+		clearAnimationRate_ += 0.05f;
+
+		clearAnimationRate_ = std::clamp(clearAnimationRate_, 0.0f, 1.0f);
+	}
 }
 
 void Car::Finalize()
@@ -146,7 +159,7 @@ void Car::Draw()
 
 	if (model_ == ModelType::NORMAL)
 	{
-		drawModelHandle = sNormalCarModelHandle;
+		drawModelHandle = sNormalCarModelHandles[color_];
 	}
 	else
 	{
@@ -154,17 +167,65 @@ void Car::Draw()
 	}
 
 	Matrix4 worldMat;
-	worldMat = scale(Vector3(0.04f, 0.04f, 0.04f));
+
+	float carScale = 0.04f;
+	float pressEaseRate = Easing::easeOutCubic(pressAnimationRate);
+	float pressScale = 0.01f;
+
+	pressScale *= (1 - pressEaseRate);
+	worldMat = scale(Vector3(carScale, carScale - pressScale, carScale));
 
 	Vector3 carAngle = (colObject_->endPosition - frontPos_);
+
+	if (isCounted_)
+	{
+		float easeRate = Easing::easeOutQuad(clearAnimationRate_);
+		worldMat *= rotationZ(6.24f * easeRate);
+	}
 	worldMat *= Posture(carAngle, Vector3(0.0f, 1.0f, 0.0f));
 	worldMat *= rotationY(3.14);
+
+
 	worldMat *= translate(centerPos_);
+
+	if (isCounted_)
+	{
+
+		Vector3 jump = Vector3(0.0f, 50.0f, 0.0f);
+
+		float carHeight = 10.0f;
+		if (model_ == ModelType::TRACK)
+		{
+			carHeight = 5.0f;
+		}
+		else
+		{
+			carHeight = 2.0f;
+		}
+		Vector3 uVec = Vector3(0.0f, -carHeight, 0.0f);
+		Matrix4 uVecMat = translate(uVec);
+		float easeRate = Easing::easeOutQuad(clearAnimationRate_);
+
+		uVec = transform(uVec, rotationZ(6.24f * -easeRate));
+		uVec = transform(uVec, Posture(carAngle, Vector3(0.0f, 1.0f, 0.0f)));
+		uVec += Vector3(0.0f, carHeight, 0.0f);
+
+		float jumpEaseRate = Easing::easeInOutQuad(clearAnimationRate_);
+
+		if (jumpEaseRate >= 0.5f)
+		{
+			jumpEaseRate -= 0.5f;
+
+			jumpEaseRate = 0.5f - jumpEaseRate;
+		}
+		uVec += (jump * jumpEaseRate);
+		worldMat *= translate(uVec);
+	}
 
 
 	MV1SetMatrix(drawModelHandle, worldMat);
 	MV1DrawModel(drawModelHandle);
-	colObject_->draw();
+	//colObject_->draw();
 }
 
 bool Car::GetIsAlive()
@@ -218,6 +279,11 @@ void Car::Count()
 	isCounted_ = true;
 }
 
+int Car::GetCarColor()
+{
+	return color_;
+}
+
 bool Car::GetIsPass()
 {
 	bool isPass = false;
@@ -225,11 +291,11 @@ bool Car::GetIsPass()
 	{
 		if (isPlayer_)
 		{
-			isPass = (abs(frontPos_.x) >= sPassWidth || abs(frontPos_.z) > sStopPos);
+			isPass = (abs(colObject_->endPosition.x) >= sPassWidth || abs(colObject_->endPosition.z) > sStopPos);
 		}
 		else
 		{
-			isPass = (abs(frontPos_.x) >= sPassWidth || abs(frontPos_.z) > sStopPos);
+			isPass = (abs(colObject_->endPosition.x) >= sPassWidth || abs(colObject_->endPosition.z) > sStopPos);
 		}
 	}
 	return isPass;
@@ -269,8 +335,19 @@ void Car::SetGameSpeed(float speed)
 
 void Car::LoadModel()
 {
-	sNormalCarModelHandle = MV1LoadModel("Resources/car/car.mv1");
+	sNormalCarModelHandles.resize(5);
+	sNormalCarModelHandles[0] = MV1LoadModel("Resources/cars/light blue/car.mv1");
+	sNormalCarModelHandles[1] = MV1LoadModel("Resources/cars/light green/car.mv1");
+	sNormalCarModelHandles[2] = MV1LoadModel("Resources/cars/pink/car.mv1");
+	sNormalCarModelHandles[3] = MV1LoadModel("Resources/cars/purple/car.mv1");
+	sNormalCarModelHandles[4] = MV1LoadModel("Resources/cars/yellow/car.mv1");
+
 	sTrackCarModelHandle = MV1LoadModel("Resources/track/track.mv1");
+}
+
+void Car::SetPressAnimationRate(float rate)
+{
+	pressAnimationRate = rate;
 }
 
 void Car::CapsuleMove()
@@ -282,7 +359,7 @@ void Car::CapsuleMove()
 	carAngle.normalaize();
 	colObject_->endPosition = (frontPos_ + (carAngle * carLength_));
 
-	centerPos_ = (frontPos_ + (carAngle * (carLength_ / 2)));
+	centerPos_ = (frontPos_ + (carAngle * (carLength_ * 0.55f)));
 }
 
 void Car::StraightMove()
@@ -307,7 +384,7 @@ void Car::RightTurnMove()
 	}
 	else
 	{
-		float inputspeed = speed_* sGameSpeed;
+		float inputspeed = speed_ * sGameSpeed;
 		//旋回処理
 		angle_ = angle_ * rotationY(0.02f * (inputspeed / 0.3f));
 	}
@@ -334,14 +411,14 @@ bool Car::JudgmentToStop(bool isCrossIn)
 	//停止指示中
 	bool isStopSignal = false;
 
-	if (isPlayer_ )
+	if (isPlayer_)
 	{
 		//プレイヤーだったら
 		isStopSignal = !(type_ == sInputSignal || sInputSignal == MoveType::ALLOK);
 	}
 	else if (isStopPosIn && (enemyStopTimer_ > 0) && type_ == MoveType::RIGHTTURN)
 	{
-		enemyStopTimer_-= static_cast<int>(1.0f * sGameSpeed);
+		enemyStopTimer_ -= static_cast<int>(1.0f * sGameSpeed);
 		isStopSignal = true;
 	}
 
@@ -366,7 +443,7 @@ bool Car::JudgmentToStop(bool isCrossIn)
 
 		if (derayTimer_ > 0)
 		{
-			derayTimer_--;
+			derayTimer_ -= 1 * sGameSpeed;
 			isTrafficJam = true;
 		}
 	}

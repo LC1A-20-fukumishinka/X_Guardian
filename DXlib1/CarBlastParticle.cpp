@@ -2,27 +2,39 @@
 #include "DxLib.h"
 #include "Car.h"
 #include <algorithm>
+
+using namespace std;
+vector<Vector3> CarBlastParticle::nColors;
 CarBlastParticle::CarBlastParticle()
 {
 	particles_.reserve(100);
 
 	particles_.resize(100);
+
 }
 
 CarBlastParticle::~CarBlastParticle()
 {
 }
 
-void CarBlastParticle::Init(ModelType type, Vector3 pos)
+void CarBlastParticle::Init(ModelType type, Vector3 pos, int color)
 {
-	Vector3 color = Vector3(1.0f, 1.0f, 1.0f);
+	Vector3 particleColor = Vector3(1.0f, 1.0f, 1.0f);
 	switch (type)
 	{
 	case ModelType::NORMAL:
-		color = Vector3(0.7f, 0.3f, 0.3f);
+
+		if (color >= nColors.size())
+		{
+			particleColor = nColors[0];
+		}
+		else
+		{
+			particleColor = nColors[color];
+		}
 		break;
 	case ModelType::TRACK:
-		color = Vector3(1.0f, 1.0f, 0.25f);
+		particleColor = Vector3(1.0f, 1.0f, 0.25f);
 		break;
 	default:
 		break;
@@ -55,7 +67,7 @@ void CarBlastParticle::Init(ModelType type, Vector3 pos)
 		{
 			power *= 10;
 		}
-		e.Init(pos, RandBlastVector3(overPower), power, color);
+		e.Init(pos, RandBlastVector3(overPower), power, particleColor);
 	}
 }
 
@@ -83,6 +95,17 @@ void CarBlastParticle::Draw()
 			e.Draw();
 		}
 	}
+}
+
+void CarBlastParticle::InitializeColor()
+{
+	nColors.resize(5);
+	float max = 255.0;
+	nColors[0] = Vector3( 0.0f/max, 160.0f /max, 246.0f /max);
+	nColors[1] = Vector3( 145.0f/max, 253.0f/max, 107.0f/max);
+	nColors[2] = Vector3( 254.0f/max, 69.0f/max, 80.0f/max);
+	nColors[3] = Vector3( 165.0f/max, 86.0f/max, 255.0f/max);
+	nColors[4] = Vector3( 255.0f/max, 213.0f/max, 75.0f/max);
 }
 
 void particleObject::Init(Vector3 pos, Vector3 angle, float power, Vector3 color)

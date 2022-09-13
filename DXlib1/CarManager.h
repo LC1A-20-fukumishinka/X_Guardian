@@ -4,6 +4,7 @@
 #include <memory>
 #include <vector>
 #include <list>
+#include "Matrix4.h"
 class CarManager
 {
 public:
@@ -35,6 +36,10 @@ public:
 	void LoadGraphics();
 
 	bool GetDeadAnimation();
+
+	bool GetIsAllCarDead();
+
+	void SetCamMat(Matrix4 mat);
 private:
 	void IngameUpdate();
 
@@ -47,8 +52,10 @@ private:
 	static CarInitializeDesc sTrackCar;
 	static float sGameSpeed;
 
-	static int up, right, down, left;
+	static int up, right, down, left, stop;
+	static int sNextModel, sStraight, sStop,sRight;
 
+	static int sActFrameModel, sGuideModel;
 	static const int sDeadAnimationTimerMax;
 private:
 	std::vector<std::shared_ptr<Car>> playerCars_;
@@ -65,7 +72,18 @@ private:
 
 	MoveType inputSignal = MoveType::STRAIGHT;
 
+	Matrix4 camMat_;
 
+	Vector3 nextFrameObject_;
+	Vector3 nextObject_;
+	Vector3 nextnextObject_;
+	float nextAnimationRate_ = 0.0f;
+
+
+	Vector3 actFrameObject_;
+	Vector3 actObject;
+
+	Vector3 guideObject_;
 
 	bool isDeadAnimation_ = false;
 	bool isIngame_ = false;

@@ -1,5 +1,7 @@
 #pragma once
 #include "Vector3.h"
+#include <array>
+#include "Matrix4.h"
 enum class GameStatus
 {
 	TITLE,
@@ -15,6 +17,9 @@ public:
 	~GameManager();
 	void Init();
 	void Update();
+	void TitleObjectUpdate();
+	void scoreObjectUpdate();
+	void PressAnyKeyUpdate();
 	void Finalize();
 	void Draw();
 
@@ -29,11 +34,28 @@ public:
 	void SetCameraPos(Vector3 camPos, Vector3 targetPos);
 
 	void SetIsDeadAnimation(bool isDeadAnimation);
+
+	void Load();
+
+	void TitleDraw();
+
+	void scoreDraw();
+
+	void ResultDraw();
+
+	void PressAnyKeyDraw();
+
+	void CountDownDraw();
+
+	void CheckCarAllDead(bool isAllDead);
+
+	Matrix4 GetCamMat();
 private:
 	//sceneà⁄ìÆä÷êî
 	void ToIngame();
 	void ToResult();
 	void ToTitle();
+
 	void ToSelect();
 public:
 	const int baseScore = 100;
@@ -45,8 +67,37 @@ private:
 	int maxNormaCount = 25;
 
 	int normaCars = 0;
-	int TimeLimit = 3000;
+	int TimeLimit = 1800;
 	int gameTimer_ = 0;
+
+	std::array<int, 10> numberObjects_;
+
+	int scoreTextObject_;
+	Vector3 scoreObjectPos_;
+	Vector3 scoreNumberObjectPos_;
+	float scoreObjectAnimationRate_ = 0.0f;
+
+	Vector3 scoreResultObjectPos_;
+	Vector3 scoreResultNumberObjectPos_;
+	float scoreResultObjectAnimationRate_ = 0.0f;
+
+	int comboTextObject_;
+	Vector3 comboObjectPos_;
+	Vector3 comboNumberObjectPos_;
+	float comboObjectAnimationRate_ = 0.0f;
+
+	int timeTextObjectHandle_;
+	Vector3 timeObjectPos_;
+	Vector3 timeNumberObjectPos_;
+	float timeObjectAnimationRate_ = 0.0f;
+
+	int TitleObject_;
+	Vector3 titleObjectPos_;
+	float titleObjectAnimationRate_ = 0.0f;
+
+	int pressAnyKeyHandle_;
+	Vector3 pressAnyKeyObjectPos_;
+	float pressAnyKeyObjectAnimationRate_ = 0.0f;
 
 	bool isClear_ = false;
 	bool isFailed_ = false;
@@ -56,6 +107,9 @@ private:
 
 	bool isDeadAnimation_ = false;
 
+	bool isNotAnimationEnd_ = false;
+
+	bool isCarAllDead_ = true;
 	float rotation = 0.0f;
 	float animationRate = 0.0f;
 	Vector3 cameraBasePos_;

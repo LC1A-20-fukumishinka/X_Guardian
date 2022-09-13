@@ -1,5 +1,5 @@
 #include "Game.h"
-
+#include "EaseClass.h"
 Game::Game()
 {
 
@@ -24,14 +24,16 @@ Game::Game()
 	float cameraUpAngle = 0.0f;
 
 
-	model = MV1LoadModel("Resources/cross_road/cross_road.mv1");
+	model = MV1LoadModel("Resources/city/city.mv1");
+	skyModel = MV1LoadModel("Resources/skydome/sky_dome.mv1");
 	//int model = MV1LoadModel("city/city.mv1");
 
-	Vector3 BasePos(0, 0, 225);
+	Vector3 BasePos(-20, 0.1, 302);
 	Sphere sphere(BasePos, 5, GetColor(0, 0, 255));
 
-	Matrix4 matScale = scale(Vector3(0.08f, 0.08f, 0.08f));
-	Matrix4 matRot = rotate(quaternion(Vector3(0, 1, 0), 3.14));
+	float cityScale = 0.2f;
+	Matrix4 matScale = scale(Vector3(cityScale, cityScale, cityScale));
+	Matrix4 matRot = rotate(quaternion(Vector3(0, 1, 0), 0));
 	Matrix4 matTrans = translate(BasePos);
 
 
@@ -46,17 +48,28 @@ Game::Game()
 	qLocal = rot * qLocal;
 
 	matWorld = matScale;
-	matWorld *= rotate(qLocal);
-	BasePos += vForwordAxis *= (-1.0f * 0.0f);
+	matWorld *= matRot;
 	matWorld *= translate(BasePos);
 	cameraUpAngle = 0.0f;
 	cameraRightAngle = 0.0f;
 
-
+	skyMat = scale(Vector3(10.0f, 10.0f, 10.0f));
+	skyMat *= rotate(qLocal);
+	BasePos += vForwordAxis;
+	skyMat *= translate(BasePos);
 
 	gameManager.Init();
 	gameManager.SetCameraPos(cameraOrgPosition, cameraTarget);
+	gameManager.Load();
+
+	carManager.SetCamMat(gameManager.GetCamMat());
 	OldScene = gameManager.GetStatus();
+	int test = SetLightAmbColor(GetColorF(1.0f, 1.0f, 1.0f, 0.0f));
+
+	ChangeLightTypeDir(Vector3(0.0f, -1.0f, 1.0f));
+	leftLightHandle = CreateDirLightHandle(VGet(1.0f, -0.2f, 0.0f));
+	rightLightHandle = CreateDirLightHandle(VGet(-1.0f, -0.2f, 0.0f));
+
 }
 
 Game::~Game()
@@ -76,11 +89,15 @@ void Game::Finalize()
 void Game::Draw()
 {
 	ClearDrawScreen();
-	DrawAxis3D(200.0f);
-	DrawFloorLine();
+	//DrawAxis3D(200.0f);
+	//DrawFloorLine();
 
 	MV1SetMatrix(model, matWorld);
 	MV1DrawModel(model);
+
+	MV1SetMatrix(skyModel, skyMat);
+
+	MV1DrawModel(skyModel);
 
 	carManager.Draw();
 
@@ -95,7 +112,7 @@ void Game::Draw()
 	case GameStatus::INGAME:
 		if (!carManager.GetDeadAnimation())
 		{
-		carManager.DrwaHud();
+			carManager.DrwaHud();
 		}
 		break;
 	case GameStatus::RESULT:
@@ -128,6 +145,8 @@ void Game::Update()
 	default:
 		break;
 	}
+
+	gameManager.CheckCarAllDead(carManager.GetIsAllCarDead());
 	gameManager.Update();
 
 
@@ -137,6 +156,41 @@ void Game::Update()
 	}
 	OldScene = gameManager.GetStatus();
 
+
+	Vector3 BasePos(-20, 0.1, 302);
+
+
+	float cityAnimationScale = 0.05f;
+
+	if (cityAnimationRate >= 1.0f)
+	{
+		cityAnimationRate = 0.0f;
+	}
+	else
+	{
+		float moveRate = (1.0f / 30.0f);
+		if (carManager.GetDeadAnimation())
+		{
+			moveRate *= 0.01f;
+		}
+
+		cityAnimationRate += moveRate;
+	}
+
+	//’¬‚Õ‚É‚Õ‚ÉON/OFF
+	//cityAnimationRate = 1.0f;
+
+	Car::SetPressAnimationRate(cityAnimationRate);
+	float easeRate = Easing::easeOutCubic(cityAnimationRate);
+
+	cityAnimationScale *= (1.0f - easeRate);
+	float cityScale = 0.2f;
+	Matrix4 matScale = scale(Vector3(cityScale, cityScale - cityAnimationScale, cityScale));
+	Matrix4 matRot = rotate(quaternion(Vector3(0, 1, 0), 0));
+	Matrix4 matTrans = translate(BasePos);
+	matWorld = matScale;
+	matWorld *= matRot;
+	matWorld *= translate(BasePos);
 }
 
 void Game::TitleUpdate()

@@ -33,9 +33,16 @@ private:
 	void SceneChange();
 public:
 	int model;
+	int skyModel;
 	int spawnTimer = 60;
 	float camZPos = -50;
 	Matrix4 matWorld;
+	Matrix4 skyMat;
+
+
+	float cityAnimationRate = 0.0f;
+	int leftLightHandle;
+	int rightLightHandle;
 
 	CarManager carManager;
 	GameManager gameManager;

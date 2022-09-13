@@ -27,11 +27,14 @@ public:
 	CarBlastParticle();
 	~CarBlastParticle();
 
-	void Init(ModelType type, Vector3 pos);
+	void Init(ModelType type, Vector3 pos, int color);
 	void Update();
 	void Finalize();
 	void Draw();
+
+	static void InitializeColor();
 private:
+	static 	std::vector<Vector3>nColors;
 
 	std::vector<particleObject> particles_;
 	float scale = 1.0f;
