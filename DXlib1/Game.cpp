@@ -73,6 +73,7 @@ Game::Game()
 
 	sounds = std::make_unique<SoundManager>();
 	sounds->Load();
+	sounds->ChangeVolume();
 
 	carManager.SetSoundManager(sounds.get());
 	gameManager.SetSoundManager(sounds.get());

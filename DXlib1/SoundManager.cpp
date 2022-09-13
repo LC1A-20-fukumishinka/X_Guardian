@@ -31,6 +31,23 @@ void SoundManager::Load()
 	Timeup_ = LoadSoundMem("Resources/sound/game_end.mp3");
 }
 
+void SoundManager::ChangeVolume()
+{
+	ChangeVolumeSoundMem(150, action_);
+	ChangeVolumeSoundMem(150, BGM_);
+	ChangeVolumeSoundMem(150, brake_);
+	ChangeVolumeSoundMem(150, enter_);
+	ChangeVolumeSoundMem(150, explosion1_);
+	ChangeVolumeSoundMem(150, explosion2_);
+	ChangeVolumeSoundMem(150, explosion3_);
+	ChangeVolumeSoundMem(150, horn1_);
+	ChangeVolumeSoundMem(150, horn2_);
+	ChangeVolumeSoundMem(150, horn3_);
+	ChangeVolumeSoundMem(150, leaveCar_);
+	ChangeVolumeSoundMem(150, comingCar_);
+	ChangeVolumeSoundMem(150, slow_);
+}
+
 void SoundManager::Action()
 {
 	PlaySoundMem(action_, DX_PLAYTYPE_BACK);

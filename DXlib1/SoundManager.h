@@ -6,6 +6,8 @@ public:
 	~SoundManager();
 
 	void Load();
+	void ChangeVolume();
+
 
 	void Action();
 	void BGM();
