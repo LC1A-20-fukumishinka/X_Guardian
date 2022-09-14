@@ -14,7 +14,7 @@ const float Car::sEraseWidth = 200.0f;
 const float Car::sEraseDepth = 600.0f;
 float Car::sGameSpeed = 1.0f;
 
-MoveType Car::sInputSignal = MoveType::STRAIGHT;
+MoveType Car::sInputSignal = MoveType::ALLOK;
 
 const int Car::sMaxEnemyStopTimer = 60;
 const int Car::sMaxDerayTimer = 35;

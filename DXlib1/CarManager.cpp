@@ -53,6 +53,8 @@ CarManager::CarManager()
 
 
 	guideObject_ = Vector3(20.0f, 35.0f, -160.0f);
+
+	TitleParticles.resize(60);
 }
 
 CarManager::~CarManager()
@@ -93,6 +95,10 @@ void CarManager::Update()
 			return (!x.lock()->GetIsAlive() || x.lock()->GetIsPass());
 		});
 
+	for (auto &e : TitleParticles)
+	{
+		e.Update();
+	}
 	playerBlast.Update();
 	enemyBlast.Update();
 }
@@ -117,6 +123,11 @@ void CarManager::Draw()
 			e->Draw();
 		}
 	}
+
+	for (auto &e : TitleParticles)
+	{
+		e.Draw();
+	}
 	playerBlast.Draw();
 	enemyBlast.Draw();
 }
@@ -125,19 +136,22 @@ void CarManager::SetSignal()
 {
 
 	MoveType oldSignal = inputSignal;
-	if (CheckHitKey(KEY_INPUT_W))
-	{
-		inputSignal = MoveType::STRAIGHT;
-	}
-	else if (CheckHitKey(KEY_INPUT_D))
-	{
-		inputSignal = MoveType::RIGHTTURN;
-	}
-	else
-	{
-		inputSignal = MoveType::STOP;
-	}
 
+	if (!isDeadAnimation_)
+	{
+		if (CheckHitKey(KEY_INPUT_W))
+		{
+			inputSignal = MoveType::STRAIGHT;
+		}
+		else if (CheckHitKey(KEY_INPUT_D))
+		{
+			inputSignal = MoveType::RIGHTTURN;
+		}
+		else
+		{
+			inputSignal = MoveType::STOP;
+		}
+	}
 	//if (CheckHitKey(KEY_INPUT_S))
 	//{
 	//	inputSignal = MoveType::STOP;
@@ -165,14 +179,14 @@ void CarManager::Collision()
 					{
 						deadPlayerCar_ = pCar;
 						deadEnemyCar_ = eCar;
-						isDeadAnimation_ = true;
 						deadAnimationTimer_ = 0;
 						if (isIngame_)
 						{
-						SetGameSpeed(0.01f);
-						sounds_->BGMStop();
-						sounds_->Slow();
-						inputSignal = MoveType::STOP;
+							isDeadAnimation_ = true;
+							SetGameSpeed(0.01f);
+							sounds_->BGMStop();
+							sounds_->Slow();
+							inputSignal = MoveType::STOP;
 						}
 						break;
 					}
@@ -541,6 +555,38 @@ void CarManager::SetSoundManager(SoundManager *sounds)
 	Car::SetSoundManager(sounds);
 }
 
+void CarManager::SetIsResult(bool isResult)
+{
+	isResult_ = isResult;
+}
+
+void CarManager::AllDead()
+{
+int count = 0;
+	for (auto &e : playerCars_)
+	{
+		if (e->GetIsAlive())
+		{
+			e->Dead();
+			TitleParticles[count].Init(e->GetModelType(), e->GetFrontPos(), e->GetCarColor());
+		}
+		count++;
+	}
+
+	for (auto &e : enemyCars_)
+	{
+		if (e->GetIsAlive())
+		{
+			e->Dead();
+			TitleParticles[count].Init(e->GetModelType(), e->GetFrontPos(), e->GetCarColor());
+		}
+		count++;
+	}
+	sounds_->ContinueBGM();
+	sounds_->Explosion();
+	sounds_->Broken();
+}
+
 void CarManager::IngameUpdate()
 {
 	nextAnimationRate_ += 0.02f;
@@ -605,13 +651,18 @@ void CarManager::OutGameUpdate()
 			sounds_->Explosion();
 			sounds_->Broken();
 		}
-		if (!deadEnemyCar_.expired() && deadPlayerCar_.lock()->GetIsAlive())
+		if (!deadEnemyCar_.expired() && deadEnemyCar_.lock()->GetIsAlive())
 		{
 			deadEnemyCar_.lock()->Update();
 			deadEnemyCar_.lock()->Dead();
 			enemyBlast.Init(deadEnemyCar_.lock()->GetModelType(), deadEnemyCar_.lock()->GetFrontPos(), deadEnemyCar_.lock()->GetCarColor());
 		}
 		deadAnimationTimer_++;
+	}
+
+	if (!isResult_)
+	{
+		Collision();
 	}
 
 	for (auto &e : playerCars_)

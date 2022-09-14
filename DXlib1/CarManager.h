@@ -45,6 +45,10 @@ public:
 	void SetCamMat(Matrix4 mat);
 
 	void SetSoundManager(SoundManager *sounds);
+
+	void SetIsResult(bool isResult);
+
+	void AllDead();
 private:
 	void IngameUpdate();
 
@@ -91,11 +95,13 @@ private:
 	Vector3 guideObject_;
 
 	bool isDeadAnimation_ = false;
+
+	bool isResult_ = false;
 	bool isIngame_ = false;
 	int deadAnimationTimer_ = 0;
 	CarBlastParticle playerBlast;
 	CarBlastParticle enemyBlast;
-
+	std::vector<CarBlastParticle> TitleParticles;
 	SoundManager *sounds_ = nullptr;
 };
 

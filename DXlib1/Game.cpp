@@ -164,6 +164,14 @@ void Game::Update()
 		carManager.SetGameSpeed(1.0f);
 		carManager.Update();
 		SoundUpdate();
+
+			spawnTimer--;
+		if (spawnTimer <= 0)
+		{
+			spawnTimer = 90;
+			carManager.AddPlayerCar();
+			carManager.AddEnemyCar();
+		}
 		break;
 	case GameStatus::SELECT:
 		break;
@@ -182,7 +190,7 @@ void Game::Update()
 	gameManager.CheckCarAllDead(carManager.GetIsAllCarDead());
 	gameManager.Update();
 
-
+	carManager.SetIsResult((gameManager.GetStatus() == GameStatus::RESULT));
 	if (OldScene != gameManager.GetStatus())
 	{
 		SceneChange();
@@ -355,10 +363,13 @@ void Game::SceneChange()
 	switch (gameManager.GetStatus())
 	{
 	case GameStatus::TITLE:
+	carManager.SetGameSpeed(1.0f);
+	
 		break;
 	case GameStatus::SELECT:
 		break;
 	case GameStatus::INGAME:
+		carManager.AllDead();
 		carManager.Init();
 		break;
 	case GameStatus::RESULT:
