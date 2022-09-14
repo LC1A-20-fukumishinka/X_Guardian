@@ -364,6 +364,11 @@ void GameManager::TitleDraw()
 
 	worldMat *= cameraPosture;
 
+
+	titleObjectPos_.y = sin(level_ * (DX_PI_F / 180.0f)) * 2 + 50;
+
+	level_ += 2.0f;
+
 	Vector3 easePos = titleObjectPos_;
 
 	Vector3 moveVec(0.0f, 100.0f, 0.0f);
@@ -685,6 +690,10 @@ void GameManager::PressAnyKeyDraw()
 	worldMat = scale(Vector3(0.05f, 0.05f, 0.05f));
 
 	worldMat *= cameraPosture;
+
+	pressAnyKeyObjectPos_.y = sin(level_ * (DX_PI_F / 180.0f)) * 1 + 10.0f;
+
+
 
 	Vector3 easePos = pressAnyKeyObjectPos_;
 
