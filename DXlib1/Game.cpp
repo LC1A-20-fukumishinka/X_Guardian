@@ -94,16 +94,11 @@ Game::Game()
 		count++;
 	}
 
-<<<<<<< HEAD
 	xGuardian.Init();
-=======
 	for (auto &e : isComboEffects)
 	{
 		e = false;
 	}
-
-	xrossGuardian.Init();
->>>>>>> 22487f27f5d35f1afa8a088e362c310ebd70c97a
 
 }
 
