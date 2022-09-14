@@ -62,7 +62,7 @@ void XGuardian::Draw()
 {
 	Matrix4 worldMat;
 
-	float XScale = 0.1f;
+	float XScale = 0.13f;
 
 	Matrix4 matRot = rotationY(0.314f);
 	matRot *= rotationX(0.314f);
