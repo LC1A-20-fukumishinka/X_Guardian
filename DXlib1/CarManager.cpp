@@ -519,6 +519,11 @@ bool CarManager::GetIsAllCarDead()
 	return isAllDead;
 }
 
+MoveType CarManager::GetInputSignal()
+{
+	return inputSignal;
+}
+
 void CarManager::SetCamMat(Matrix4 mat)
 {
 	camMat_ = mat;

@@ -11,6 +11,7 @@
 #include "GameManager.h"
 #include "SoundManager.h"
 #include <memory>
+#include "XGuardian.h"
 using namespace DxLib;
 
 class Game
@@ -48,6 +49,7 @@ public:
 
 	CarManager carManager;
 	GameManager gameManager;
+	XGuardian xrossGuardian;
 	Vector3 cameraPosition;
 	Vector3 cameraTarget;
 
