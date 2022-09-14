@@ -227,6 +227,7 @@ void Game::Update()
 		matWorld = matScale;
 		matWorld *= matRot;
 		matWorld *= translate(BasePos);
+		xrossGuardian.ScaleAnimation(easeRate);
 	}
 
 

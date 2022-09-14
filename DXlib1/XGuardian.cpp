@@ -19,7 +19,11 @@ XGuardian::XGuardian()
 	XGuardiansStopModelHandle_ = -1;
 	XGuardiansStraightModelHandle_ = -1;
 	XGuardiansTurnRightModelHandle_ = -1;
-	var = 0;
+	var_ = 0;
+	angle_ = 0.0f;
+	spinTimer_ = 0;
+	isSpin_ = false;
+	xGuardianAnimScale_ = 0.05;
 }
 
 XGuardian::~XGuardian()
@@ -28,7 +32,7 @@ XGuardian::~XGuardian()
 
 void XGuardian::Init()
 {
-	centerPos_ = Vector3(45, 38, -120);
+	centerPos_ = Vector3(15, 38, -120);
 }
 
 void XGuardian::Update(MoveType inputSignal)
@@ -39,8 +43,10 @@ void XGuardian::Update(MoveType inputSignal)
 	MV1SetPosition(XGuardiansStraightModelHandle_, centerPos_);
 	MV1SetPosition(XGuardiansTurnRightModelHandle_, centerPos_);
 
-	centerPos_.y = sin(var * (DX_PI_F / 180.0f)) * 2 + 38;
-	var += 4.0f;
+	centerPos_.y = sin(var_ * (DX_PI_F / 180.0f)) * 2 + 38;
+	var_ += 4.0f;
+
+	Spin();
 }
 
 void XGuardian::Finalize()
@@ -56,51 +62,31 @@ void XGuardian::Draw()
 {
 	Matrix4 worldMat;
 
-	float XScale = 0.1f;/*
-	float pressEaseRate = Easing::easeOutCubic(pressAnimationRate);
-	float pressScale = 0.01f;*/
+	float XScale = 0.1f;
 
-	//pressScale *= (1 - pressEaseRate);
-	worldMat = scale(Vector3(XScale, XScale, XScale));
+	worldMat = scale(Vector3(XScale, XScale - xGuardianAnimScale_, XScale));
 
-	//Vector3 carAngle = (colObject_->endPosition - frontPos_);
-
-	//if (isCounted_)
-	//{
-	//	float easeRate = Easing::easeOutQuad(clearAnimationRate_);
-	//	worldMat *= rotationZ(6.24f * easeRate);
-	//}
-	//worldMat *= Posture(carAngle, Vector3(0.0f, 1.0f, 0.0f));
-	worldMat *= rotationY(3.14f/2.5f);
-
+	worldMat *= rotationY(15 / 180 * 3.14);
 
 	worldMat *= translate(centerPos_);
 
-	//if (isCounted_)
-	//{
+	Matrix4 sWorldMat;
 
-	//	Vector3 jump = Vector3(0.0f, 50.0f, 0.0f);
+	sWorldMat = scale(Vector3(XScale, XScale - xGuardianAnimScale_, XScale));
 
-	//	float carHeight = 10.0f;
-	//	if (model_ == ModelType::TRACK)
-	//	{
-	//		carHeight = 5.0f;
-	//	}
-	//	else
-	//	{
-	//		carHeight = 2.0f;
-	//	}
-	//	Vector3 uVec = Vector3(0.0f, -carHeight, 0.0f);
-	//	Matrix4 uVecMat = translate(uVec);
+	sWorldMat *= rotationY(15 / 180 * 3.14);
 
-	//	worldMat *= translate(uVec);
-	//}
+	sWorldMat *= rotationY(angle_);
+
+	//angle_ += 2.0f;
+
+	sWorldMat *= translate(centerPos_);
 
 
 	MV1SetMatrix(XGuardianModelHandle_, worldMat);
-	MV1SetMatrix(XGuardiansStopModelHandle_, worldMat);
-	MV1SetMatrix(XGuardiansStraightModelHandle_, worldMat);
-	MV1SetMatrix(XGuardiansTurnRightModelHandle_, worldMat);
+	MV1SetMatrix(XGuardiansStopModelHandle_, sWorldMat);
+	MV1SetMatrix(XGuardiansStraightModelHandle_, sWorldMat);
+	MV1SetMatrix(XGuardiansTurnRightModelHandle_, sWorldMat);
 	
 	//colObject_->draw();
 	MV1DrawModel(XGuardianModelHandle_);
@@ -118,4 +104,29 @@ void XGuardian::Draw()
 	default:
 		break;
 	}
+}
+
+void XGuardian::Spin()
+{
+	if (oldInputSignal_ != inputSignal_&&!isSpin_) {
+		isSpin_ = true;
+	}
+	oldInputSignal_ = inputSignal_;
+	if (isSpin_) {
+		spinTimer_++;
+		if (spinTimer_ <= MAX_SPINTIMER) {
+			angle_ += 2.0f;
+		}
+		if (spinTimer_ > MAX_SPINTIMER) {
+			isSpin_ = false;
+			spinTimer_ = 0;
+			angle_ = 0.0f;
+		}
+	}
+}
+
+void XGuardian::ScaleAnimation(float easeRate)
+{
+	xGuardianAnimScale_ = 0.025f;
+	xGuardianAnimScale_ *= (1.0f - easeRate);
 }
