@@ -75,6 +75,7 @@ private:
 	int normaCars = 0;
 	int TimeLimit = 1800;
 	int gameTimer_ = 0;
+	int level_ = 0.0f;
 
 	std::array<int, 10> numberObjects_;
 

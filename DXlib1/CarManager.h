@@ -40,6 +40,8 @@ public:
 
 	bool GetIsAllCarDead();
 
+	MoveType GetInputSignal();
+
 	void SetCamMat(Matrix4 mat);
 
 	void SetSoundManager(SoundManager *sounds);

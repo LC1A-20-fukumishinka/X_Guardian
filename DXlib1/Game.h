@@ -11,6 +11,7 @@
 #include "GameManager.h"
 #include "SoundManager.h"
 #include <memory>
+#include "XGuardian.h"
 using namespace DxLib;
 
 enum class TimerName
@@ -84,6 +85,7 @@ public:
 	bool isTurn = false;
 	CarManager carManager;
 	GameManager gameManager;
+	XGuardian xrossGuardian;
 	Vector3 cameraPosition;
 	Vector3 cameraTarget;
 

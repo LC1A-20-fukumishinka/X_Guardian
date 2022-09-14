@@ -98,6 +98,9 @@ Game::Game()
 	{
 		e = false;
 	}
+
+	xrossGuardian.Init();
+
 }
 
 Game::~Game()
@@ -108,6 +111,7 @@ void Game::Init()
 {
 	Car::LoadModel();
 	carManager.LoadGraphics();
+	xrossGuardian.LoadModel();
 }
 
 void Game::Finalize()
@@ -145,6 +149,7 @@ void Game::Draw()
 		{
 			carManager.DrwaHud();
 		}
+		xrossGuardian.Draw();
 		break;
 	case GameStatus::RESULT:
 		break;
@@ -272,6 +277,7 @@ void Game::Update()
 		}
 		matWorld *= matRot;
 		matWorld *= translate(BasePos);
+		xrossGuardian.ScaleAnimation(easeRate);
 	}
 
 
@@ -338,6 +344,7 @@ void Game::IngameUpdate()
 	}
 
 	gameManager.SetIsDeadAnimation(carManager.GetDeadAnimation());
+	xrossGuardian.Update(carManager.GetInputSignal());
 }
 
 
