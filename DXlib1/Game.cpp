@@ -94,7 +94,7 @@ Game::Game()
 		count++;
 	}
 
-	xrossGuardian.Init();
+	xGuardian.Init();
 
 }
 
@@ -105,8 +105,9 @@ Game::~Game()
 void Game::Init()
 {
 	Car::LoadModel();
+	RoadSign::LoadModel();
 	carManager.LoadGraphics();
-	xrossGuardian.LoadModel();
+	xGuardian.LoadModel();
 }
 
 void Game::Finalize()
@@ -144,7 +145,8 @@ void Game::Draw()
 		{
 			carManager.DrwaHud();
 		}
-		xrossGuardian.Draw();
+		xGuardian.Draw();
+		roadSignManager.Draw();
 		break;
 	case GameStatus::RESULT:
 		break;
@@ -235,7 +237,8 @@ void Game::Update()
 		matWorld = matScale;
 		matWorld *= matRot;
 		matWorld *= translate(BasePos);
-		xrossGuardian.ScaleAnimation(easeRate);
+		xGuardian.ScaleAnimation(easeRate);
+		roadSignManager.ScaleAnimation(easeRate);
 	}
 
 
@@ -302,7 +305,8 @@ void Game::IngameUpdate()
 	}
 
 	gameManager.SetIsDeadAnimation(carManager.GetDeadAnimation());
-	xrossGuardian.Update(carManager.GetInputSignal());
+	xGuardian.Update(carManager.GetInputSignal());
+	roadSignManager.Update(carManager.GetInputSignal());
 }
 
 
