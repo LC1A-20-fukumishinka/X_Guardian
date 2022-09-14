@@ -32,7 +32,7 @@ XGuardian::~XGuardian()
 
 void XGuardian::Init()
 {
-	centerPos_ = Vector3(15, 38, -120);
+	centerPos_ = Vector3(40, 38, -120);
 }
 
 void XGuardian::Update(MoveType inputSignal)
@@ -62,7 +62,7 @@ void XGuardian::Draw()
 {
 	Matrix4 worldMat;
 
-	float XScale = 0.1f;
+	float XScale = 0.13f;
 
 	worldMat = scale(Vector3(XScale, XScale - xGuardianAnimScale_, XScale));
 
@@ -74,7 +74,7 @@ void XGuardian::Draw()
 
 	sWorldMat = scale(Vector3(XScale, XScale - xGuardianAnimScale_, XScale));
 
-	sWorldMat *= rotationY(15 / 180 * 3.14);
+	sWorldMat *= rotationY(20 / 180 * 3.14);
 
 	sWorldMat *= rotationY(angle_);
 

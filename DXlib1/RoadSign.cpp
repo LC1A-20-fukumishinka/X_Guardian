@@ -29,7 +29,7 @@ void RoadSign::Init(Vector3 pos,MoveType type)
 
 void RoadSign::Update()
 {
-	if (centerPos_.y <= 0) { centerPos_.y += 8; }
+	if (centerPos_.y <= -10) { centerPos_.y += 8; }
 }
 
 void RoadSign::Draw()
