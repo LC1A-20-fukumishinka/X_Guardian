@@ -14,6 +14,22 @@
 #include "XGuardian.h"
 using namespace DxLib;
 
+enum class TimerName
+{
+	WHISTLE,
+	BRAKE,
+	HORN,
+	ENGINE,
+	BROKEN,
+};
+
+struct TimerRange
+{
+int min = 100;
+int max = 1000;
+
+void Set(int min,int max);
+};
 class Game
 {
 public:
@@ -34,14 +50,28 @@ private:
 	void DrawFloorLine();
 
 	void SceneChange();
+
+	void SoundUpdate();
+
+	int SetRandTimer(TimerRange range);
 public:
 	int model;
+	int ground;
 	int skyModel;
+	int info;
 	int spawnTimer = 60;
 	float camZPos = -50;
 	Matrix4 matWorld;
 	Matrix4 skyMat;
+	Matrix4 boardMat;
 
+	std::vector<int> soundTimers_;
+	std::vector<TimerRange> soundTimersMax_;
+	int whistleTimer_;
+	int brakeTimer_;
+	int hornTimer_;
+	int engineTimer_;
+	int brokenTimer_;
 
 	float cityAnimationRate = 1.0f;
 	int leftLightHandle;

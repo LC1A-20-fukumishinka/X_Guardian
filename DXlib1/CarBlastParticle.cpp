@@ -34,7 +34,16 @@ void CarBlastParticle::Init(ModelType type, Vector3 pos, int color)
 		}
 		break;
 	case ModelType::TRACK:
-		particleColor = Vector3(1.0f, 1.0f, 0.25f);
+		if (color >= nColors.size())
+		{
+			particleColor = nColors[0];
+		}
+		else
+		{
+			particleColor = nColors[color];
+		}
+
+		//particleColor = Vector3(1.0f, 1.0f, 0.25f);
 		break;
 	default:
 		break;

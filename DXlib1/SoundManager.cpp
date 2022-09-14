@@ -14,6 +14,7 @@ void SoundManager::Load()
 	action_ = LoadSoundMem("Resources/sound/action.wav");
 	BGM_ = LoadSoundMem("Resources/sound/BGM.mp3");
 	brake_ = LoadSoundMem("Resources/sound/brake.wav");
+	softBrake_ = LoadSoundMem("Resources/sound/new_brake.wav");
 	enter_ = LoadSoundMem("Resources/sound/enter.mp3");
 	explosion1_ = LoadSoundMem("Resources/sound/explosion_01.wav");
 	explosion2_ = LoadSoundMem("Resources/sound/explosion_02.wav");
@@ -23,24 +24,99 @@ void SoundManager::Load()
 	horn3_ = LoadSoundMem("Resources/sound/horn_03.wav");
 	leaveCar_ = LoadSoundMem("Resources/sound/move_car_01.wav");
 	comingCar_ = LoadSoundMem("Resources/sound/move_car_02.wav");
+	normalCar_ = LoadSoundMem("Resources/sound/move_car_03.wav");
 	slow_ = LoadSoundMem("Resources/sound/slow.wav");
+	broken_ = LoadSoundMem("Resources/sound/break_car.wav");
+	combo_ = LoadSoundMem("Resources/sound/combo.mp3");
+	Timeup_ = LoadSoundMem("Resources/sound/game_end.mp3");
+
+	ChangeInitializeVolume();
 }
 
-void SoundManager::ChangeVolume()
+void SoundManager::ChangeInitializeVolume()
 {
-	ChangeVolumeSoundMem(150, action_);
-	ChangeVolumeSoundMem(150, BGM_);
-	ChangeVolumeSoundMem(150, brake_);
-	ChangeVolumeSoundMem(150, enter_);
-	ChangeVolumeSoundMem(150, explosion1_);
-	ChangeVolumeSoundMem(150, explosion2_);
-	ChangeVolumeSoundMem(150, explosion3_);
-	ChangeVolumeSoundMem(150, horn1_);
-	ChangeVolumeSoundMem(150, horn2_);
-	ChangeVolumeSoundMem(150, horn3_);
-	ChangeVolumeSoundMem(150, leaveCar_);
-	ChangeVolumeSoundMem(150, comingCar_);
-	ChangeVolumeSoundMem(150, slow_);
+	int volume = 100;
+
+	ChangeVolumeSoundMem(volume, action_);
+	ChangeVolumeSoundMem(volume, BGM_);
+	ChangeVolumeSoundMem(volume, brake_);
+	ChangeVolumeSoundMem(volume, enter_);
+	ChangeVolumeSoundMem(volume, explosion1_);
+	ChangeVolumeSoundMem(volume, explosion2_);
+	ChangeVolumeSoundMem(volume, explosion3_);
+	ChangeVolumeSoundMem(volume, horn1_);
+	ChangeVolumeSoundMem(volume, horn2_);
+	ChangeVolumeSoundMem(volume, horn3_);
+	ChangeVolumeSoundMem(volume, leaveCar_);
+	ChangeVolumeSoundMem(volume, comingCar_);
+	ChangeVolumeSoundMem(volume, slow_);
+
+	ChangeVolumeSoundMem(volume, softBrake_);
+	ChangeVolumeSoundMem(volume, normalCar_);
+	ChangeVolumeSoundMem(volume, broken_);
+	ChangeVolumeSoundMem(volume, combo_);
+	ChangeVolumeSoundMem(volume, Timeup_);
+}
+
+void SoundManager::TitleVolume()
+{
+	int volume = 200;
+
+	ChangeVolumeSoundMem(60, action_);
+	ChangeVolumeSoundMem(50, Timeup_);
+
+	ChangeVolumeSoundMem(50, brake_);
+	ChangeVolumeSoundMem(40, softBrake_);
+
+
+	ChangeVolumeSoundMem(40, horn1_);
+	ChangeVolumeSoundMem(40, horn2_);
+	ChangeVolumeSoundMem(40, horn3_);
+	ChangeVolumeSoundMem(60, combo_);
+
+
+	ChangeVolumeSoundMem(60, leaveCar_);
+	ChangeVolumeSoundMem(60, comingCar_);
+	ChangeVolumeSoundMem(100, normalCar_);
+
+
+	//ChangeVolumeSoundMem(volume, explosion1_);
+	//ChangeVolumeSoundMem(volume, explosion2_);
+	//ChangeVolumeSoundMem(volume, explosion3_);
+	ChangeVolumeSoundMem(100, broken_);
+
+
+}
+
+void SoundManager::IngameVolume()
+{
+	int volume = 100;
+
+	int explosionVolume = 150;
+	ChangeVolumeSoundMem(volume, action_);
+	ChangeVolumeSoundMem(volume, BGM_);
+	ChangeVolumeSoundMem(volume, brake_);
+	ChangeVolumeSoundMem(volume, enter_);
+	ChangeVolumeSoundMem(explosionVolume, explosion1_);
+	ChangeVolumeSoundMem(explosionVolume, explosion2_);
+	ChangeVolumeSoundMem(explosionVolume, explosion3_);
+	ChangeVolumeSoundMem(volume, horn1_);
+	ChangeVolumeSoundMem(volume, horn2_);
+	ChangeVolumeSoundMem(volume, horn3_);
+	ChangeVolumeSoundMem(volume, leaveCar_);
+	ChangeVolumeSoundMem(volume, comingCar_);
+	ChangeVolumeSoundMem(volume, slow_);
+
+	ChangeVolumeSoundMem(volume, softBrake_);
+	ChangeVolumeSoundMem(volume, normalCar_);
+	ChangeVolumeSoundMem(volume, broken_);
+	ChangeVolumeSoundMem(volume, combo_);
+	ChangeVolumeSoundMem(volume, Timeup_);
+}
+
+void SoundManager::ResultVolume()
+{
+	ChangeVolumeSoundMem(60, BGM_);
 }
 
 void SoundManager::Action()
@@ -48,9 +124,23 @@ void SoundManager::Action()
 	PlaySoundMem(action_, DX_PLAYTYPE_BACK);
 }
 
+void SoundManager::Whistle()
+{
+	int playNum = (rand() % 2);
+
+	if (playNum == 0)
+	{
+		PlaySoundMem(action_, DX_PLAYTYPE_BACK);
+	}
+	else if (playNum == 1)
+	{
+		PlaySoundMem(Timeup_, DX_PLAYTYPE_BACK);
+	}
+}
+
 void SoundManager::BGM()
 {
-		PlaySoundMem(BGM_, DX_PLAYTYPE_LOOP);
+	PlaySoundMem(BGM_, DX_PLAYTYPE_LOOP);
 }
 
 void SoundManager::BGMStop()
@@ -66,9 +156,31 @@ void SoundManager::ContinueBGM()
 	PlaySoundMem(BGM_, DX_PLAYTYPE_LOOP, FALSE);
 }
 
-void SoundManager::Brake()
+void SoundManager::Broken()
 {
-	PlaySoundMem(brake_, DX_PLAYTYPE_BACK);
+	PlaySoundMem(broken_, DX_PLAYTYPE_BACK);
+}
+
+void SoundManager::Brake(int num)
+{
+	int playNum;
+	if (num >= 0 && num <= 1)
+	{
+		playNum = num;
+	}
+	else
+	{
+		playNum = (rand() % 2);
+	}
+
+	if (playNum == 0)
+	{
+		PlaySoundMem(brake_, DX_PLAYTYPE_BACK);
+	}
+	else if (playNum == 1)
+	{
+		PlaySoundMem(softBrake_, DX_PLAYTYPE_BACK);
+	}
 }
 
 void SoundManager::Enter()
@@ -81,11 +193,11 @@ void SoundManager::Explosion(int num)
 	int playNum;
 	if (num >= 0 && num <= 2)
 	{
-		playNum =num;
+		playNum = num;
 	}
 	else
 	{
-		playNum = rand() % 3;
+		playNum = (rand() % 3);
 	}
 
 	if (playNum == 0)
@@ -105,13 +217,13 @@ void SoundManager::Explosion(int num)
 void SoundManager::Horn(int num)
 {
 	int playNum;
-	if (num >= 0 && num <= 2)
+	if (num >= 0 && num <= 3)
 	{
 		playNum = num;
 	}
 	else
 	{
-		playNum = rand() % 3;
+		playNum = (rand() % 4);
 	}
 
 	if (playNum == 0)
@@ -122,35 +234,110 @@ void SoundManager::Horn(int num)
 	{
 		PlaySoundMem(horn2_, DX_PLAYTYPE_BACK);
 	}
-	else
+	else if (playNum == 2)
 	{
 		PlaySoundMem(horn3_, DX_PLAYTYPE_BACK);
 	}
+	else
+	{
+		PlaySoundMem(combo_, DX_PLAYTYPE_BACK);
+	}
+
 }
 
 void SoundManager::Engine(int num)
 {
 	int playNum;
-	if (num >= 0 && num <= 1)
+	if (num >= 0 && num <= 2)
 	{
 		playNum = num;
 	}
 	else
 	{
-		playNum = rand() % 2;
+		playNum = (rand() % 3);
 	}
 
 	if (playNum == 0)
 	{
 		PlaySoundMem(leaveCar_, DX_PLAYTYPE_BACK);
 	}
-	else
+
+	else if (playNum == 1)
 	{
 		PlaySoundMem(comingCar_, DX_PLAYTYPE_BACK);
 	}
+	else
+	{
+		PlaySoundMem(normalCar_, DX_PLAYTYPE_BACK);
+	}
+}
+
+void SoundManager::EngineStop(int num)
+{
+	int playNum;
+	if (num >= 0 && num <= 2)
+	{
+		playNum = num;
+	}
+	else
+	{
+		playNum = 2;
+	}
+
+	if (playNum == 0)
+	{
+		StopSoundMem(leaveCar_);
+	}
+
+	else if (playNum == 1)
+	{
+		StopSoundMem(comingCar_);
+	}
+	else
+	{
+		StopSoundMem(normalCar_);
+	}
+}
+
+bool SoundManager::EngineCheck(int num)
+{
+	int playNum;
+	if (num >= 0 && num <= 2)
+	{
+		playNum = num;
+	}
+	else
+	{
+		playNum = 2;
+	}
+
+	bool isSound = false;
+	if (playNum == 0)
+	{
+		isSound = CheckSoundMem(leaveCar_);
+	}
+	else if (playNum == 1)
+	{
+		isSound = CheckSoundMem(comingCar_);
+	}
+	else
+	{
+		isSound = CheckSoundMem(normalCar_);
+	}
+	return isSound;
 }
 
 void SoundManager::Slow()
 {
 	PlaySoundMem(slow_, DX_PLAYTYPE_BACK);
+}
+
+void SoundManager::Combo()
+{
+	PlaySoundMem(combo_, DX_PLAYTYPE_BACK);
+}
+
+void SoundManager::TimeUp()
+{
+	PlaySoundMem(Timeup_, DX_PLAYTYPE_BACK);
 }

@@ -21,7 +21,7 @@ const int Car::sMaxDerayTimer = 35;
 
 const float Car::sCarDistanceLimit = 10.0f;
 vector<int> Car::sNormalCarModelHandles;
-int Car::sTrackCarModelHandle = -1;
+vector<int> Car::sTrackCarModelHandles;
 
 float Car::pressAnimationRate = 0.0f;
 
@@ -79,6 +79,11 @@ void Car::Init(CarInitializeDesc desc)
 	clearAnimationRate_ = 0.0f;
 
 	color_ = rand() % static_cast<int>(sNormalCarModelHandles.size());
+	isCrossSound_ = false;
+
+
+	bool isNowStop_ = false;
+	bool isOldStop_ = false;
 }
 
 void Car::Update()
@@ -112,11 +117,11 @@ void Car::Update()
 		}
 	}
 
-
-
+	isOldStop_ = isNowStop_;
 	//Ž~‚Ü‚é‚©‚Ç‚¤‚©
 	bool isStop = JudgmentToStop(isCrossIn);
 
+	isNowStop_ = isStop;
 	float inputSpeed = speed_;
 
 	inputSpeed *= sGameSpeed;
@@ -127,7 +132,11 @@ void Car::Update()
 
 	if (isStop)
 	{
-
+		if (isPlayer_ && isNowStop_ && !isOldStop_)
+		{
+			sSounds->EngineStop();
+			sSounds->Brake(1);
+		}
 	}
 	else
 	{
@@ -135,6 +144,16 @@ void Car::Update()
 		frontPos_ += angle_ * inputSpeed;
 	}
 
+
+	float underFrame = -200.0f;
+	bool isEnemySound = ((frontPos_.z <= underFrame + 70) && !isPlayer_ && !isCrossSound_);
+	bool isPlayerSound = ((frontPos_.z >= underFrame) && isPlayer_ && !isCrossSound_);
+
+	if (isPlayerSound || isEnemySound)
+	{
+		isCrossSound_ = true;
+		sSounds->Engine(2);
+	}
 	bool isCrossTheIntersection = (isCrossIn_ && (abs(frontPos_.x) >= sEraseWidth || abs(frontPos_.z) >= sEraseDepth));
 	if (isCrossTheIntersection)
 	{
@@ -165,7 +184,7 @@ void Car::Draw()
 	}
 	else
 	{
-		drawModelHandle = sTrackCarModelHandle;
+		drawModelHandle = sTrackCarModelHandles[color_];
 	}
 
 	Matrix4 worldMat;
@@ -279,6 +298,7 @@ void Car::Dead()
 void Car::Count()
 {
 	isCounted_ = true;
+	sSounds->Combo();
 }
 
 int Car::GetCarColor()
@@ -344,7 +364,13 @@ void Car::LoadModel()
 	sNormalCarModelHandles[3] = MV1LoadModel("Resources/cars/purple/car.mv1");
 	sNormalCarModelHandles[4] = MV1LoadModel("Resources/cars/yellow/car.mv1");
 
-	sTrackCarModelHandle = MV1LoadModel("Resources/track/track.mv1");
+	sTrackCarModelHandles.resize(5);
+	sTrackCarModelHandles[0] = MV1LoadModel("Resources/tracks/light blue/track.mv1");
+	sTrackCarModelHandles[1] = MV1LoadModel("Resources/tracks/light green/track.mv1");
+	sTrackCarModelHandles[2] = MV1LoadModel("Resources/tracks/pink/track.mv1");
+	sTrackCarModelHandles[3] = MV1LoadModel("Resources/tracks/purple/track.mv1");
+	sTrackCarModelHandles[4] = MV1LoadModel("Resources/tracks/yellow/track.mv1");
+	//sTrackCarModelHandles = MV1LoadModel("Resources/track/track.mv1");
 }
 
 void Car::SetPressAnimationRate(float rate)

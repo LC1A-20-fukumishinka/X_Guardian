@@ -75,7 +75,7 @@ private:
 	static SoundManager *sSounds;
 	//Modelƒnƒ“ƒhƒ‹
 	static std::vector<int> sNormalCarModelHandles;
-	static int sTrackCarModelHandle;
+	static std::vector<int> sTrackCarModelHandles;
 
 	static float sGameSpeed;
 
@@ -117,6 +117,10 @@ private:
 	bool isPlayer_ = true;
 	bool isCrossIn_ = false;
 	bool isCounted_ = false;
+	bool isCrossSound_ = false;
+
+	bool isNowStop_ =false;
+	bool isOldStop_ = false;
 	int derayTimer_ = 0;
 
 	int color_ = 0;

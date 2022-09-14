@@ -25,10 +25,10 @@ Game::Game()
 	float cameraUpAngle = 0.0f;
 
 
-	model = MV1LoadModel("Resources/city/city.mv1");
+	model = MV1LoadModel("Resources/city/city_object.mv1");
+	ground = MV1LoadModel("Resources/city/city_ground.mv1");
 	skyModel = MV1LoadModel("Resources/skydome/sky_dome.mv1");
-	//int model = MV1LoadModel("city/city.mv1");
-
+	info = MV1LoadModel("Resources/signboard/signboard.mv1");
 	Vector3 BasePos(-20, 0.1, 302);
 	Sphere sphere(BasePos, 5, GetColor(0, 0, 255));
 
@@ -51,6 +51,8 @@ Game::Game()
 	matWorld = matScale;
 	matWorld *= matRot;
 	matWorld *= translate(BasePos);
+	MV1SetMatrix(ground, matWorld);
+
 	cameraUpAngle = 0.0f;
 	cameraRightAngle = 0.0f;
 
@@ -73,10 +75,24 @@ Game::Game()
 
 	sounds = std::make_unique<SoundManager>();
 	sounds->Load();
-	sounds->ChangeVolume();
-
+	sounds->TitleVolume();
 	carManager.SetSoundManager(sounds.get());
 	gameManager.SetSoundManager(sounds.get());
+	soundTimers_.resize(5);
+	soundTimersMax_.resize(5);
+	soundTimersMax_[static_cast<int>(TimerName::WHISTLE)].Set(600, 1200);
+	soundTimersMax_[static_cast<int>(TimerName::BRAKE)].Set(300, 480);
+	soundTimersMax_[static_cast<int>(TimerName::HORN)].Set(180, 300);
+	soundTimersMax_[static_cast<int>(TimerName::ENGINE)].Set(120, 240);
+	soundTimersMax_[static_cast<int>(TimerName::BROKEN)].Set(600, 1200);
+
+	int count = 0;
+	for (auto &e : soundTimers_)
+	{
+		e = SetRandTimer(soundTimersMax_[count]);
+		e -= (120 * (count % 2));
+		count++;
+	}
 
 	xrossGuardian.Init();
 
@@ -106,6 +122,9 @@ void Game::Draw()
 	MV1SetMatrix(model, matWorld);
 	MV1DrawModel(model);
 
+	MV1SetMatrix(info, boardMat);
+	MV1DrawModel(info);
+	MV1DrawModel(ground);
 	MV1SetMatrix(skyModel, skyMat);
 
 	MV1DrawModel(skyModel);
@@ -143,6 +162,7 @@ void Game::Update()
 	{
 	case GameStatus::TITLE:
 		carManager.Update();
+		SoundUpdate();
 		break;
 	case GameStatus::SELECT:
 		break;
@@ -181,7 +201,7 @@ void Game::Update()
 	else
 	{
 		float moveRate = (1.0f / 23.25f);
-		
+
 		if (carManager.GetDeadAnimation())
 		{
 			moveRate *= 0.01f;
@@ -197,15 +217,34 @@ void Game::Update()
 
 	Car::SetPressAnimationRate(cityAnimationRate);
 	float easeRate = Easing::easeOutCubic(cityAnimationRate);
+	{
+		cityAnimationScale *= (1.0f - easeRate);
+		float cityScale = 0.2f;
+		Matrix4 matScale = scale(Vector3(cityScale, cityScale - cityAnimationScale, cityScale));
+		Matrix4 matRot = rotate(quaternion(Vector3(0, 1, 0), 0));
+		Matrix4 matTrans = translate(BasePos);
+		matWorld = matScale;
+		matWorld *= matRot;
+		matWorld *= translate(BasePos);
+	}
 
-	cityAnimationScale *= (1.0f - easeRate);
-	float cityScale = 0.2f;
-	Matrix4 matScale = scale(Vector3(cityScale, cityScale - cityAnimationScale, cityScale));
-	Matrix4 matRot = rotate(quaternion(Vector3(0, 1, 0), 0));
-	Matrix4 matTrans = translate(BasePos);
-	matWorld = matScale;
-	matWorld *= matRot;
-	matWorld *= translate(BasePos);
+
+	{
+		float boardScale = 0.1f;
+		float boardAnimationScale = boardScale / 20.0f;
+
+		boardAnimationScale *= (1.0f - easeRate);
+
+		Vector3 drawPos = BasePos;
+
+		drawPos += Vector3(-75.0f, 0.0f, -275.0f);
+		Matrix4 matScale = scale(Vector3(boardScale, boardScale - boardAnimationScale, boardScale));
+		Matrix4 matRot = rotate(quaternion(Vector3(0, 1, 0), (3.14 / 2.0f)));
+		Matrix4 matTrans = translate(BasePos);
+		boardMat = matScale;
+		boardMat *= matRot;
+		boardMat *= translate(drawPos);
+	}
 }
 
 void Game::TitleUpdate()
@@ -322,3 +361,57 @@ void Game::SceneChange()
 	}
 }
 
+void Game::SoundUpdate()
+{
+	int count = 0;
+	for (auto &e : soundTimers_)
+	{
+		e--;
+
+		if (e <= 0)
+		{
+			switch (static_cast<TimerName>(count))
+			{
+			case TimerName::WHISTLE:
+				sounds->Whistle();
+				break;
+			case TimerName::BRAKE:
+				sounds->Brake();
+				break;
+			case TimerName::HORN:
+				sounds->Horn();
+				break;
+			case TimerName::ENGINE:
+				sounds->Engine();
+				break;
+			case TimerName::BROKEN:
+				sounds->Broken();
+				break;
+			default:
+				break;
+			}
+			e = SetRandTimer(soundTimersMax_[count]);
+		}
+
+		count++;
+	}
+}
+
+int Game::SetRandTimer(TimerRange range)
+{
+	int tmpRange = (range.max - range.min);
+	if (tmpRange == 0)
+	{
+		tmpRange = 1;
+	}
+	int ret = (rand() % tmpRange);
+
+	ret += range.min;
+	return ret;
+}
+
+void TimerRange::Set(int min, int max)
+{
+	this->min = min;
+	this->max = max;
+}
