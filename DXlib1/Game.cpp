@@ -355,6 +355,7 @@ void Game::IngameUpdate()
 	gameManager.SetIsDeadAnimation(carManager.GetDeadAnimation());
 	xGuardian.Update(carManager.GetInputSignal());
 	roadSignManager.Update(carManager.GetInputSignal());
+	roadSignManager.conboToAlive(gameManager.GetCombo());
 
 	if (carManager.GetIsNotTrackMove())
 	{

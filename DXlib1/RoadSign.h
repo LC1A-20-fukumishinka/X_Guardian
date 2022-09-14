@@ -11,6 +11,7 @@ public:
 	MoveType sType;;
 
 	float signAnimScale_;
+	bool isAlive = false;
 
 	Vector3 centerPos_;
 	RoadSign();

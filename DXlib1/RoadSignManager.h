@@ -58,4 +58,6 @@ public:
 	}
 
 	void ScaleAnimation(float easeRate);
+
+	void conboToAlive(int conbo);
 };
