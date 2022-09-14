@@ -7,7 +7,7 @@ using namespace std;
 
 const float Car::sTurnStartPos = 4.0f;
 const float Car::sStopPos = 50.0f + sTurnStartPos;
-const float Car::sStopLength = 10.0f;
+const float Car::sStopLength = 3.0f;
 
 const float Car::sPassWidth = sStopPos;
 const float Car::sEraseWidth = 200.0f;
@@ -436,7 +436,7 @@ bool Car::JudgmentToStop(bool isCrossIn)
 	}
 	else
 	{
-		bool inAria = (frontPos_.z <= sStopPos && frontPos_.z > (sStopPos - sStopLength));
+		bool inAria = (frontPos_.z <= sStopPos && frontPos_.z >= (sStopPos - sStopLength));
 		isStopPosIn = (!isCrossIn && inAria);
 	}
 

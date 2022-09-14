@@ -129,18 +129,21 @@ void CarManager::SetSignal()
 	{
 		inputSignal = MoveType::STRAIGHT;
 	}
-
-	if (CheckHitKey(KEY_INPUT_D))
+	else if (CheckHitKey(KEY_INPUT_D))
 	{
 		inputSignal = MoveType::RIGHTTURN;
 	}
-
-	if (CheckHitKey(KEY_INPUT_S))
+	else
 	{
 		inputSignal = MoveType::STOP;
 	}
 
-	if (oldSignal != inputSignal)
+	//if (CheckHitKey(KEY_INPUT_S))
+	//{
+	//	inputSignal = MoveType::STOP;
+	//}
+
+	if (oldSignal != inputSignal && inputSignal != MoveType::STOP)
 	{
 		sounds_->Action();
 	}

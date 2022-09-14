@@ -743,6 +743,7 @@ void GameManager::ToTitle()
 	sounds_->TitleVolume();
 	sounds_->BGMStop();
 	sounds_->Enter();
+
 	status_ = GameStatus::TITLE;
 }
 
