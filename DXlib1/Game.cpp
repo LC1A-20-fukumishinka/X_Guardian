@@ -94,7 +94,16 @@ Game::Game()
 		count++;
 	}
 
+<<<<<<< HEAD
 	xGuardian.Init();
+=======
+	for (auto &e : isComboEffects)
+	{
+		e = false;
+	}
+
+	xrossGuardian.Init();
+>>>>>>> 22487f27f5d35f1afa8a088e362c310ebd70c97a
 
 }
 
@@ -167,7 +176,7 @@ void Game::Update()
 		carManager.Update();
 		SoundUpdate();
 
-			spawnTimer--;
+		spawnTimer--;
 		if (spawnTimer <= 0)
 		{
 			spawnTimer = 90;
@@ -208,6 +217,13 @@ void Game::Update()
 	if (cityAnimationRate >= 1.0f && (gameManager.GetStatus() == GameStatus::INGAME))
 	{
 		cityAnimationRate = 0.0f;
+		int comboCount = gameManager.GetCombo();
+
+		for (int i = 0; i < isComboEffects.size(); i++)
+		{
+			isComboEffects[i] = (comboCount >= (10 * (i + 1)));
+		}
+		isTurn = !isTurn;
 	}
 	else
 	{
@@ -235,6 +251,36 @@ void Game::Update()
 		Matrix4 matRot = rotate(quaternion(Vector3(0, 1, 0), 0));
 		Matrix4 matTrans = translate(BasePos);
 		matWorld = matScale;
+
+
+		float skewRate = 0.314f;
+		if (isComboEffects[2])
+		{
+			skewRate /= 1.0f;
+		}
+		else if (isComboEffects[1])
+		{
+			skewRate /= 2.0f;
+		}
+		else if (isComboEffects[0])
+		{
+			skewRate /= 10.0f;
+		}
+		else
+		{
+			skewRate = 0.0f;
+		}
+
+
+		if (isTurn)
+		{
+			matWorld *= ZSkew((skewRate * easeRate));
+		}
+		else
+		{
+			matWorld *= ZSkew((-skewRate * easeRate));
+
+		}
 		matWorld *= matRot;
 		matWorld *= translate(BasePos);
 		xGuardian.ScaleAnimation(easeRate);
@@ -285,10 +331,10 @@ void Game::IngameUpdate()
 
 	carManager.SetSignal();
 	carManager.Update();
-	int passCarCount = carManager.GetPassCars();
-	for (int i = 0; i < passCarCount; i++)
+	std::vector<Vector3> passCarsPos = carManager.GetPassCars();
+	for (auto &e:passCarsPos)
 	{
-		gameManager.PassCar();
+		gameManager.PassCar(e);
 	}
 
 	if (carManager.GetAnyCarStop())
@@ -367,8 +413,8 @@ void Game::SceneChange()
 	switch (gameManager.GetStatus())
 	{
 	case GameStatus::TITLE:
-	carManager.SetGameSpeed(1.0f);
-	
+		carManager.SetGameSpeed(1.0f);
+
 		break;
 	case GameStatus::SELECT:
 		break;
@@ -433,6 +479,18 @@ int Game::SetRandTimer(TimerRange range)
 
 	ret += range.min;
 	return ret;
+}
+
+Matrix4 Game::ZSkew(float angle)
+{
+	Matrix4 a =
+	{
+		1.0f		,0.0f,0.0f,0.0f,
+		tan(angle)	,1.0f,0.0f,0.0f,
+		0.0f		,0.0f,1.0f,0.0f,
+		0.0f		,0.0f,0.0f,1.0f
+	};
+	return a;
 }
 
 void TimerRange::Set(int min, int max)

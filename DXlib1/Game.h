@@ -55,6 +55,8 @@ private:
 	void SoundUpdate();
 
 	int SetRandTimer(TimerRange range);
+
+	Matrix4 ZSkew(float angle);
 public:
 	int model;
 	int ground;
@@ -80,6 +82,8 @@ public:
 
 	int comboTimer = 0;
 
+	std::array<bool, 3> isComboEffects;
+	bool isTurn = false;
 	CarManager carManager;
 	GameManager gameManager;
 	XGuardian xGuardian;

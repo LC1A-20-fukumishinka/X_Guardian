@@ -12,6 +12,14 @@ enum class GameStatus
 	RESULT,
 	PAUSE,
 };
+
+struct UpperComboObject
+{
+	Vector3 pos = Vector3();
+	int timer = 0;
+	int comboCount = 0;
+};
+
 class GameManager
 {
 public:
@@ -25,7 +33,7 @@ public:
 	void Finalize();
 	void Draw();
 
-	void PassCar();
+	void PassCar(Vector3 pos);
 
 	void StopCar();
 
@@ -53,7 +61,14 @@ public:
 
 	Matrix4 GetCamMat();
 
+	int GetCombo();
+
 	void SetSoundManager(SoundManager *sound);
+
+
+	void ComboObjectUpdate();
+
+	void ComboObjectDraw();
 private:
 	//sceneà⁄ìÆä÷êî
 	void ToIngame();
@@ -128,5 +143,8 @@ private:
 
 	int AddSec = 5;
 	int SubSec = 3;
+
+	std::vector<UpperComboObject> comboPos;
+
 };
 

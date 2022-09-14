@@ -24,7 +24,7 @@ public:
 
 	void Collision();
 
-	int GetPassCars();
+	std::vector<Vector3> GetPassCars();
 
 	bool GetAnyCarStop();
 

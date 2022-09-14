@@ -29,6 +29,8 @@ public:
 	void Slow();
 	void Combo();
 	void TimeUp();
+	void Crap();
+	void AddTime();
 private:
 	int action_;
 	int BGM_;
@@ -48,5 +50,7 @@ private:
 	int slow_;
 	int combo_;
 	int Timeup_;
+	int AddTime_;
+	int Crap_;
 };
 

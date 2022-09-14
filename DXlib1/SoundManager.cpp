@@ -29,7 +29,8 @@ void SoundManager::Load()
 	broken_ = LoadSoundMem("Resources/sound/break_car.wav");
 	combo_ = LoadSoundMem("Resources/sound/combo.mp3");
 	Timeup_ = LoadSoundMem("Resources/sound/game_end.mp3");
-
+	AddTime_ = LoadSoundMem("Resources/sound/add_time.wav");
+	Crap_ = LoadSoundMem("Resources/sound/crap.mp3");
 	ChangeInitializeVolume();
 }
 
@@ -56,6 +57,8 @@ void SoundManager::ChangeInitializeVolume()
 	ChangeVolumeSoundMem(volume, broken_);
 	ChangeVolumeSoundMem(volume, combo_);
 	ChangeVolumeSoundMem(volume, Timeup_);
+	ChangeVolumeSoundMem(volume, AddTime_);
+	ChangeVolumeSoundMem(200, Crap_);
 }
 
 void SoundManager::TitleVolume()
@@ -340,4 +343,14 @@ void SoundManager::Combo()
 void SoundManager::TimeUp()
 {
 	PlaySoundMem(Timeup_, DX_PLAYTYPE_BACK);
+}
+
+void SoundManager::Crap()
+{
+	PlaySoundMem(Crap_, DX_PLAYTYPE_BACK);
+}
+
+void SoundManager::AddTime()
+{
+	PlaySoundMem(AddTime_, DX_PLAYTYPE_BACK);
 }
