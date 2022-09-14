@@ -32,6 +32,8 @@ void SoundManager::Load()
 	AddTime_ = LoadSoundMem("Resources/sound/add_time.wav");
 	Crap_ = LoadSoundMem("Resources/sound/crap.mp3");
 	Buzzer_ = LoadSoundMem("Resources/sound/buzzer.mp3");
+
+	jingle_ = LoadSoundMem("Resources/sound/result.mp3");
 	ChangeInitializeVolume();
 }
 
@@ -60,6 +62,7 @@ void SoundManager::ChangeInitializeVolume()
 	ChangeVolumeSoundMem(volume, Timeup_);
 	ChangeVolumeSoundMem(volume, AddTime_);
 	ChangeVolumeSoundMem(200, Crap_);
+	ChangeVolumeSoundMem(130, jingle_);
 }
 
 void SoundManager::TitleVolume()
@@ -361,4 +364,9 @@ void SoundManager::Buzzer()
 {
 	StopSoundMem(Buzzer_);
 	PlaySoundMem(Buzzer_, DX_PLAYTYPE_BACK);
+}
+
+void SoundManager::Jingle()
+{
+	PlaySoundMem(jingle_, DX_PLAYTYPE_BACK);
 }
