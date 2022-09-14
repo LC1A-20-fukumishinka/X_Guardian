@@ -41,11 +41,11 @@ CarManager::CarManager()
 
 	camMat_ = identity();
 
-	actFrameObject_ = Vector3(-30.0f, 34.0f, -120.0f);
+	nextFrameObject_ = Vector3(-27.0f, 34.0f, -120.0f);
 	actObject = actFrameObject_ + +Vector3(3, 0.0f, 0.0f);
 
 
-	nextFrameObject_ = actFrameObject_ + Vector3(0.0f, -20.0f, -10.0f);
+	actFrameObject_ = actFrameObject_ + Vector3(0.0f, -20.0f, -10.0f);
 	nextObject_ = nextFrameObject_ + Vector3(3, 0.0f, 0.0f);
 	nextnextObject_ = nextObject_ + Vector3(-7, 4.0f, 0.0f);
 
@@ -101,6 +101,9 @@ void CarManager::Update()
 	}
 	playerBlast.Update();
 	enemyBlast.Update();
+
+	inpuAnimation += 0.1f;
+	inpuAnimation = clamp(inpuAnimation, 0.0f, 1.0f);
 }
 
 void CarManager::Finalize()
@@ -157,8 +160,10 @@ void CarManager::SetSignal()
 	//	inputSignal = MoveType::STOP;
 	//}
 
-	if (oldSignal != inputSignal && inputSignal != MoveType::STOP)
+	isChangeSignal = (oldSignal != inputSignal);
+	if (isChangeSignal)
 	{
+		inpuAnimation = 0.0f;
 		sounds_->Action();
 	}
 	Car::SetSignal(inputSignal);
@@ -317,7 +322,6 @@ void CarManager::DrwaHud()
 	{
 		inputDrawHandle = sStop;
 	}
-
 	int x = 700, y = 300;
 
 
@@ -328,8 +332,16 @@ void CarManager::DrwaHud()
 		float guideScale = 0.03f;
 		worldMat = scale(Vector3(guideScale, guideScale, guideScale));
 
+		Vector3 yVec(0.0f, 5.0f, 0.0f);
+		float upEase =	Easing::easeOutExpo(inpuAnimation);
+		float downEase = Easing::easeOutSine(inpuAnimation);
+		worldMat *= translate((yVec * upEase));
+		worldMat *= translate((-yVec * downEase));
+
 		worldMat *= rotationY(0.3f);
 		worldMat *= camMat_;
+
+
 
 		Vector3 easePos = guideObject_;
 
@@ -347,46 +359,46 @@ void CarManager::DrwaHud()
 
 #pragma region input
 
-	{
-		Matrix4 worldMat;
+	//{
+	//	Matrix4 worldMat;
 
-		float frameScale = 0.023f;
-		worldMat = scale(Vector3(frameScale, frameScale, frameScale));
+	//	float frameScale = 0.023f;
+	//	worldMat = scale(Vector3(frameScale, frameScale, frameScale));
 
-		worldMat *= camMat_;
+	//	worldMat *= camMat_;
 
-		Vector3 easePos = actFrameObject_;
+	//	Vector3 easePos = actFrameObject_;
 
-		Vector3 moveVec(0.0f, -100.0f, 0.0f);
+	//	Vector3 moveVec(0.0f, -100.0f, 0.0f);
 
-		moveVec = transform(moveVec, camMat_);
-		float easeRate = Easing::easeOutBack(inputRate);
-		easePos += (moveVec * (1 - easeRate));
-		worldMat *= translate(easePos);
-		MV1SetMatrix(sActFrameModel, worldMat);
-		MV1DrawModel(sActFrameModel);
-	}
+	//	moveVec = transform(moveVec, camMat_);
+	//	float easeRate = Easing::easeOutBack(inputRate);
+	//	easePos += (moveVec * (1 - easeRate));
+	//	worldMat *= translate(easePos);
+	//	MV1SetMatrix(sActFrameModel, worldMat);
+	//	MV1DrawModel(sActFrameModel);
+	//}
 
-	{
-		Matrix4 worldMat;
+	//{
+	//	Matrix4 worldMat;
 
-		float frameScale = 0.020f;
-		worldMat = scale(Vector3(frameScale, frameScale, frameScale));
+	//	float frameScale = 0.020f;
+	//	worldMat = scale(Vector3(frameScale, frameScale, frameScale));
 
-		worldMat *= camMat_;
+	//	worldMat *= camMat_;
 
-		Vector3 easePos = actObject;
+	//	Vector3 easePos = actObject;
 
-		Vector3 moveVec(0.0f, -100.0f, 0.0f);
+	//	Vector3 moveVec(0.0f, -100.0f, 0.0f);
 
-		moveVec = transform(moveVec, camMat_);
-		float easeRate = Easing::easeOutBack(inputRate);
-		easePos += (moveVec * (1 - easeRate));
-		worldMat *= translate(easePos);
-		MV1SetMatrix(inputDrawHandle, worldMat);
-		MV1DrawModel(inputDrawHandle);
-		DrawExtendGraph(x, y, x + 100, y + 100, inputDrawHandle, TRUE);
-	}
+	//	moveVec = transform(moveVec, camMat_);
+	//	float easeRate = Easing::easeOutBack(inputRate);
+	//	easePos += (moveVec * (1 - easeRate));
+	//	worldMat *= translate(easePos);
+	//	MV1SetMatrix(inputDrawHandle, worldMat);
+	//	MV1DrawModel(inputDrawHandle);
+	//	DrawExtendGraph(x, y, x + 100, y + 100, inputDrawHandle, TRUE);
+	//}
 #pragma endregion
 
 
@@ -543,6 +555,26 @@ bool CarManager::GetIsAllCarDead()
 	return isAllDead;
 }
 
+bool CarManager::GetIsNotTrackMove()
+{
+	bool isNotMove = false;
+	if (alivePlayerCars_.size() > 0)
+	{
+		isNotMove = (alivePlayerCars_.begin()->lock()->GetModelType() == ModelType::TRACK);
+
+		if (isNotMove)
+		{
+			isNotMove = alivePlayerCars_.begin()->lock()->GetIsSignalStop();
+		}
+	}
+
+	if (isNotMove)
+	{
+		isNotMove = (isChangeSignal && (inputSignal ==MoveType::STRAIGHT));
+	}
+	return isNotMove;
+}
+
 MoveType CarManager::GetInputSignal()
 {
 	return inputSignal;
@@ -566,7 +598,7 @@ void CarManager::SetIsResult(bool isResult)
 
 void CarManager::AllDead()
 {
-int count = 0;
+	int count = 0;
 	for (auto &e : playerCars_)
 	{
 		if (e->GetIsAlive())

@@ -104,6 +104,7 @@ void GameManager::Update()
 			if (isOlddeadAnimation)
 			{
 				gameTimer_ += 60 * SubSec;
+				SubSecObjectAnimationRate_ = 0.0f;
 			}
 			animationRate -= 0.1f;
 			rotation = 0.0f;
@@ -138,46 +139,8 @@ void GameManager::Update()
 	TitleObjectUpdate();
 	scoreObjectUpdate();
 	PressAnyKeyUpdate();
-
+	AddTimeUpdate();
 	ComboObjectUpdate();
-	if (CheckHitKeyAll() && !isInput_)
-	{
-		int a = 2;
-		//if (CheckHitKey(KEY_INPUT_1))
-		//{
-		//	AddSec--;
-		//}
-		//if (CheckHitKey(KEY_INPUT_2))
-		//{
-		//	AddSec++;
-		//}
-		//if (CheckHitKey(KEY_INPUT_3))
-		//{
-		//	SubSec--;
-		//}
-		//if (CheckHitKey(KEY_INPUT_4))
-		//{
-		//	SubSec--;
-		//}
-		//if (CheckHitKey(KEY_INPUT_5))
-		//{
-		//	sounds_->Explosion(a);
-		//}
-		//if (CheckHitKey(KEY_INPUT_6))
-		//{
-		//	sounds_->Horn(a);
-		//}
-
-
-		if (CheckHitKey(KEY_INPUT_9))
-		{
-			sounds_->Enter();
-		}
-		if (CheckHitKey(KEY_INPUT_0))
-		{
-			sounds_->BGM();
-		}
-	}
 
 	isInput_ = (CheckHitKeyAll() || isNotAnimationEnd_);
 
@@ -335,6 +298,7 @@ void GameManager::PassCar(Vector3 pos)
 		gameTimer_ -= (60 * AddSec);
 		sounds_->AddTime();
 		sounds_->Crap();
+		AddSecObjectAnimationRate_ = 0.0f;
 	}
 	normaCars++;
 }
@@ -384,6 +348,8 @@ void GameManager::Load()
 	TitleObject_ = MV1LoadModel("Resources/title/title.mv1");
 	pressAnyKeyHandle_ = MV1LoadModel("Resources/press_any_key/press_any_key.mv1");
 	timeTextObjectHandle_ = MV1LoadModel("Resources/time_ui/time_ui.mv1");
+	AddHandle_ = MV1LoadModel("Resources/add_sub/add.mv1");
+	SubHandle_ = MV1LoadModel("Resources/add_sub/sub.mv1");
 }
 
 void GameManager::TitleDraw()
@@ -576,6 +542,8 @@ void GameManager::scoreDraw()
 		timeNums.resize(2);
 		int tmpTime = TimeLimit - gameTimer_;
 		tmpTime /= 60;
+
+		tmpTime = std::clamp(tmpTime, 0, 99);
 		tmpTime++;
 		for (int i = 1; i <= timeNums.size(); i++)
 		{
@@ -631,6 +599,73 @@ void GameManager::scoreDraw()
 	}
 #pragma endregion
 
+
+	Vector3 iconMovePos = Vector3(15.0f, 0.0f, 0.0f);
+	Vector3 iconBasePos = Vector3(-23.0f, 0.0f, 0.0f);
+
+#pragma region Addtime
+	if (AddSecObjectAnimationRate_ < 1.0f)
+	{
+		Matrix4 worldMat;
+		Matrix4 iconMat;
+
+		float scaleRate = (1 - Easing::easeInExpo(AddSecObjectAnimationRate_));
+		float baseScale = timeScale * 2 * scaleRate;
+		worldMat = scale(Vector3(baseScale, timeScale * 2, timeScale * 2));
+
+		worldMat *= cameraPosture;
+		iconMat = worldMat;
+
+		Vector3 easePos = timeNumberObjectPos_- iconMovePos + iconBasePos;
+		Vector3 iconEasePos = timeNumberObjectPos_ - iconMovePos + iconBasePos;
+
+		float easeRate = Easing::easeOutExpo(AddSecObjectAnimationRate_);
+		easePos += ((iconMovePos * easeRate) + Vector3(+3.5f * scaleRate, 0.0f, 0.0f));
+		iconEasePos += ((iconMovePos * easeRate) + Vector3(-3.5f * scaleRate, 0.0f, 0.0f));
+
+		worldMat *= translate(easePos);
+		iconMat *= translate(iconEasePos);
+		MV1SetMatrix(numberObjects_[5], worldMat);
+
+		MV1DrawModel(numberObjects_[5]);
+
+		MV1SetMatrix(AddHandle_, iconMat);
+
+		MV1DrawModel(AddHandle_);
+
+	}
+#pragma endregion
+#pragma region Subtime
+	if (SubSecObjectAnimationRate_ < 1.0f)
+	{
+		float scaleRate = (1 - Easing::easeInExpo(SubSecObjectAnimationRate_));
+		float baseScale = timeScale * 2 * scaleRate;
+		Matrix4 worldMat;
+		Matrix4 iconMat;
+		worldMat = scale(Vector3(baseScale, timeScale * 2, timeScale * 2));
+
+		worldMat *= cameraPosture;
+		iconMat = worldMat;
+
+		Vector3 easePos = timeNumberObjectPos_ + iconMovePos + iconBasePos;
+		Vector3 iconEasePos = timeNumberObjectPos_ + iconMovePos + iconBasePos;
+
+		float easeRate = Easing::easeOutExpo(SubSecObjectAnimationRate_);
+		easePos += (-iconMovePos * easeRate) + Vector3(+3.5f * scaleRate, 0.0f, 0.0f);
+		iconEasePos += (-iconMovePos * easeRate) + Vector3(-3.5f * scaleRate, 0.0f, 0.0f);
+
+		worldMat *= translate(easePos);
+		iconMat *= translate(iconEasePos);
+		MV1SetMatrix(numberObjects_[3], worldMat);
+
+		MV1DrawModel(numberObjects_[3]);
+
+		MV1SetMatrix(SubHandle_, iconMat);
+
+		MV1DrawModel(SubHandle_);
+
+	}
+#pragma endregion
 }
 
 void GameManager::ResultDraw()
@@ -816,7 +851,7 @@ void GameManager::ComboObjectDraw()
 					scaleRate = (1.0f - scaleRate);
 					worldMat = scale(Vector3(comboScale, comboScale * scaleRate, comboScale));
 
-														//ˆê‚ÌˆÊ						‚»‚±‚©‚ç‚¸‚ç‚·—Ê
+					//ˆê‚ÌˆÊ						‚»‚±‚©‚ç‚¸‚ç‚·—Ê
 					Vector3 easePos = e.pos + Vector3((5.0f * degetMoveCount) - ((125.0f * comboScale) * (deget)), -15.0f * scaleRate, 0.0f);
 
 					easePos = easePos;
@@ -861,6 +896,14 @@ void GameManager::ComboObjectDraw()
 #pragma endregion
 		}
 	}
+}
+
+void GameManager::AddTimeUpdate()
+{
+	AddSecObjectAnimationRate_ += (1.0f / 60.0f);
+	SubSecObjectAnimationRate_ += (1.0f / 60.0f);
+	AddSecObjectAnimationRate_ = clamp(AddSecObjectAnimationRate_, 0.0f, 1.0f);
+	SubSecObjectAnimationRate_ = clamp(SubSecObjectAnimationRate_, 0.0f, 1.0f);
 }
 
 void GameManager::ToIngame()

@@ -32,7 +32,7 @@ XGuardian::~XGuardian()
 
 void XGuardian::Init()
 {
-	centerPos_ = Vector3(15, 38, -120);
+	centerPos_ = Vector3(18, 30, -130);
 }
 
 void XGuardian::Update(MoveType inputSignal)
@@ -43,7 +43,7 @@ void XGuardian::Update(MoveType inputSignal)
 	MV1SetPosition(XGuardiansStraightModelHandle_, centerPos_);
 	MV1SetPosition(XGuardiansTurnRightModelHandle_, centerPos_);
 
-	centerPos_.y = sin(var_ * (DX_PI_F / 180.0f)) * 2 + 38;
+	centerPos_.y = sin(var_ * (DX_PI_F / 180.0f)) * 2 + 30;
 	var_ += 4.0f;
 
 	Spin();
@@ -64,9 +64,13 @@ void XGuardian::Draw()
 
 	float XScale = 0.1f;
 
+	Matrix4 matRot = rotationY(0.314f);
+	matRot *= rotationX(0.314f);
 	worldMat = scale(Vector3(XScale, XScale - xGuardianAnimScale_, XScale));
 
 	worldMat *= rotationY(15 / 180 * 3.14);
+	worldMat *= matRot;
+
 
 	worldMat *= translate(centerPos_);
 
@@ -74,9 +78,12 @@ void XGuardian::Draw()
 
 	sWorldMat = scale(Vector3(XScale, XScale - xGuardianAnimScale_, XScale));
 
+
 	sWorldMat *= rotationY(15 / 180 * 3.14);
 
 	sWorldMat *= rotationY(angle_);
+	sWorldMat *= matRot;
+
 
 	//angle_ += 2.0f;
 

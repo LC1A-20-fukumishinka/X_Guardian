@@ -290,9 +290,16 @@ void Game::Update()
 		Vector3 drawPos = BasePos;
 
 		drawPos += Vector3(-75.0f, 0.0f, -275.0f);
-		Matrix4 matScale = scale(Vector3(boardScale, boardScale - boardAnimationScale, boardScale));
+		
+		Vector3 boardBaseScale = Vector3(boardScale, boardScale - boardAnimationScale, boardScale);
+		Vector3 NotMoveAnimationScale = Vector3(0.0f, 0.05f,0.05f);
+		float rate = Easing::easeInBack(NotTrackMoveAnimationRate_);
+		NotMoveAnimationScale *= (1 - rate);
+		Matrix4 matScale = scale(boardBaseScale + NotMoveAnimationScale);
 		Matrix4 matRot = rotate(quaternion(Vector3(0, 1, 0), (3.14 / 2.0f)));
 		Matrix4 matTrans = translate(BasePos);
+
+
 		boardMat = matScale;
 		boardMat *= matRot;
 		boardMat *= translate(drawPos);
@@ -345,6 +352,15 @@ void Game::IngameUpdate()
 
 	gameManager.SetIsDeadAnimation(carManager.GetDeadAnimation());
 	xrossGuardian.Update(carManager.GetInputSignal());
+
+	if (carManager.GetIsNotTrackMove())
+	{
+		NotTrackMoveAnimationRate_ = 0.0f;
+		sounds->Buzzer();
+	}
+	NotTrackMoveAnimationRate_+= 0.04f;
+
+	NotTrackMoveAnimationRate_ = std::clamp(NotTrackMoveAnimationRate_, 0.0f, 1.0f);
 }
 
 

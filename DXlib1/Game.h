@@ -63,6 +63,7 @@ public:
 	int info;
 	int spawnTimer = 60;
 	float camZPos = -50;
+	float NotTrackMoveAnimationRate_ = 1.0f;
 	Matrix4 matWorld;
 	Matrix4 skyMat;
 	Matrix4 boardMat;

@@ -31,6 +31,7 @@ public:
 	void TimeUp();
 	void Crap();
 	void AddTime();
+	void Buzzer();
 private:
 	int action_;
 	int BGM_;
@@ -52,5 +53,6 @@ private:
 	int Timeup_;
 	int AddTime_;
 	int Crap_;
+	int Buzzer_;
 };
 

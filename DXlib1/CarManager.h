@@ -40,6 +40,7 @@ public:
 
 	bool GetIsAllCarDead();
 
+	bool GetIsNotTrackMove();
 	MoveType GetInputSignal();
 
 	void SetCamMat(Matrix4 mat);
@@ -98,6 +99,9 @@ private:
 
 	bool isResult_ = false;
 	bool isIngame_ = false;
+
+	bool isChangeSignal = false;
+	float inpuAnimation = 0.0f;
 	int deadAnimationTimer_ = 0;
 	CarBlastParticle playerBlast;
 	CarBlastParticle enemyBlast;

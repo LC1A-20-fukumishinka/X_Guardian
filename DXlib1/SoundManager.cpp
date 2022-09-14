@@ -31,6 +31,7 @@ void SoundManager::Load()
 	Timeup_ = LoadSoundMem("Resources/sound/game_end.mp3");
 	AddTime_ = LoadSoundMem("Resources/sound/add_time.wav");
 	Crap_ = LoadSoundMem("Resources/sound/crap.mp3");
+	Buzzer_ = LoadSoundMem("Resources/sound/buzzer.mp3");
 	ChangeInitializeVolume();
 }
 
@@ -115,6 +116,7 @@ void SoundManager::IngameVolume()
 	ChangeVolumeSoundMem(volume, broken_);
 	ChangeVolumeSoundMem(volume, combo_);
 	ChangeVolumeSoundMem(volume, Timeup_);
+	ChangeVolumeSoundMem(190, Buzzer_);
 }
 
 void SoundManager::ResultVolume()
@@ -353,4 +355,10 @@ void SoundManager::Crap()
 void SoundManager::AddTime()
 {
 	PlaySoundMem(AddTime_, DX_PLAYTYPE_BACK);
+}
+
+void SoundManager::Buzzer()
+{
+	StopSoundMem(Buzzer_);
+	PlaySoundMem(Buzzer_, DX_PLAYTYPE_BACK);
 }

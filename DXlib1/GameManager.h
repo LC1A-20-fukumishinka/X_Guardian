@@ -69,6 +69,8 @@ public:
 	void ComboObjectUpdate();
 
 	void ComboObjectDraw();
+
+	void AddTimeUpdate();
 private:
 	//sceneà⁄ìÆä÷êî
 	void ToIngame();
@@ -119,6 +121,12 @@ private:
 	Vector3 pressAnyKeyObjectPos_;
 	float pressAnyKeyObjectAnimationRate_ = 0.0f;
 
+	int AddHandle_;
+	int SubHandle_;
+
+	Vector3 AddSecObjectPos_;
+	float AddSecObjectAnimationRate_ = 1.0f;
+	float SubSecObjectAnimationRate_ = 1.0f;
 	bool isClear_ = false;
 	bool isFailed_ = false;
 
