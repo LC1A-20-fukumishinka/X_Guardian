@@ -57,10 +57,12 @@ public:
 	int model;
 	int ground;
 	int skyModel;
+	int info;
 	int spawnTimer = 60;
 	float camZPos = -50;
 	Matrix4 matWorld;
 	Matrix4 skyMat;
+	Matrix4 boardMat;
 
 	std::vector<int> soundTimers_;
 	std::vector<TimerRange> soundTimersMax_;

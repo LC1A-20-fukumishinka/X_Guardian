@@ -28,7 +28,7 @@ Game::Game()
 	model = MV1LoadModel("Resources/city/city_object.mv1");
 	ground = MV1LoadModel("Resources/city/city_ground.mv1");
 	skyModel = MV1LoadModel("Resources/skydome/sky_dome.mv1");
-
+	info = MV1LoadModel("Resources/signboard/signboard.mv1");
 	Vector3 BasePos(-20, 0.1, 302);
 	Sphere sphere(BasePos, 5, GetColor(0, 0, 255));
 
@@ -118,6 +118,9 @@ void Game::Draw()
 
 	MV1SetMatrix(model, matWorld);
 	MV1DrawModel(model);
+
+	MV1SetMatrix(info, boardMat);
+	MV1DrawModel(info);
 	MV1DrawModel(ground);
 	MV1SetMatrix(skyModel, skyMat);
 
@@ -210,16 +213,34 @@ void Game::Update()
 
 	Car::SetPressAnimationRate(cityAnimationRate);
 	float easeRate = Easing::easeOutCubic(cityAnimationRate);
+	{
+		cityAnimationScale *= (1.0f - easeRate);
+		float cityScale = 0.2f;
+		Matrix4 matScale = scale(Vector3(cityScale, cityScale - cityAnimationScale, cityScale));
+		Matrix4 matRot = rotate(quaternion(Vector3(0, 1, 0), 0));
+		Matrix4 matTrans = translate(BasePos);
+		matWorld = matScale;
+		matWorld *= matRot;
+		matWorld *= translate(BasePos);
+	}
 
-	cityAnimationScale *= (1.0f - easeRate);
-	float cityScale = 0.2f;
-	Matrix4 matScale = scale(Vector3(cityScale, cityScale - cityAnimationScale, cityScale));
-	Matrix4 matRot = rotate(quaternion(Vector3(0, 1, 0), 0));
-	Matrix4 matTrans = translate(BasePos);
-	matWorld = matScale;
-	matWorld *= matRot;
-	matWorld *= translate(BasePos);
 
+	{
+		float boardScale = 0.1f;
+		float boardAnimationScale = boardScale / 20.0f;
+
+		boardAnimationScale *= (1.0f - easeRate);
+
+		Vector3 drawPos = BasePos;
+
+		drawPos += Vector3(-75.0f, 0.0f, -275.0f);
+		Matrix4 matScale = scale(Vector3(boardScale, boardScale - boardAnimationScale, boardScale));
+		Matrix4 matRot = rotate(quaternion(Vector3(0, 1, 0), (3.14 / 2.0f)));
+		Matrix4 matTrans = translate(BasePos);
+		boardMat = matScale;
+		boardMat *= matRot;
+		boardMat *= translate(drawPos);
+	}
 }
 
 void Game::TitleUpdate()
@@ -373,11 +394,11 @@ void Game::SoundUpdate()
 
 int Game::SetRandTimer(TimerRange range)
 {
-int tmpRange = (range.max - range.min);
-if (tmpRange == 0)
-{
-	tmpRange = 1;
-}
+	int tmpRange = (range.max - range.min);
+	if (tmpRange == 0)
+	{
+		tmpRange = 1;
+	}
 	int ret = (rand() % tmpRange);
 
 	ret += range.min;

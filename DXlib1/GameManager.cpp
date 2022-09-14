@@ -81,7 +81,7 @@ void GameManager::Update()
 
 		isGameOver = (isClear_ || isFailed_);
 
-		if (isGameOver)
+		if (isGameOver && animationRate <= 0.0f)
 		{
 			sounds_->TimeUp();
 			ToResult();
@@ -96,10 +96,14 @@ void GameManager::Update()
 		}
 		else
 		{
+			if (isOlddeadAnimation)
+			{
+				gameTimer_ += 60 * SubSec;
+			}
 			animationRate -= 0.1f;
 			rotation = 0.0f;
 		}
-
+		isOlddeadAnimation = isDeadAnimation_;
 		animationRate = std::clamp(animationRate, 0.0f, 1.0f);
 
 		angle = transform(cameraDeadAnimationPos_, rotationY(rotation));
@@ -133,30 +137,30 @@ void GameManager::Update()
 	if (CheckHitKeyAll() && !isInput_)
 	{
 		int a = 2;
-		if (CheckHitKey(KEY_INPUT_1))
-		{
-			sounds_->Action();
-		}
-		if (CheckHitKey(KEY_INPUT_2))
-		{
-			sounds_->Brake();
-		}
-		if (CheckHitKey(KEY_INPUT_3))
-		{
-			sounds_->Engine(a);
-		}
-		if (CheckHitKey(KEY_INPUT_4))
-		{
-			sounds_->Slow();
-		}
-		if (CheckHitKey(KEY_INPUT_5))
-		{
-			sounds_->Explosion(a);
-		}
-		if (CheckHitKey(KEY_INPUT_6))
-		{
-			sounds_->Horn(a);
-		}
+		//if (CheckHitKey(KEY_INPUT_1))
+		//{
+		//	AddSec--;
+		//}
+		//if (CheckHitKey(KEY_INPUT_2))
+		//{
+		//	AddSec++;
+		//}
+		//if (CheckHitKey(KEY_INPUT_3))
+		//{
+		//	SubSec--;
+		//}
+		//if (CheckHitKey(KEY_INPUT_4))
+		//{
+		//	SubSec--;
+		//}
+		//if (CheckHitKey(KEY_INPUT_5))
+		//{
+		//	sounds_->Explosion(a);
+		//}
+		//if (CheckHitKey(KEY_INPUT_6))
+		//{
+		//	sounds_->Horn(a);
+		//}
 
 
 		if (CheckHitKey(KEY_INPUT_9))
@@ -298,6 +302,10 @@ void GameManager::PassCar()
 
 	score += (baseScore * (combo * comboRate));
 
+	if (combo % 5 == 0)
+	{
+		gameTimer_ -= (60 * AddSec);
+	}
 	normaCars++;
 }
 
@@ -588,7 +596,6 @@ void GameManager::scoreDraw()
 		MV1DrawModel(timeTextObjectHandle_);
 	}
 #pragma endregion
-
 
 }
 

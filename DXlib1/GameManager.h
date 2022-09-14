@@ -122,5 +122,10 @@ private:
 	Vector3 cameraDeadAnimationPos_;
 
 	SoundManager *sounds_ = nullptr;
-	};
+
+	bool isOlddeadAnimation = false;
+
+	int AddSec = 5;
+	int SubSec = 3;
+};
 

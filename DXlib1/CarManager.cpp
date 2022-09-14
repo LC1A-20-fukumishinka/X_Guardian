@@ -597,43 +597,47 @@ void CarManager::OutGameUpdate()
 
 bool CarManager::AddEnemyCar()
 {
-	int carType = rand() % 2;
-	CarInitializeDesc desc = sNormalCar;
-	desc.type = MoveType::STRAIGHT;
-	if (carType == 1)
+
+	bool isSpawn = (aliveEnemyCars_.size() < 11);
+
+	if (isSpawn)
 	{
-		desc = sTrackCar;
-		desc.type = MoveType::RIGHTTURN;
-	}
-	bool isSpawn = false;
-	desc.angle = Vector3(0, 0, -1);
-	desc.startPos = Vector3(sCarWidthPos, 0.0f, 500.0f);
-	desc.isPlayer = false;
-
-	desc.speed = 1.0f;
-
-
-	for (auto &e : enemyCars_)
-	{
-		if (!e->GetIsAlive())
+		int carType = rand() % 2;
+		CarInitializeDesc desc = sNormalCar;
+		desc.type = MoveType::STRAIGHT;
+		if (carType == 1)
 		{
-			//‰Šú‰»
-			e->Init(desc);
-			isSpawn = true;
+			desc = sTrackCar;
+			desc.type = MoveType::RIGHTTURN;
+		}
+		desc.angle = Vector3(0, 0, -1);
+		desc.startPos = Vector3(sCarWidthPos, 0.0f, 500.0f);
+		desc.isPlayer = false;
 
-			//‚Ğ‚Æ‚Â‘O‚ÌÔ—¼‚ª‘¶İ‚·‚é‚È‚ç
-			if (!enemyEndCar.expired())
+		desc.speed = 1.0f;
+
+
+		for (auto &e : enemyCars_)
+		{
+			if (!e->GetIsAlive())
 			{
-				e->SetFrontCar(enemyEndCar);
-			}
-			//©•ª‚ªÅŒã”öÔ—¼‚É‚È‚é
-			enemyEndCar = e;
+				//‰Šú‰»
+				e->Init(desc);
+				isSpawn = true;
 
-			aliveEnemyCars_.emplace_back(e);
-			break;
+				//‚Ğ‚Æ‚Â‘O‚ÌÔ—¼‚ª‘¶İ‚·‚é‚È‚ç
+				if (!enemyEndCar.expired())
+				{
+					e->SetFrontCar(enemyEndCar);
+				}
+				//©•ª‚ªÅŒã”öÔ—¼‚É‚È‚é
+				enemyEndCar = e;
+
+				aliveEnemyCars_.emplace_back(e);
+				break;
+			}
 		}
 	}
-
 	return isSpawn;
 }
 

@@ -21,7 +21,7 @@ const int Car::sMaxDerayTimer = 35;
 
 const float Car::sCarDistanceLimit = 10.0f;
 vector<int> Car::sNormalCarModelHandles;
-int Car::sTrackCarModelHandle = -1;
+vector<int> Car::sTrackCarModelHandles;
 
 float Car::pressAnimationRate = 0.0f;
 
@@ -184,7 +184,7 @@ void Car::Draw()
 	}
 	else
 	{
-		drawModelHandle = sTrackCarModelHandle;
+		drawModelHandle = sTrackCarModelHandles[color_];
 	}
 
 	Matrix4 worldMat;
@@ -364,7 +364,13 @@ void Car::LoadModel()
 	sNormalCarModelHandles[3] = MV1LoadModel("Resources/cars/purple/car.mv1");
 	sNormalCarModelHandles[4] = MV1LoadModel("Resources/cars/yellow/car.mv1");
 
-	sTrackCarModelHandle = MV1LoadModel("Resources/track/track.mv1");
+	sTrackCarModelHandles.resize(5);
+	sTrackCarModelHandles[0] = MV1LoadModel("Resources/tracks/light blue/track.mv1");
+	sTrackCarModelHandles[1] = MV1LoadModel("Resources/tracks/light green/track.mv1");
+	sTrackCarModelHandles[2] = MV1LoadModel("Resources/tracks/pink/track.mv1");
+	sTrackCarModelHandles[3] = MV1LoadModel("Resources/tracks/purple/track.mv1");
+	sTrackCarModelHandles[4] = MV1LoadModel("Resources/tracks/yellow/track.mv1");
+	//sTrackCarModelHandles = MV1LoadModel("Resources/track/track.mv1");
 }
 
 void Car::SetPressAnimationRate(float rate)

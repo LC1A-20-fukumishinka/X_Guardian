@@ -75,7 +75,7 @@ private:
 	static SoundManager *sSounds;
 	//Modelƒnƒ“ƒhƒ‹
 	static std::vector<int> sNormalCarModelHandles;
-	static int sTrackCarModelHandle;
+	static std::vector<int> sTrackCarModelHandles;
 
 	static float sGameSpeed;
 
