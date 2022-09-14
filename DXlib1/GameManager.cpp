@@ -46,6 +46,11 @@ void GameManager::Init()
 	timeObjectPos_ = Vector3(0.0f, 70.0f, -70.0f);
 	timeNumberObjectPos_ = timeObjectPos_ + Vector3(6.3f, -10.0f, 0.0f);
 	timeObjectAnimationRate_ = 0.0f;
+
+	const int comboObjectMaxCount = 30;
+	comboPos.reserve(comboObjectMaxCount);
+	comboPos.resize(comboObjectMaxCount);
+
 }
 
 void GameManager::Update()
@@ -134,6 +139,7 @@ void GameManager::Update()
 	scoreObjectUpdate();
 	PressAnyKeyUpdate();
 
+	ComboObjectUpdate();
 	if (CheckHitKeyAll() && !isInput_)
 	{
 		int a = 2;
@@ -174,6 +180,7 @@ void GameManager::Update()
 	}
 
 	isInput_ = (CheckHitKeyAll() || isNotAnimationEnd_);
+
 }
 
 void GameManager::TitleObjectUpdate()
@@ -293,18 +300,41 @@ void GameManager::Draw()
 	ResultDraw();
 	TitleDraw();
 	PressAnyKeyDraw();
+	ComboObjectDraw();
 }
 
-void GameManager::PassCar()
+void GameManager::PassCar(Vector3 pos)
 {
 	combo++;
 	float comboRate = 0.5;
 
 	score += (baseScore * (combo * comboRate));
+	int tmpTimer = comboPos.begin()->comboCount;
 
+	//ÉRÉìÉ{ëŒè€ÇÃëIë
+	std::vector<UpperComboObject>::iterator itr = comboPos.begin();
+	for (auto tmpItr = comboPos.begin(); tmpItr != comboPos.end(); tmpItr++)
+	{
+		if (tmpItr->timer < itr->timer)
+		{
+			itr = tmpItr;
+		}
+		if (itr->timer <= 0)
+		{
+			break;
+		}
+	}
+
+	const int timerMax = 60;
+	itr->timer = timerMax;
+	itr->comboCount = combo;
+	itr->pos = pos;
+	itr->pos += Vector3(0.0f, 10.0f, 0.0f);
 	if (combo % 5 == 0)
 	{
 		gameTimer_ -= (60 * AddSec);
+		sounds_->AddTime();
+		sounds_->Crap();
 	}
 	normaCars++;
 }
@@ -730,6 +760,107 @@ int GameManager::GetCombo()
 void GameManager::SetSoundManager(SoundManager *sound)
 {
 	sounds_ = sound;
+}
+
+void GameManager::ComboObjectUpdate()
+{
+	for (auto &e : comboPos)
+	{
+		if (e.timer > 0)
+		{
+			e.timer--;
+		}
+	}
+}
+
+void GameManager::ComboObjectDraw()
+{
+
+	Vector3 moveVec = Vector3(0.0f, 20.0f, 0.0f);
+
+	float comboScale = 0.05f;
+	for (auto &e : comboPos)
+	{
+		if (e.timer > 0)
+		{
+			float rate = (1 - (e.timer / 60.0f));
+
+
+			int degetMoveCount;
+#pragma region comboNum
+			{
+				int deget = 0;
+
+				std::vector<int> comboNums;
+				comboNums;
+				int tmpCombo = e.comboCount;
+				for (int i = 0; 10 <= tmpCombo; i++)
+				{
+
+					int tmpDegit = tmpCombo % 10;
+					comboNums.emplace_back(tmpDegit);
+
+					tmpCombo /= 10;
+				}
+				comboNums.emplace_back(tmpCombo);
+
+
+				degetMoveCount = static_cast<int>(comboNums.size());
+				degetMoveCount--;
+				for (auto &num : comboNums)
+				{
+
+					Matrix4 worldMat;
+
+					float scaleRate = Easing::easeInExpo(rate);
+					scaleRate = (1.0f - scaleRate);
+					worldMat = scale(Vector3(comboScale, comboScale * scaleRate, comboScale));
+
+														//àÍÇÃà 						ÇªÇ±Ç©ÇÁÇ∏ÇÁÇ∑ó 
+					Vector3 easePos = e.pos + Vector3((5.0f * degetMoveCount) - ((125.0f * comboScale) * (deget)), -15.0f * scaleRate, 0.0f);
+
+					easePos = easePos;
+
+					float easeRate = Easing::easeOutCubic(rate);
+					easePos += ((moveVec + Vector3(0.0f, 0.0f, 0.0f)) * easeRate);
+
+					worldMat *= translate(easePos);
+
+					deget++;
+					MV1SetMatrix(numberObjects_[num], worldMat);
+
+					MV1DrawModel(numberObjects_[num]);
+				}
+			}
+
+#pragma endregion
+
+#pragma region comboText
+			{
+				Matrix4 worldMat;
+
+				float scaleRate = Easing::easeInExpo(rate);
+				scaleRate = (1.0f - scaleRate);
+
+				float textScale = comboScale / 1.0f;
+				textScale *= scaleRate;
+				worldMat = scale(Vector3(textScale, textScale, textScale));
+
+				Vector3 easePos = e.pos + Vector3(/*(5.0f * degetMoveCount)*/0.0f, -5.0f * scaleRate, 0.0f);
+
+				easePos += Vector3();
+				float easeRate = Easing::easeOutCubic(rate);
+				easePos += (moveVec * easeRate);
+
+
+				worldMat *= translate(easePos);
+				MV1SetMatrix(comboTextObject_, worldMat);
+
+				MV1DrawModel(comboTextObject_);
+			}
+#pragma endregion
+		}
+	}
 }
 
 void GameManager::ToIngame()

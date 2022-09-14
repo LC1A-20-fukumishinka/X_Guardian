@@ -196,15 +196,18 @@ void CarManager::Collision()
 	}
 }
 
-int CarManager::GetPassCars()
+std::vector<Vector3> CarManager::GetPassCars()
 {
 	int passCarCount = 0;
+
+	vector<Vector3> retPos;
 	for (auto &e : playerCars_)
 	{
 		if (e->GetIsAlive())
 		{
 			if (e->GetIsPass())
 			{
+				retPos.emplace_back(e->GetFrontPos());
 				e->Count();
 				passCarCount++;
 			}
@@ -217,12 +220,13 @@ int CarManager::GetPassCars()
 
 			if (e->GetIsPass())
 			{
+				retPos.emplace_back(e->GetFrontPos());
 				e->Count();
 				passCarCount++;
 			}
 		}
 	}
-	return passCarCount;
+	return retPos;
 }
 
 bool CarManager::GetAnyCarStop()

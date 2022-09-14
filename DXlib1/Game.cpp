@@ -254,7 +254,7 @@ void Game::Update()
 		}
 		else if (isComboEffects[1])
 		{
-			skewRate /= 5.0f;
+			skewRate /= 2.0f;
 		}
 		else if (isComboEffects[0])
 		{
@@ -324,10 +324,10 @@ void Game::IngameUpdate()
 
 	carManager.SetSignal();
 	carManager.Update();
-	int passCarCount = carManager.GetPassCars();
-	for (int i = 0; i < passCarCount; i++)
+	std::vector<Vector3> passCarsPos = carManager.GetPassCars();
+	for (auto &e:passCarsPos)
 	{
-		gameManager.PassCar();
+		gameManager.PassCar(e);
 	}
 
 	if (carManager.GetAnyCarStop())
