@@ -53,6 +53,8 @@ public:
 
 	Matrix4 GetCamMat();
 
+	int GetCombo();
+
 	void SetSoundManager(SoundManager *sound);
 private:
 	//sceneˆÚ“®ŠÖ”

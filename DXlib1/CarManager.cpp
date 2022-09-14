@@ -11,7 +11,7 @@ const float CarManager::sCarWidthPos = 13.0f;
 CarInitializeDesc CarManager::sNormalCar;
 CarInitializeDesc CarManager::sTrackCar;
 float CarManager::sGameSpeed = 1.0f;
-const int CarManager::sDeadAnimationTimerMax = 90;
+const int CarManager::sDeadAnimationTimerMax = 60;
 
 int CarManager::up, CarManager::right, CarManager::down, CarManager::left, CarManager::stop;
 int CarManager::sNextModel, CarManager::sStraight, CarManager::sStop, CarManager::sRight;

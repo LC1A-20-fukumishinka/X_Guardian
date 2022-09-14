@@ -713,6 +713,11 @@ Matrix4 GameManager::GetCamMat()
 	return  Posture((cameraBaseTargetPos_ - cameraBasePos_), Vector3(0.0f, 1.0f, 0.0f));
 }
 
+int GameManager::GetCombo()
+{
+	return combo;
+}
+
 void GameManager::SetSoundManager(SoundManager *sound)
 {
 	sounds_ = sound;
