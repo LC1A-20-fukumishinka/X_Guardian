@@ -144,8 +144,11 @@
     <ClCompile Include="Matrix4.cpp" />
     <ClCompile Include="Primitive.cpp" />
     <ClCompile Include="Quaternion.cpp" />
+    <ClCompile Include="RoadSign.cpp" />
+    <ClCompile Include="RoadSignManager.cpp" />
     <ClCompile Include="SoundManager.cpp" />
     <ClCompile Include="Vector3.cpp" />
+    <ClCompile Include="XGuardian.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Car.h" />
@@ -158,8 +161,11 @@
     <ClInclude Include="Matrix4.h" />
     <ClInclude Include="Primitive.h" />
     <ClInclude Include="Quaternion.h" />
+    <ClInclude Include="RoadSign.h" />
+    <ClInclude Include="RoadSignManager.h" />
     <ClInclude Include="SoundManager.h" />
     <ClInclude Include="Vector3.h" />
+    <ClInclude Include="XGuardian.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
