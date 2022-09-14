@@ -89,6 +89,7 @@ void GameManager::Update()
 		if (isGameOver && animationRate <= 0.0f)
 		{
 			sounds_->TimeUp();
+			sounds_->Jingle();
 			ToResult();
 		}
 
