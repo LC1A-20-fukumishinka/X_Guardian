@@ -77,6 +77,8 @@ public:
 	int leftLightHandle;
 	int rightLightHandle;
 
+	int comboTimer = 0;
+
 	CarManager carManager;
 	GameManager gameManager;
 	XGuardian xrossGuardian;

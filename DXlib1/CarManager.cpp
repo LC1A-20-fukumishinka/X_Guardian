@@ -164,10 +164,13 @@ void CarManager::Collision()
 						deadEnemyCar_ = eCar;
 						isDeadAnimation_ = true;
 						deadAnimationTimer_ = 0;
+						if (isIngame_)
+						{
 						SetGameSpeed(0.01f);
 						sounds_->BGMStop();
 						sounds_->Slow();
 						inputSignal = MoveType::STOP;
+						}
 						break;
 					}
 				}
@@ -582,7 +585,31 @@ void CarManager::IngameUpdate()
 
 void CarManager::OutGameUpdate()
 {
+	//Car::SetSignal();
 	nextAnimationRate_ -= 0.02f;
+
+
+
+
+	if (deadAnimationTimer_ <= 0)
+	{
+		if (!deadPlayerCar_.expired())
+		{
+			deadPlayerCar_.lock()->Update();
+			deadPlayerCar_.lock()->Dead();
+			playerBlast.Init(deadPlayerCar_.lock()->GetModelType(), deadPlayerCar_.lock()->GetFrontPos(), deadPlayerCar_.lock()->GetCarColor());
+
+			sounds_->Explosion();
+			sounds_->Broken();
+		}
+		if (!deadEnemyCar_.expired() && deadPlayerCar_.lock()->GetIsAlive())
+		{
+			deadEnemyCar_.lock()->Update();
+			deadEnemyCar_.lock()->Dead();
+			enemyBlast.Init(deadEnemyCar_.lock()->GetModelType(), deadEnemyCar_.lock()->GetFrontPos(), deadEnemyCar_.lock()->GetCarColor());
+		}
+		deadAnimationTimer_++;
+	}
 
 	for (auto &e : playerCars_)
 	{
