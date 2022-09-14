@@ -311,7 +311,6 @@ void GameManager::PassCar()
 
 void GameManager::StopCar()
 {
-
 	combo = 0;
 }
 

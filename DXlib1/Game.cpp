@@ -157,6 +157,7 @@ void Game::Update()
 	switch (gameManager.GetStatus())
 	{
 	case GameStatus::TITLE:
+		carManager.SetGameSpeed(1.0f);
 		carManager.Update();
 		SoundUpdate();
 		break;
@@ -276,7 +277,15 @@ void Game::IngameUpdate()
 
 	if (carManager.GetAnyCarStop())
 	{
-		gameManager.StopCar();
+		comboTimer++;
+		if (comboTimer >= 30)
+		{
+			gameManager.StopCar();
+		}
+	}
+	else
+	{
+		comboTimer = 0;
 	}
 
 	gameManager.SetIsDeadAnimation(carManager.GetDeadAnimation());

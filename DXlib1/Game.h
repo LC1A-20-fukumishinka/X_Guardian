@@ -76,6 +76,8 @@ public:
 	int leftLightHandle;
 	int rightLightHandle;
 
+	int comboTimer = 0;
+
 	CarManager carManager;
 	GameManager gameManager;
 	Vector3 cameraPosition;
