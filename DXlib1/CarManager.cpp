@@ -4,6 +4,7 @@
 #include "EaseClass.h"
 #include <algorithm>
 #include "SoundManager.h"
+#include "Input.h"
 
 using namespace std;
 
@@ -142,11 +143,11 @@ void CarManager::SetSignal()
 
 	if (!isDeadAnimation_)
 	{
-		if (CheckHitKey(KEY_INPUT_W))
+		if (CheckHitKey(KEY_INPUT_W) || CheckHitKey(KEY_INPUT_UP) || Input::isPad(XINPUT_BUTTON_DPAD_UP) || Input::isPad(XINPUT_BUTTON_Y) || Input::isPadThumb(XINPUT_THUMB_LEFTVERT) >= 0.5f)
 		{
 			inputSignal = MoveType::STRAIGHT;
 		}
-		else if (CheckHitKey(KEY_INPUT_D))
+		else if (CheckHitKey(KEY_INPUT_D) || CheckHitKey(KEY_INPUT_RIGHT)|| Input::isPad(XINPUT_BUTTON_DPAD_RIGHT) || Input::isPad(XINPUT_BUTTON_B)|| Input::isPadThumb(XINPUT_THUMB_LEFTSIDE) >= 0.5f)
 		{
 			inputSignal = MoveType::RIGHTTURN;
 		}
