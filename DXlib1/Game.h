@@ -63,6 +63,7 @@ public:
 	int skyModel;
 	int info;
 	int spawnTimer = 60;
+	int playerSpawnTimer = 60;
 	float camZPos = -50;
 	float NotTrackMoveAnimationRate_ = 1.0f;
 	Matrix4 matWorld;

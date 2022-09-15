@@ -59,6 +59,7 @@ void GameManager::Update()
 	bool isGameOver = false;
 	float easeRate = Easing::easeOutQuad(animationRate);
 
+	int sec = 60;
 
 	Vector3 angle;
 	Vector3 animationEndPos;
@@ -77,6 +78,7 @@ void GameManager::Update()
 		break;
 	case GameStatus::INGAME:
 
+	gameLevel_ = (elapsedTime_ / (10 * sec));
 		if (!isDeadAnimation_)
 		{
 			gameTimer_++;
@@ -122,6 +124,7 @@ void GameManager::Update()
 		easePos = cameraBasePos_ + (distance * animationRate);
 		SetCameraPositionAndTargetAndUpVec(easePos, easeTargetPos, Vector3(0.0f, 1.0f, 0.0f));
 
+		elapsedTime_++;
 		break;
 	case GameStatus::RESULT:
 		if (CheckHitKeyAll() && !isInput_ && isCarAllDead_)
@@ -541,10 +544,15 @@ void GameManager::scoreDraw()
 		std::vector<int> timeNums;
 		timeNums.resize(2);
 		int tmpTime = TimeLimit - gameTimer_;
+
+		bool isNotTimeup = (tmpTime > 0);
 		tmpTime /= 60;
 
 		tmpTime = std::clamp(tmpTime, 0, 99);
-		tmpTime++;
+		if (isNotTimeup)
+		{
+			tmpTime++;
+		}
 		for (int i = 1; i <= timeNums.size(); i++)
 		{
 			int tmpDegit = tmpTime % 10;
@@ -906,12 +914,19 @@ void GameManager::AddTimeUpdate()
 	SubSecObjectAnimationRate_ = clamp(SubSecObjectAnimationRate_, 0.0f, 1.0f);
 }
 
+int GameManager::GetGameLevel()
+{
+	return gameLevel_;
+}
+
 void GameManager::ToIngame()
 {
 	score = 0;
 	combo = 0;
 	normaCars = 0;
 	gameTimer_ = 0;
+	elapsedTime_ = 0;
+	gameLevel_ = 0;
 	sounds_->IngameVolume();
 	sounds_->Enter();
 	sounds_->BGM();

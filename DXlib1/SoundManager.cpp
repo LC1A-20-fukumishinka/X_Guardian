@@ -34,6 +34,13 @@ void SoundManager::Load()
 	Buzzer_ = LoadSoundMem("Resources/sound/buzzer.mp3");
 
 	jingle_ = LoadSoundMem("Resources/sound/result.mp3");
+
+
+	int TitleExplosion1_ = DuplicateSoundMem(explosion1_);
+	int TitleExplosion2_ = DuplicateSoundMem(explosion2_);
+	int TitleExplosion3_ = DuplicateSoundMem(explosion3_);
+	int TitleBroken = DuplicateSoundMem(broken_);;
+
 	ChangeInitializeVolume();
 }
 
@@ -63,6 +70,12 @@ void SoundManager::ChangeInitializeVolume()
 	ChangeVolumeSoundMem(volume, AddTime_);
 	ChangeVolumeSoundMem(200, Crap_);
 	ChangeVolumeSoundMem(130, jingle_);
+
+	int titleEexplosionVolume = 75;
+	ChangeVolumeSoundMem(titleEexplosionVolume, TitleExplosion1_);
+	ChangeVolumeSoundMem(titleEexplosionVolume, TitleExplosion2_);
+	ChangeVolumeSoundMem(titleEexplosionVolume, TitleExplosion3_);
+	ChangeVolumeSoundMem((titleEexplosionVolume * (0.666f)), TitleBroken_);
 }
 
 void SoundManager::TitleVolume()
@@ -374,4 +387,26 @@ void SoundManager::Jingle()
 void SoundManager::StopJingle()
 {
 	StopSoundMem(jingle_);
+}
+
+void SoundManager::TitleExplosion()
+{
+	int playNum;
+
+		playNum = (rand() % 3);
+
+	if (playNum == 0)
+	{
+		PlaySoundMem(TitleExplosion1_, DX_PLAYTYPE_BACK);
+	}
+	else if (playNum == 1)
+	{
+		PlaySoundMem(TitleExplosion1_, DX_PLAYTYPE_BACK);
+	}
+	else
+	{
+		PlaySoundMem(TitleExplosion1_, DX_PLAYTYPE_BACK);
+	}
+
+	PlaySoundMem(TitleBroken_, DX_PLAYTYPE_BACK);
 }

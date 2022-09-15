@@ -71,6 +71,8 @@ public:
 	void ComboObjectDraw();
 
 	void AddTimeUpdate();
+
+	int GetGameLevel();
 private:
 	//sceneˆÚ“®ŠÖ”
 	void ToIngame();
@@ -154,5 +156,8 @@ private:
 
 	std::vector<UpperComboObject> comboPos;
 
+	int gameLevel_ = 0;
+	bool isLevelUp = false;
+	int elapsedTime_ = 0;
 };
 

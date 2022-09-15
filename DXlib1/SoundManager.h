@@ -35,6 +35,8 @@ public:
 	void Jingle();
 
 	void StopJingle();
+
+	void TitleExplosion();
 private:
 	int action_;
 	int BGM_;
@@ -58,5 +60,10 @@ private:
 	int Crap_;
 	int Buzzer_;
 	int jingle_;
+
+	int TitleExplosion1_;
+	int TitleExplosion2_;
+	int TitleExplosion3_;
+	int TitleBroken_;
 };
 

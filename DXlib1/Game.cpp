@@ -195,7 +195,6 @@ void Game::Update()
 
 	gameManager.CheckCarAllDead(carManager.GetIsAllCarDead());
 	gameManager.Update();
-
 	carManager.SetIsResult((gameManager.GetStatus() == GameStatus::RESULT));
 	if (OldScene != gameManager.GetStatus())
 	{
@@ -315,21 +314,37 @@ void Game::TitleUpdate()
 
 void Game::IngameUpdate()
 {
+int spawnTimerMax = 90;
 	if (carManager.GetDeadAnimation())
 	{
-		spawnTimer = 90;
+		spawnTimer = spawnTimerMax;
+		playerSpawnTimer = spawnTimerMax;
 	}
 	else
 	{
 		spawnTimer--;
+		playerSpawnTimer--;
 	}
+
+	//óNÇ≠èàóù
 	if (spawnTimer <= 0)
 	{
-		spawnTimer = 90;
-		carManager.AddPlayerCar();
+		spawnTimer = spawnTimerMax;
+
 		carManager.AddEnemyCar();
 	}
 
+	if (playerSpawnTimer <= 0)
+	{
+		int gameLevel = gameManager.GetGameLevel();
+		if (gameLevel)
+		{
+			int hoge = 0;
+		}
+		gameLevel *= 2;
+		playerSpawnTimer = (spawnTimerMax - 30);
+		carManager.AddPlayerCar();
+	}
 
 	carManager.SetSignal();
 	carManager.Update();
@@ -376,7 +391,7 @@ void Game::BaseInitialize()
 	ChangeWindowMode(true);
 	SetGraphMode(WindowWidth, WindowHeight, 32);
 	SetBackgroundColor(0, 0, 64);
-	SetWindowText(_T("è\éöòHÇÃéÁåÏê_"));
+	SetWindowText(_T("3008_è\éöòHÇÃéÁåÏê_"));
 	if (DxLib_Init() == -1)return;
 	SetDrawScreen(DX_SCREEN_BACK);
 

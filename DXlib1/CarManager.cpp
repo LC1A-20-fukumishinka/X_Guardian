@@ -333,7 +333,7 @@ void CarManager::DrwaHud()
 		worldMat = scale(Vector3(guideScale, guideScale, guideScale));
 
 		Vector3 yVec(0.0f, 5.0f, 0.0f);
-		float upEase =	Easing::easeOutExpo(inpuAnimation);
+		float upEase = Easing::easeOutExpo(inpuAnimation);
 		float downEase = Easing::easeOutSine(inpuAnimation);
 		worldMat *= translate((yVec * upEase));
 		worldMat *= translate((-yVec * downEase));
@@ -570,7 +570,7 @@ bool CarManager::GetIsNotTrackMove()
 
 	if (isNotMove)
 	{
-		isNotMove = (isChangeSignal && (inputSignal ==MoveType::STRAIGHT));
+		isNotMove = (isChangeSignal && (inputSignal == MoveType::STRAIGHT));
 	}
 	return isNotMove;
 }
@@ -599,12 +599,20 @@ void CarManager::SetIsResult(bool isResult)
 void CarManager::AllDead()
 {
 	int count = 0;
+
+	float underFrameLine = -145.0f;
+	bool isBroken = false;
 	for (auto &e : playerCars_)
 	{
 		if (e->GetIsAlive())
 		{
 			e->Dead();
-			TitleParticles[count].Init(e->GetModelType(), e->GetFrontPos(), e->GetCarColor());
+
+			if (e->GetFrontPos().z > underFrameLine)
+			{
+				TitleParticles[count].Init(e->GetModelType(), e->GetFrontPos(), e->GetCarColor());
+				isBroken = true;
+			}
 		}
 		count++;
 	}
@@ -614,14 +622,20 @@ void CarManager::AllDead()
 		if (e->GetIsAlive())
 		{
 			e->Dead();
-			TitleParticles[count].Init(e->GetModelType(), e->GetFrontPos(), e->GetCarColor());
+			if (e->GetTailPos().z > underFrameLine)
+			{
+				TitleParticles[count].Init(e->GetModelType(), e->GetFrontPos(), e->GetCarColor());
+				isBroken = true;
+			}
 		}
 		count++;
 	}
-	sounds_->ContinueBGM();
-	sounds_->Explosion();
-	sounds_->Broken();
+	if (isBroken)
+	{
+		sounds_->TitleExplosion();
+	}
 }
+
 
 void CarManager::IngameUpdate()
 {
