@@ -376,7 +376,7 @@ void Game::BaseInitialize()
 	ChangeWindowMode(true);
 	SetGraphMode(WindowWidth, WindowHeight, 32);
 	SetBackgroundColor(0, 0, 64);
-	SetWindowText(_T("十字路の守護神"));
+	SetWindowText(_T("3008_十字路の守護神"));
 	if (DxLib_Init() == -1)return;
 	SetDrawScreen(DX_SCREEN_BACK);
 
