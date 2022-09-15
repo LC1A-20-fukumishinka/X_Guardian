@@ -33,6 +33,8 @@ public:
 	void AddTime();
 	void Buzzer();
 	void Jingle();
+
+	void StopJingle();
 private:
 	int action_;
 	int BGM_;

@@ -89,7 +89,6 @@ void GameManager::Update()
 		if (isGameOver && animationRate <= 0.0f)
 		{
 			sounds_->TimeUp();
-			sounds_->Jingle();
 			ToResult();
 		}
 
@@ -922,6 +921,7 @@ void GameManager::ToIngame()
 
 void GameManager::ToResult()
 {
+	sounds_->Jingle();
 	sounds_->ResultVolume();
 	status_ = GameStatus::RESULT;
 }
@@ -929,6 +929,7 @@ void GameManager::ToResult()
 
 void GameManager::ToTitle()
 {
+	sounds_->StopJingle();
 	sounds_->TitleVolume();
 	sounds_->BGMStop();
 	sounds_->Enter();
