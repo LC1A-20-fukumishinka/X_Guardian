@@ -1,6 +1,8 @@
 #include "Game.h"
 #include "EaseClass.h"
 #include <algorithm>
+#include "Input.h"
+
 Game::Game()
 {
 
@@ -164,6 +166,8 @@ void Game::Draw()
 void Game::Update()
 {
 	//çXêV
+	Input::Update();
+
 	switch (gameManager.GetStatus())
 	{
 	case GameStatus::TITLE:
