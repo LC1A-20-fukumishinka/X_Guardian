@@ -370,3 +370,8 @@ void SoundManager::Jingle()
 {
 	PlaySoundMem(jingle_, DX_PLAYTYPE_BACK);
 }
+
+void SoundManager::StopJingle()
+{
+	StopSoundMem(jingle_);
+}

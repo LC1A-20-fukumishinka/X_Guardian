@@ -426,7 +426,7 @@ void Game::SceneChange()
 	{
 	case GameStatus::TITLE:
 		carManager.SetGameSpeed(1.0f);
-
+		
 		break;
 	case GameStatus::SELECT:
 		break;
