@@ -106,7 +106,7 @@ void CarManager::Update()
 	}
 	playerBlast.Update();
 	enemyBlast.Update();
-
+	ArrowBlast.Update();
 	inpuAnimation += 0.1f;
 	inpuAnimation = clamp(inpuAnimation, 0.0f, 1.0f);
 }
@@ -138,6 +138,7 @@ void CarManager::Draw()
 	}
 	playerBlast.Draw();
 	enemyBlast.Draw();
+	ArrowBlast.Draw();
 }
 
 void CarManager::SetSignal()
@@ -219,6 +220,7 @@ std::vector<Vector3> CarManager::GetPassCars()
 			{
 				retPos.emplace_back(e->GetFrontPos());
 				e->Count();
+				ArrowBlast.Init(ModelType::NORMAL, e->GetFrontPos() + Vector3(0.0f, 2.0f, 0.0f), 0, true);
 				passCarCount++;
 			}
 		}

@@ -281,7 +281,7 @@ void Car::Draw()
 	MV1DrawModel(drawModelHandle);
 
 
-	if(isPlayer_)
+	if(isPlayer_ && !isCounted_)
 	{
 		//–îˆó•`‰æ
 		MV1SetMatrix(arrowModelHandle, arrowMat);

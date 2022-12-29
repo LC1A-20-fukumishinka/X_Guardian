@@ -27,7 +27,7 @@ public:
 	CarBlastParticle();
 	~CarBlastParticle();
 
-	void Init(ModelType type, Vector3 pos, int color);
+	void Init(ModelType type, Vector3 pos, int color, bool isArrow = false);
 	void Update();
 	void Finalize();
 	void Draw();

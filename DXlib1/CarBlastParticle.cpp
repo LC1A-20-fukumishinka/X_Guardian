@@ -17,7 +17,7 @@ CarBlastParticle::~CarBlastParticle()
 {
 }
 
-void CarBlastParticle::Init(ModelType type, Vector3 pos, int color)
+void CarBlastParticle::Init(ModelType type, Vector3 pos, int color, bool isArrow)
 {
 	Vector3 particleColor = Vector3(1.0f, 1.0f, 1.0f);
 	switch (type)
@@ -48,9 +48,22 @@ void CarBlastParticle::Init(ModelType type, Vector3 pos, int color)
 	default:
 		break;
 	}
-	for (auto &e : particles_)
-	{
 
+	if (isArrow)
+	{
+		particleColor = nColors[0];
+	}
+
+	int Count = 0;
+
+	float circumference = 0.628f;
+	for (auto& e : particles_)
+	{
+		//現在生きているパーティクルは使わない
+		if (isArrow && e.isAlive)
+		{
+			continue;
+		}
 		int overPower = rand() % 25;
 
 
@@ -76,17 +89,38 @@ void CarBlastParticle::Init(ModelType type, Vector3 pos, int color)
 		{
 			power *= 10;
 		}
-		e.Init(pos, RandBlastVector3(overPower), power, particleColor);
+
+		//矢印用の特別な処理
+		if (isArrow)
+		{
+			Count++;
+			float x = cosf(circumference * Count);
+			float z = sinf(circumference * Count);
+
+			Vector3 angle(x, 10.0f, z);
+			angle.normalaize();
+
+			e.Init(pos, angle, 3, particleColor);
+		}
+		else
+		{
+			e.Init(pos, RandBlastVector3(overPower), power, particleColor);
+		}
+		if (Count >= 10)
+		{
+			break;
+		}
+
 	}
 }
 
 void CarBlastParticle::Update()
 {
-	for (auto &e : particles_)
+	for (auto& e : particles_)
 	{
 		if (e.isAlive)
 		{
-		e.Update();
+			e.Update();
 		}
 	}
 }
@@ -97,7 +131,7 @@ void CarBlastParticle::Finalize()
 
 void CarBlastParticle::Draw()
 {
-	for (auto &e : particles_)
+	for (auto& e : particles_)
 	{
 		if (e.isAlive)
 		{
@@ -110,11 +144,11 @@ void CarBlastParticle::InitializeColor()
 {
 	nColors.resize(5);
 	float max = 255.0;
-	nColors[0] = Vector3( 0.0f/max, 160.0f /max, 246.0f /max);
-	nColors[1] = Vector3( 145.0f/max, 253.0f/max, 107.0f/max);
-	nColors[2] = Vector3( 254.0f/max, 69.0f/max, 80.0f/max);
-	nColors[3] = Vector3( 165.0f/max, 86.0f/max, 255.0f/max);
-	nColors[4] = Vector3( 255.0f/max, 213.0f/max, 75.0f/max);
+	nColors[0] = Vector3(0.0f / max, 160.0f / max, 246.0f / max);
+	nColors[1] = Vector3(145.0f / max, 253.0f / max, 107.0f / max);
+	nColors[2] = Vector3(254.0f / max, 69.0f / max, 80.0f / max);
+	nColors[3] = Vector3(165.0f / max, 86.0f / max, 255.0f / max);
+	nColors[4] = Vector3(255.0f / max, 213.0f / max, 75.0f / max);
 }
 
 void particleObject::Init(Vector3 pos, Vector3 angle, float power, Vector3 color)

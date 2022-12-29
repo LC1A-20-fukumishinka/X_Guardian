@@ -114,6 +114,7 @@ private:
 	int deadAnimationTimer_ = 0;
 	CarBlastParticle playerBlast;
 	CarBlastParticle enemyBlast;
+	CarBlastParticle ArrowBlast;
 	std::vector<CarBlastParticle> TitleParticles;
 	SoundManager *sounds_ = nullptr;
 };
