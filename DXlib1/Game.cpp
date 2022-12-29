@@ -150,7 +150,7 @@ void Game::Draw()
 		{
 			carManager.DrwaHud();
 		}
-		xGuardian.Draw();
+		//xGuardian.Draw();
 		roadSignManager.Draw();
 		break;
 	case GameStatus::RESULT:
