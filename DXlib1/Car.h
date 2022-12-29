@@ -76,7 +76,7 @@ private:
 	//Modelƒnƒ“ƒhƒ‹
 	static std::vector<int> sNormalCarModelHandles;
 	static std::vector<int> sTrackCarModelHandles;
-
+	static std::vector<int> sArrowModelHandle;
 	static float sGameSpeed;
 
 	static float pressAnimationRate;

@@ -11,6 +11,12 @@ Matrix4 identity();
 //Šg‘åk¬s—ñ‚Ìİ’è
 Matrix4 scale(const Vector3 &s);
 
+/// <summary>
+/// p¨¶¬
+/// </summary>
+/// <param name="v1">³–Ê</param>
+/// <param name="v2">ã</param>
+/// <returns></returns>
 Matrix4 Posture(Vector3 v1, Vector3 v2);
 //‰ñ“]s—ñ‚Ìİ’è
 Matrix4 rotationX(float angle);

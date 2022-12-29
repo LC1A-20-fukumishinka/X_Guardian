@@ -22,6 +22,7 @@ const int Car::sMaxDerayTimer = 35;
 const float Car::sCarDistanceLimit = 10.0f;
 vector<int> Car::sNormalCarModelHandles;
 vector<int> Car::sTrackCarModelHandles;
+vector<int> Car::sArrowModelHandle;
 
 float Car::pressAnimationRate = 0.0f;
 
@@ -82,8 +83,8 @@ void Car::Init(CarInitializeDesc desc)
 	isCrossSound_ = false;
 
 
-	bool isNowStop_ = false;
-	bool isOldStop_ = false;
+	isNowStop_ = false;
+	isOldStop_ = false;
 }
 
 void Car::Update()
@@ -177,38 +178,70 @@ void Car::Draw()
 {
 
 	int drawModelHandle = -1;
-
+	int arrowModelHandle = -1;
 	if (model_ == ModelType::NORMAL)
 	{
 		drawModelHandle = sNormalCarModelHandles[color_];
+		arrowModelHandle = sArrowModelHandle[0];
 	}
 	else
 	{
 		drawModelHandle = sTrackCarModelHandles[color_];
+		arrowModelHandle = sArrowModelHandle[1];
 	}
 
 	Matrix4 worldMat;
-
+	Matrix4 arrowMat;
 	float carScale = 0.04f;
 	float pressEaseRate = Easing::easeOutCubic(pressAnimationRate);
 	float pressScale = 0.01f;
 
 	pressScale *= (1 - pressEaseRate);
 	worldMat = scale(Vector3(carScale, carScale - pressScale, carScale));
+	arrowMat = worldMat;
 
+
+	if (model_ == ModelType::NORMAL)
+	{
+		arrowMat *= scale(Vector3(0.5f, 0.5f, 0.5f));
+	}
+	else
+	{
+		arrowMat *= scale(Vector3(0.5f, 0.5f, 0.5f));
+	}
 	Vector3 carAngle = (colObject_->endPosition - frontPos_);
 
+
+	//’Ê‰ßŽž‚Ì‰ñ“]
 	if (isCounted_)
 	{
 		float easeRate = Easing::easeOutQuad(clearAnimationRate_);
 		worldMat *= rotationZ(6.24f * easeRate);
 	}
+
+	//Žp¨¶¬
 	worldMat *= Posture(carAngle, Vector3(0.0f, 1.0f, 0.0f));
 	worldMat *= rotationY(3.14);
 
 
+	if (model_ == ModelType::NORMAL)
+	{
+		arrowMat *= rotationY(-3.14f / 2.0f);
+	}
+	arrowMat *= rotationX(-0.5f);
 	worldMat *= translate(centerPos_);
+	arrowMat *= translate(centerPos_);
 
+	arrowMat *= translate(Vector3(0.0f, 15.0f, 0.0f));
+	if (model_ == ModelType::NORMAL)
+	{
+		arrowMat *= translate(Vector3(0.0f, -1.0f, 0.0f));
+	}
+	else
+	{
+		arrowMat *= translate(Vector3(5.5f / 2.0f, 3.0f, 0.0f));
+	}
+	//’Ê‰ßŽž‚Ì’µ–ô
 	if (isCounted_)
 	{
 
@@ -243,9 +276,17 @@ void Car::Draw()
 		worldMat *= translate(uVec);
 	}
 
-
+	//ŽÔ—¼•`‰æ
 	MV1SetMatrix(drawModelHandle, worldMat);
 	MV1DrawModel(drawModelHandle);
+
+
+	if(isPlayer_)
+	{
+		//–îˆó•`‰æ
+		MV1SetMatrix(arrowModelHandle, arrowMat);
+		MV1DrawModel(arrowModelHandle);
+	}
 	//colObject_->draw();
 }
 
@@ -371,6 +412,10 @@ void Car::LoadModel()
 	sTrackCarModelHandles[3] = MV1LoadModel("Resources/tracks/purple/track.mv1");
 	sTrackCarModelHandles[4] = MV1LoadModel("Resources/tracks/yellow/track.mv1");
 	//sTrackCarModelHandles = MV1LoadModel("Resources/track/track.mv1");
+	sArrowModelHandle.resize(2);
+	sArrowModelHandle[0] = MV1LoadModel("Resources/arrow/arrow.mv1");
+	sArrowModelHandle[1] = MV1LoadModel("Resources/arrow_right/arrow_right.mv1");
+	//sArrowModelHandle = MV1LoadModel("Resources/caution/caution.mv1");
 }
 
 void Car::SetPressAnimationRate(float rate)

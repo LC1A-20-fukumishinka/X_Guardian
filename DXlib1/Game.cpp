@@ -110,7 +110,6 @@ Game::~Game()
 
 void Game::Init()
 {
-	Car::LoadModel();
 	RoadSign::LoadModel();
 	carManager.LoadGraphics();
 	xGuardian.LoadModel();

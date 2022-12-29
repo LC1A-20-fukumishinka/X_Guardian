@@ -523,6 +523,8 @@ void CarManager::LoadGraphics()
 	sRight = MV1LoadModel("Resources/UI/turn_right.mv1");
 
 	CarBlastParticle::InitializeColor();
+
+	Car::LoadModel();
 }
 
 bool CarManager::GetDeadAnimation()
