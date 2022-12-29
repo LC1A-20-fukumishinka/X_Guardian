@@ -82,7 +82,7 @@ private:
 	static float pressAnimationRate;
 public:
 	static void SetSignal(MoveType isStopSignal);
-	static void LoadModel();
+	static void LoadModel(int arrow, int turnArrow);
 
 	static void SetGameSpeed(float speed);
 

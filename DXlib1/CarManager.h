@@ -48,8 +48,10 @@ public:
 	void SetSoundManager(SoundManager *sounds);
 
 	void SetIsResult(bool isResult);
-
+	
 	void AllDead();
+
+	void SetGaugeRate(float rate);
 private:
 	void IngameUpdate();
 
@@ -67,6 +69,11 @@ private:
 
 	static int sActFrameModel, sGuideModel;
 	static const int sDeadAnimationTimerMax;
+
+	static std::vector<int> sArrowModelHandle;
+	static int sCautionHandle;
+	static int sTimeBar;
+
 private:
 	std::vector<std::shared_ptr<Car>> playerCars_;
 	std::vector<std::shared_ptr<Car>> enemyCars_;
@@ -102,6 +109,8 @@ private:
 
 	bool isChangeSignal = false;
 	float inpuAnimation = 0.0f;
+
+	float gaugeRate_ = 0.0f;
 	int deadAnimationTimer_ = 0;
 	CarBlastParticle playerBlast;
 	CarBlastParticle enemyBlast;

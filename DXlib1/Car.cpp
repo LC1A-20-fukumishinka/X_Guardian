@@ -221,7 +221,7 @@ void Car::Draw()
 
 	//épê®ê∂ê¨
 	worldMat *= Posture(carAngle, Vector3(0.0f, 1.0f, 0.0f));
-	worldMat *= rotationY(3.14);
+	worldMat *= rotationY(3.14f);
 
 
 	if (model_ == ModelType::NORMAL)
@@ -396,7 +396,7 @@ void Car::SetGameSpeed(float speed)
 	sGameSpeed = speed;
 }
 
-void Car::LoadModel()
+void Car::LoadModel(int arrow, int turnArrow)
 {
 	sNormalCarModelHandles.resize(5);
 	sNormalCarModelHandles[0] = MV1LoadModel("Resources/cars/light blue/car.mv1");
@@ -413,8 +413,8 @@ void Car::LoadModel()
 	sTrackCarModelHandles[4] = MV1LoadModel("Resources/tracks/yellow/track.mv1");
 	//sTrackCarModelHandles = MV1LoadModel("Resources/track/track.mv1");
 	sArrowModelHandle.resize(2);
-	sArrowModelHandle[0] = MV1LoadModel("Resources/arrow/arrow.mv1");
-	sArrowModelHandle[1] = MV1LoadModel("Resources/arrow_right/arrow_right.mv1");
+	sArrowModelHandle[0] = arrow;
+	sArrowModelHandle[1] = turnArrow;
 	//sArrowModelHandle = MV1LoadModel("Resources/caution/caution.mv1");
 }
 

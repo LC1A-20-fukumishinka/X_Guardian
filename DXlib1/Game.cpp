@@ -370,6 +370,11 @@ int spawnTimerMax = 90;
 		comboTimer = 0;
 	}
 
+	float gaugeRate = static_cast<float>(comboTimer) / 30.0f;
+
+	gaugeRate = std::clamp(gaugeRate, 0.0f, 1.0f);
+	carManager.SetGaugeRate(gaugeRate);
+
 	gameManager.SetIsDeadAnimation(carManager.GetDeadAnimation());
 	xGuardian.Update(carManager.GetInputSignal());
 	roadSignManager.Update(carManager.GetInputSignal());
