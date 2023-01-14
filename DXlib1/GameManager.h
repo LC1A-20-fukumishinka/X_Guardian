@@ -90,7 +90,7 @@ private:
 	int maxNormaCount = 25;
 
 	int normaCars = 0;
-	int TimeLimit = 1800;
+	int TimeLimit = 3600;
 	int gameTimer_ = 0;
 	int level_ = 0.0f;
 

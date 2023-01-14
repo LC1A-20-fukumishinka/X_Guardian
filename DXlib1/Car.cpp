@@ -126,7 +126,7 @@ void Car::Update()
 	float inputSpeed = speed_;
 
 	inputSpeed *= sGameSpeed;
-	if (isPlayer_ && !isCrossIn && sInputSignal == MoveType::STOP || (isPlayer_ && isCounted_))
+	if (isPlayer_ && !isCrossIn && sInputSignal == MoveType::STOP )
 	{
 		inputSpeed /= 2.0f;
 	}
