@@ -16,6 +16,16 @@ enum class ModelType
 	NORMAL,
 	TRACK,
 };
+
+enum class Color
+{
+	BLUE,
+	GREEN,
+	PINK,
+	PURPLE,
+	YELLOW,
+	RANDUM,
+};
 struct CarInitializeDesc
 {
 	Vector3 startPos = Vector3();
@@ -26,6 +36,7 @@ struct CarInitializeDesc
 	bool isPlayer = true;
 	MoveType type = MoveType::STRAIGHT;
 	ModelType model = ModelType::NORMAL;
+	Color color = Color::RANDUM;
 };
 class Car
 {

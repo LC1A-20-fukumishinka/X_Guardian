@@ -79,7 +79,14 @@ void Car::Init(CarInitializeDesc desc)
 	isCounted_ = false;
 	clearAnimationRate_ = 0.0f;
 
-	color_ = rand() % static_cast<int>(sNormalCarModelHandles.size());
+	if (desc.color == Color::RANDUM)
+	{
+		color_ = rand() % static_cast<int>(sNormalCarModelHandles.size());
+	}
+	else
+	{
+		color_ = static_cast<int>(desc.color);
+	}
 	isCrossSound_ = false;
 
 

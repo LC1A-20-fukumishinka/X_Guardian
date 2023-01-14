@@ -718,10 +718,12 @@ bool CarManager::AddEnemyCar()
 		int carType = rand() % 2;
 		CarInitializeDesc desc = sNormalCar;
 		desc.type = MoveType::STRAIGHT;
+		desc.color = Color::BLUE;
 		if (carType == 1)
 		{
 			desc = sTrackCar;
 			desc.type = MoveType::RIGHTTURN;
+			desc.color = Color::PINK;
 		}
 		desc.angle = Vector3(0, 0, -1);
 		desc.startPos = Vector3(sCarWidthPos, 0.0f, 500.0f);

@@ -360,7 +360,9 @@ int spawnTimerMax = 90;
 	if (carManager.GetAnyCarStop())
 	{
 		comboTimer++;
-		if (comboTimer >= 30)
+
+		const int comboLimit = 40;
+		if (comboTimer >= comboLimit)
 		{
 			gameManager.StopCar();
 		}
