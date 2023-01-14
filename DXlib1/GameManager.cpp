@@ -21,10 +21,10 @@ void GameManager::Init()
 	cameraDeadAnimationPos_ = Vector3(0.0f, 30.0f, -20.0f);
 
 
-	scoreObjectPos_ = Vector3(50.0f, 9.5f, -130.0f);
-	scoreNumberObjectPos_ = scoreObjectPos_ + Vector3(-5.0f, -7.0f, 0.0f);
+	scoreObjectPos_ = Vector3(45.0f, 9.5f, -130.0f);
+	scoreNumberObjectPos_ = scoreObjectPos_ + Vector3(4.0f, -7.0f, 0.0f);
 
-	Vector3 comboObjectMovePos = Vector3(-30.0f, 0.3f, 0.0f);
+	Vector3 comboObjectMovePos = Vector3(-25.0f, 0.3f, 0.0f);
 	comboObjectPos_ = scoreObjectPos_ + comboObjectMovePos;
 	comboNumberObjectPos_ = comboObjectPos_ + Vector3(6.5f, -7.0f, 0.0f);
 	comboObjectAnimationRate_ = 0.0f;
@@ -32,7 +32,7 @@ void GameManager::Init()
 
 #pragma region result
 	scoreResultObjectPos_ = Vector3(0.0f, 60.0f, -70.0f);
-	scoreResultNumberObjectPos_ = scoreResultObjectPos_ + Vector3(-35.0f, -40.0f, -30.0f);
+	scoreResultNumberObjectPos_ = scoreResultObjectPos_ + Vector3(-8.5f, -40.0f, -30.0f);
 	scoreObjectAnimationRate_ = 0.0f;
 #pragma endregion
 
@@ -79,6 +79,8 @@ void GameManager::Update()
 	case GameStatus::INGAME:
 
 	gameLevel_ = (elapsedTime_ / (10 * sec));
+
+	gameLevel_ = std::clamp(gameLevel_, 0, 10);
 		if (!isDeadAnimation_)
 		{
 			gameTimer_++;
@@ -127,6 +129,7 @@ void GameManager::Update()
 		elapsedTime_++;
 		break;
 	case GameStatus::RESULT:
+		gameLevel_ = 0;
 		if (CheckHitKeyAll() && !isInput_ && isCarAllDead_)
 		{
 			ToTitle();
@@ -272,9 +275,9 @@ void GameManager::Draw()
 void GameManager::PassCar(Vector3 pos)
 {
 	combo++;
-	float comboRate = 0.5;
 
-	score += (baseScore * (combo * comboRate));
+	score++;
+
 	int tmpTimer = comboPos.begin()->comboCount;
 
 	//ƒRƒ“ƒ{‘ÎÛ‚Ì‘I‘ğ
@@ -416,7 +419,7 @@ void GameManager::scoreDraw()
 		int deget = 0;
 
 		std::vector<int> scoreNums;
-		scoreNums.resize(10);
+		scoreNums.resize(5);
 		int tmpScore = score;
 		for (int i = 1; i <= scoreNums.size(); i++)
 		{
@@ -633,9 +636,9 @@ void GameManager::scoreDraw()
 
 		worldMat *= translate(easePos);
 		iconMat *= translate(iconEasePos);
-		MV1SetMatrix(numberObjects_[5], worldMat);
+		MV1SetMatrix(numberObjects_[AddSec], worldMat);
 
-		MV1DrawModel(numberObjects_[5]);
+		MV1DrawModel(numberObjects_[AddSec]);
 
 		MV1SetMatrix(AddHandle_, iconMat);
 
@@ -703,12 +706,12 @@ void GameManager::ResultDraw()
 		int i = 0;
 
 		std::vector<int> scoreNums;
-		scoreNums.resize(10);
+		scoreNums.resize(5);
 		int tmpScore = score;
-		for (int i = 1; i <= 10; i++)
+		for (int i = 1; i <= scoreNums.size(); i++)
 		{
 			int degit = tmpScore % 10;
-			scoreNums[10 - i] = degit;
+			scoreNums[scoreNums.size() - i] = degit;
 
 			tmpScore /= 10;
 		}

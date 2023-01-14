@@ -18,7 +18,7 @@ public:
 	void Draw();
 
 	bool AddPlayerCar();
-	bool AddEnemyCar();
+	bool AddEnemyCar(bool isTitle);
 
 	void SetSignal();
 
@@ -52,6 +52,8 @@ public:
 	void AllDead();
 
 	void SetGaugeRate(float rate);
+
+	void SetLevel(int level);
 private:
 	void IngameUpdate();
 
@@ -112,6 +114,8 @@ private:
 
 	float gaugeRate_ = 0.0f;
 	int deadAnimationTimer_ = 0;
+
+	int level_ = 0;
 	CarBlastParticle playerBlast;
 	CarBlastParticle enemyBlast;
 	CarBlastParticle ArrowBlast;

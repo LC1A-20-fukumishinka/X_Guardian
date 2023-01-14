@@ -151,7 +151,7 @@ private:
 
 	bool isOlddeadAnimation = false;
 
-	int AddSec = 5;
+	int AddSec = 3;
 	int SubSec = 3;
 
 	std::vector<UpperComboObject> comboPos;

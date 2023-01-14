@@ -179,7 +179,7 @@ void Game::Update()
 		{
 			spawnTimer = 90;
 			carManager.AddPlayerCar();
-			carManager.AddEnemyCar();
+			carManager.AddEnemyCar(true);
 		}
 		break;
 	case GameStatus::SELECT:
@@ -332,24 +332,20 @@ int spawnTimerMax = 90;
 	//—N‚­ˆ—
 	if (spawnTimer <= 0)
 	{
-		spawnTimer = spawnTimerMax;
+		spawnTimer = spawnTimerMax - (gameManager.GetGameLevel()* 3);
 
-		carManager.AddEnemyCar();
+		carManager.AddEnemyCar(false);
 	}
 
 	if (playerSpawnTimer <= 0)
 	{
-		int gameLevel = gameManager.GetGameLevel();
-		if (gameLevel)
-		{
-			int hoge = 0;
-		}
-		gameLevel *= 2;
 		playerSpawnTimer = (spawnTimerMax - 30);
 		carManager.AddPlayerCar();
 	}
 
+
 	carManager.SetSignal();
+	carManager.SetLevel(gameManager.GetGameLevel());
 	carManager.Update();
 	std::vector<Vector3> passCarsPos = carManager.GetPassCars();
 	for (auto &e:passCarsPos)

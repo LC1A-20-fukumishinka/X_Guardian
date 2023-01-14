@@ -291,10 +291,11 @@ void Car::Draw()
 	if(isPlayer_ && !isCounted_)
 	{
 		//–îˆó•`‰æ
+		MV1SetDifColorScale(arrowModelHandle, GetColorF(1.0f, 1.0f, 1.0f, 1.0f));
 		MV1SetMatrix(arrowModelHandle, arrowMat);
 		MV1DrawModel(arrowModelHandle);
 	}
-	//colObject_->draw();
+	colObject_->draw();
 }
 
 bool Car::GetIsAlive()

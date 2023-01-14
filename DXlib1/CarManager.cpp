@@ -414,6 +414,7 @@ void CarManager::DrwaHud()
 				float easeRate = Easing::easeOutBack(nextRate);
 				easePos += (moveVec);
 				worldMat *= translate(easePos);
+				MV1SetDifColorScale(drawHandle, GetColorF(1.0f, 1.0f, 1.0f, 0.5f));
 				MV1SetMatrix(drawHandle, worldMat);
 				MV1DrawModel(drawHandle);
 
@@ -422,6 +423,7 @@ void CarManager::DrwaHud()
 				cautionMat *= camMat_;
 				cautionMat *= translate(easePos);
 				//cautionMat ;
+				MV1SetDifColorScale(sCautionHandle, GetColorF(1.0f, 1.0f, 1.0f, 0.5f));
 				MV1SetMatrix(sCautionHandle, cautionMat);
 				MV1DrawModel(sCautionHandle);
 #pragma endregion
@@ -440,7 +442,7 @@ void CarManager::DrwaHud()
 
 
 		float gaugeScale = 0.02f;
-		float lengthRate = (1.0f - Easing::easeOutQuad(gaugeRate_));
+		float lengthRate = (1.0f - gaugeRate_);
 		worldMat = scale(Vector3(gaugeScale * lengthRate, gaugeScale, gaugeScale));
 
 		worldMat *= camMat_;
@@ -530,20 +532,24 @@ bool CarManager::GetIsAllCarDead()
 bool CarManager::GetIsNotTrackMove()
 {
 	bool isNotMove = false;
+
+	if (inputSignal == MoveType::STOP)
+	{
+		return false;
+	}
+
 	if (alivePlayerCars_.size() > 0)
 	{
-		isNotMove = (alivePlayerCars_.begin()->lock()->GetModelType() == ModelType::TRACK);
+		//isNotMove = (alivePlayerCars_.begin()->lock()->GetModelType() == ModelType::TRACK);
+			isNotMove = alivePlayerCars_.begin()->lock()->GetIsSignalStop();
+
 
 		if (isNotMove)
 		{
-			isNotMove = alivePlayerCars_.begin()->lock()->GetIsSignalStop();
+			isNotMove = (isChangeSignal && (inputSignal != alivePlayerCars_.begin()->lock()->GetMoveType()));
 		}
 	}
 
-	if (isNotMove)
-	{
-		isNotMove = (isChangeSignal && (inputSignal == MoveType::STRAIGHT));
-	}
 	return isNotMove;
 }
 
@@ -611,6 +617,11 @@ void CarManager::AllDead()
 void CarManager::SetGaugeRate(float rate)
 {
 	gaugeRate_ = rate;
+}
+
+void CarManager::SetLevel(int level)
+{
+	level_ = level;
 }
 
 
@@ -708,28 +719,46 @@ void CarManager::OutGameUpdate()
 	}
 }
 
-bool CarManager::AddEnemyCar()
+bool CarManager::AddEnemyCar(bool isTitle)
 {
-
-	bool isSpawn = (aliveEnemyCars_.size() < 11);
+	bool isNothing = (aliveEnemyCars_.size() <= 0);
+	bool isAreaSafe = false;
+	if (!isNothing)
+	{
+		isAreaSafe = (aliveEnemyCars_.back().lock()->GetTailPos().z < 470.0f);
+	}
+	bool isSpawn = (isNothing || isAreaSafe);
 
 	if (isSpawn)
 	{
-		int carType = rand() % 2;
+		int carType = rand() % 100;
+
+		//トラックになる確率
+		int trackProbability = (level_ * 5);
+
+		if (isTitle)
+		{
+			trackProbability = 50;
+		}
+		//トラックになるか確認
+		bool isTrack = (carType <= trackProbability);
+
+
 		CarInitializeDesc desc = sNormalCar;
 		desc.type = MoveType::STRAIGHT;
 		desc.color = Color::BLUE;
-		if (carType == 1)
+		if (isTrack)
 		{
 			desc = sTrackCar;
 			desc.type = MoveType::RIGHTTURN;
 			desc.color = Color::PINK;
+			desc.length -= 3.0f;
 		}
 		desc.angle = Vector3(0, 0, -1);
 		desc.startPos = Vector3(sCarWidthPos, 0.0f, 500.0f);
 		desc.isPlayer = false;
 
-		desc.speed = 1.0f;
+		desc.speed = (1.0f + (level_ * 0.05f));
 
 
 		for (auto& e : enemyCars_)
@@ -758,17 +787,23 @@ bool CarManager::AddEnemyCar()
 
 bool CarManager::AddPlayerCar()
 {
-	bool isSpawn = (alivePlayerCars_.size() < 6);
+	bool isSpawn = (alivePlayerCars_.size() < 5);
 
 	if (isSpawn)
 	{
-		int carType = rand() % 2;
-		CarInitializeDesc desc = sNormalCar;
+		int carType = rand() % 100;
+
+		//トラックになる確率
+		int trackProbability = 30;
+
+		//トラックになるか確認
+		bool isTrack = (carType <= trackProbability);		CarInitializeDesc desc = sNormalCar;
 		desc.type = MoveType::STRAIGHT;
-		if (carType == 1)
+		if (isTrack)
 		{
 			desc = sTrackCar;
 			desc.type = MoveType::RIGHTTURN;
+			desc.length -= 3.0f;
 		}
 		desc.angle = Vector3(0, 0, 1);
 		desc.startPos = Vector3(-sCarWidthPos, 0.0f, -300.0f);
