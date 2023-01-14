@@ -115,6 +115,10 @@ private:
 	float gaugeRate_ = 0.0f;
 	int deadAnimationTimer_ = 0;
 
+	bool isNextDraw_ = false;
+	int nextDrawHandle = -1;
+	float nextColorRate_ = 0.0f;
+	bool nextColorAnimation = false;
 	int level_ = 0;
 	CarBlastParticle playerBlast;
 	CarBlastParticle enemyBlast;

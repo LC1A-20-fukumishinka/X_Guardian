@@ -295,7 +295,7 @@ void Car::Draw()
 		MV1SetMatrix(arrowModelHandle, arrowMat);
 		MV1DrawModel(arrowModelHandle);
 	}
-	colObject_->draw();
+	//colObject_->draw();
 }
 
 bool Car::GetIsAlive()

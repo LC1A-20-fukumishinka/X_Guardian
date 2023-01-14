@@ -369,73 +369,73 @@ void CarManager::DrwaHud()
 	int carsCount = 0;
 	if (!alivePlayerCars_.empty())
 	{
-		//‰æ–Ê‚Ìˆê”Ô‰º‚É‚ ‚½‚é•”•ª
-		float underFrameLine = -145.0f;
 
-		for (auto& e : alivePlayerCars_)
+		if (isNextDraw_)
 		{
-			//‰æ–Ê‚æ‚è‰º‚É‚¢‚½‚ç
-			if (e.lock()->GetFrontPos().z < underFrameLine)
-			{
-
-				int drawHandle = -1;
-				if (e.lock()->GetMoveType() == MoveType::STRAIGHT)
-				{
-					drawHandle = sArrowModelHandle[0];
-				}
-				else
-				{
-					drawHandle = sArrowModelHandle[1];
-				}
-
 #pragma region next
-				Matrix4 worldMat;
-				Matrix4 cautionMat;
+			Matrix4 worldMat;
+			Matrix4 cautionMat;
 
-				float frameScale = 0.005f;
-				float cautionScale = 20.0f;
-				worldMat = scale(Vector3(frameScale, frameScale, frameScale));
-				cautionMat = scale(Vector3(frameScale * cautionScale, frameScale * 0.1f, frameScale * cautionScale));
-				if (e.lock()->GetMoveType() == MoveType::STRAIGHT)
-				{
-					worldMat *= rotationY(-3.14f / 2.0f);
-				}
-
-				worldMat *= camMat_;
-
-				worldMat *= rotationX(-3.14f / 2.0f);
-
-				Vector3 easePos = nextObject_;
-
-				Vector3 moveVec(18.0f, -25.0f, -20.0f);
-
-				moveVec = transform(moveVec, camMat_);
-
-				float easeRate = Easing::easeOutBack(nextRate);
-				easePos += (moveVec);
-				worldMat *= translate(easePos);
-				MV1SetDifColorScale(drawHandle, GetColorF(1.0f, 1.0f, 1.0f, 0.5f));
-				MV1SetMatrix(drawHandle, worldMat);
-				MV1DrawModel(drawHandle);
-
-				cautionMat *= rotationX(-3.14f / 2.0f);
-				cautionMat *= rotationZ(-3.14f / 4.0f);
-				cautionMat *= camMat_;
-				cautionMat *= translate(easePos);
-				//cautionMat ;
-				MV1SetDifColorScale(sCautionHandle, GetColorF(1.0f, 1.0f, 1.0f, 0.5f));
-				MV1SetMatrix(sCautionHandle, cautionMat);
-				MV1DrawModel(sCautionHandle);
-#pragma endregion
-				break;
+			float frameScale = 0.005f;
+			float cautionScale = 20.0f;
+			worldMat = scale(Vector3(frameScale, frameScale, frameScale));
+			cautionMat = scale(Vector3(frameScale * cautionScale, frameScale * 0.1f, frameScale * cautionScale));
+			if (nextDrawHandle == sArrowModelHandle[0])
+			{
+				worldMat *= rotationY(-3.14f / 2.0f);
 			}
+
+			worldMat *= camMat_;
+
+			worldMat *= rotationX(-3.14f / 2.0f);
+
+			Vector3 easePos = nextObject_;
+
+			Vector3 moveVec(18.0f, -25.0f, -20.0f);
+
+			moveVec = transform(moveVec, camMat_);
+
+			easePos += (moveVec);
+			worldMat *= translate(easePos);
+
+			float easeRate = 1.0f;
+
+			nextColorRate_ += (1.0f / 60.0f);
+
+			if (nextColorRate_ >= 1.0f)
+			{
+				isNextDraw_ = false;
+			}
+
+			if (nextColorRate_ >= 0.5f)
+			{
+				float tmpRate = nextColorRate_;
+
+				tmpRate -= 0.5f;
+				tmpRate *= 2.0f;
+				easeRate = Easing::easeInQuad(1.0f - tmpRate);
+			}
+
+			MV1SetDifColorScale(nextDrawHandle, GetColorF(1.0f, 1.0f, 1.0f, easeRate));
+			MV1SetMatrix(nextDrawHandle, worldMat);
+			MV1DrawModel(nextDrawHandle);
+
+			cautionMat *= rotationX(-3.14f / 2.0f);
+			cautionMat *= rotationZ(-3.14f / 4.0f);
+			cautionMat *= camMat_;
+			cautionMat *= translate(easePos);
+			//cautionMat ;
+			MV1SetDifColorScale(sCautionHandle, GetColorF(1.0f, 1.0f, 1.0f, easeRate));
+			MV1SetMatrix(sCautionHandle, cautionMat);
+			MV1DrawModel(sCautionHandle);
+#pragma endregion
 		}
 	}
 #pragma endregion
 
 
 #pragma region GaugeDraw
-	if(gaugeRate_ > 0.0f && gaugeRate_ < 1.0f)
+	if (gaugeRate_ > 0.0f && gaugeRate_ < 1.0f)
 	{
 		Matrix4 worldMat;
 		Matrix4 cautionMat;
@@ -541,7 +541,7 @@ bool CarManager::GetIsNotTrackMove()
 	if (alivePlayerCars_.size() > 0)
 	{
 		//isNotMove = (alivePlayerCars_.begin()->lock()->GetModelType() == ModelType::TRACK);
-			isNotMove = alivePlayerCars_.begin()->lock()->GetIsSignalStop();
+		isNotMove = alivePlayerCars_.begin()->lock()->GetIsSignalStop();
 
 
 		if (isNotMove)
@@ -828,6 +828,18 @@ bool CarManager::AddPlayerCar()
 				break;
 			}
 		}
+
+		nextColorRate_ = 0.0f;
+		isNextDraw_ = true;
+		if (desc.type == MoveType::STRAIGHT)
+		{
+			nextDrawHandle = sArrowModelHandle[0];
+		}
+		else
+		{
+			nextDrawHandle = sArrowModelHandle[1];
+		}
+
 	}
 	return isSpawn;
 }

@@ -78,9 +78,9 @@ void GameManager::Update()
 		break;
 	case GameStatus::INGAME:
 
-	gameLevel_ = (elapsedTime_ / (10 * sec));
+		gameLevel_ = (elapsedTime_ / (10 * sec));
 
-	gameLevel_ = std::clamp(gameLevel_, 0, 10);
+		gameLevel_ = std::clamp(gameLevel_, 0, 10);
 		if (!isDeadAnimation_)
 		{
 			gameTimer_++;
@@ -342,7 +342,7 @@ void GameManager::Load()
 	string number = "number/number_";
 
 	int i = 0;
-	for (auto &e : numberObjects_)
+	for (auto& e : numberObjects_)
 	{
 		string path = baseName + number + to_string(i) + ".mv1";
 		e = MV1LoadModel(path.c_str());
@@ -396,7 +396,7 @@ void GameManager::scoreDraw()
 
 		float Range = 0.2f;
 		float allFlowRate = scoreObjectAnimationRate_ * (1.0f + Range);
-		for (auto &e : rate)
+		for (auto& e : rate)
 		{
 			float RangeLag = Range / 11.0f;
 			e = allFlowRate - (i * RangeLag);
@@ -428,7 +428,7 @@ void GameManager::scoreDraw()
 
 			tmpScore /= 10;
 		}
-		for (auto &e : scoreNums)
+		for (auto& e : scoreNums)
 		{
 
 			Matrix4 worldMat;
@@ -491,7 +491,7 @@ void GameManager::scoreDraw()
 
 			tmpCombo /= 10;
 		}
-		for (auto &e : comboNums)
+		for (auto& e : comboNums)
 		{
 
 			Matrix4 worldMat;
@@ -563,7 +563,7 @@ void GameManager::scoreDraw()
 
 			tmpTime /= 10;
 		}
-		for (auto &e : timeNums)
+		for (auto& e : timeNums)
 		{
 
 			Matrix4 worldMat;
@@ -627,7 +627,7 @@ void GameManager::scoreDraw()
 		worldMat *= cameraPosture;
 		iconMat = worldMat;
 
-		Vector3 easePos = timeNumberObjectPos_- iconMovePos + iconBasePos;
+		Vector3 easePos = timeNumberObjectPos_ - iconMovePos + iconBasePos;
 		Vector3 iconEasePos = timeNumberObjectPos_ - iconMovePos + iconBasePos;
 
 		float easeRate = Easing::easeOutExpo(AddSecObjectAnimationRate_);
@@ -690,7 +690,7 @@ void GameManager::ResultDraw()
 
 		float Range = 0.1f;
 		float allFlowRate = scoreResultObjectAnimationRate_ * (1.0f + Range);
-		for (auto &e : rate)
+		for (auto& e : rate)
 		{
 			float RangeLag = Range / 11.0f;
 			e = allFlowRate - (i * RangeLag);
@@ -715,7 +715,7 @@ void GameManager::ResultDraw()
 
 			tmpScore /= 10;
 		}
-		for (auto &e : scoreNums)
+		for (auto& e : scoreNums)
 		{
 
 			Matrix4 worldMat;
@@ -803,14 +803,14 @@ int GameManager::GetCombo()
 	return combo;
 }
 
-void GameManager::SetSoundManager(SoundManager *sound)
+void GameManager::SetSoundManager(SoundManager* sound)
 {
 	sounds_ = sound;
 }
 
 void GameManager::ComboObjectUpdate()
 {
-	for (auto &e : comboPos)
+	for (auto& e : comboPos)
 	{
 		if (e.timer > 0)
 		{
@@ -825,7 +825,7 @@ void GameManager::ComboObjectDraw()
 	Vector3 moveVec = Vector3(0.0f, 20.0f, 0.0f);
 
 	float comboScale = 0.05f;
-	for (auto &e : comboPos)
+	for (auto& e : comboPos)
 	{
 		if (e.timer > 0)
 		{
@@ -849,11 +849,11 @@ void GameManager::ComboObjectDraw()
 					tmpCombo /= 10;
 				}
 				comboNums.emplace_back(tmpCombo);
+				int digitsCount = static_cast<int>(comboNums.size());
 
-
-				degetMoveCount = static_cast<int>(comboNums.size());
+				degetMoveCount = digitsCount;
 				degetMoveCount--;
-				for (auto &num : comboNums)
+				for (auto& num : comboNums)
 				{
 
 					Matrix4 worldMat;
@@ -862,8 +862,8 @@ void GameManager::ComboObjectDraw()
 					scaleRate = (1.0f - scaleRate);
 					worldMat = scale(Vector3(comboScale, comboScale * scaleRate, comboScale));
 
-					//ˆê‚ÌˆÊ						‚»‚±‚©‚ç‚¸‚ç‚·—Ê
-					Vector3 easePos = e.pos + Vector3((5.0f * degetMoveCount) - ((125.0f * comboScale) * (deget)), -15.0f * scaleRate, 0.0f);
+					//								   ˆê‚ÌˆÊ					  ‚»‚±‚©‚ç‚¸‚ç‚·—Ê
+					Vector3 easePos = e.pos + Vector3((2.5f * degetMoveCount ) - ((125.0f * comboScale) * (deget)), -15.0f * scaleRate, 0.0f);
 
 					easePos = easePos;
 
