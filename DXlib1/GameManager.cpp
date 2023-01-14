@@ -78,9 +78,9 @@ void GameManager::Update()
 		break;
 	case GameStatus::INGAME:
 
-		gameLevel_ = (elapsedTime_ / (10 * sec));
+		gameLevel_ = (elapsedTime_ / (5 * sec));
 
-		gameLevel_ = std::clamp(gameLevel_, 0, 10);
+		gameLevel_ = std::clamp(gameLevel_, 0, 20);
 		if (!isDeadAnimation_)
 		{
 			gameTimer_++;

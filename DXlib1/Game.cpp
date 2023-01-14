@@ -332,7 +332,7 @@ int spawnTimerMax = 90;
 	//—N‚­ˆ—
 	if (spawnTimer <= 0)
 	{
-		spawnTimer = spawnTimerMax - (gameManager.GetGameLevel()* 3);
+		spawnTimer = spawnTimerMax - (gameManager.GetGameLevel()* 1.5f);
 
 		carManager.AddEnemyCar(false);
 	}

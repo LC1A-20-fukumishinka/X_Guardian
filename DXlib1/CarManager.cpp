@@ -734,7 +734,7 @@ bool CarManager::AddEnemyCar(bool isTitle)
 		int carType = rand() % 100;
 
 		//トラックになる確率
-		int trackProbability = (level_ * 5);
+		int trackProbability = (level_ * 1.5f);
 
 		if (isTitle)
 		{
@@ -758,7 +758,7 @@ bool CarManager::AddEnemyCar(bool isTitle)
 		desc.startPos = Vector3(sCarWidthPos, 0.0f, 500.0f);
 		desc.isPlayer = false;
 
-		desc.speed = (1.0f + (level_ * 0.05f));
+		desc.speed = (1.5f + (level_ * 0.05f));
 
 
 		for (auto& e : enemyCars_)
