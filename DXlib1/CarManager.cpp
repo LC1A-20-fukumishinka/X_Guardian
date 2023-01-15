@@ -758,7 +758,7 @@ bool CarManager::AddEnemyCar(bool isTitle)
 		desc.startPos = Vector3(sCarWidthPos, 0.0f, 500.0f);
 		desc.isPlayer = false;
 
-		desc.speed = (1.5f + (level_ * 0.05f));
+		desc.speed = (1.5f + (level_ * 0.025f));
 
 
 		for (auto& e : enemyCars_)

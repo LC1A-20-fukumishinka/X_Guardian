@@ -48,62 +48,61 @@ void SoundManager::ChangeInitializeVolume()
 {
 	int volume = 100;
 
-	ChangeVolumeSoundMem(volume, action_);
-	ChangeVolumeSoundMem(volume, BGM_);
-	ChangeVolumeSoundMem(volume, brake_);
-	ChangeVolumeSoundMem(volume, enter_);
-	ChangeVolumeSoundMem(volume, explosion1_);
-	ChangeVolumeSoundMem(volume, explosion2_);
-	ChangeVolumeSoundMem(volume, explosion3_);
-	ChangeVolumeSoundMem(volume, horn1_);
-	ChangeVolumeSoundMem(volume, horn2_);
-	ChangeVolumeSoundMem(volume, horn3_);
-	ChangeVolumeSoundMem(volume, leaveCar_);
-	ChangeVolumeSoundMem(volume, comingCar_);
-	ChangeVolumeSoundMem(volume, slow_);
+	ChangeVolumeSoundMem(volume + upperVolume, action_);
+	ChangeVolumeSoundMem(volume + upperVolume, BGM_);
+	ChangeVolumeSoundMem(volume + upperVolume, brake_);
+	ChangeVolumeSoundMem(volume + upperVolume, enter_);
+	ChangeVolumeSoundMem(volume + upperVolume, explosion1_);
+	ChangeVolumeSoundMem(volume + upperVolume, explosion2_);
+	ChangeVolumeSoundMem(volume + upperVolume, explosion3_);
+	ChangeVolumeSoundMem(volume + upperVolume, horn1_);
+	ChangeVolumeSoundMem(volume + upperVolume, horn2_);
+	ChangeVolumeSoundMem(volume + upperVolume, horn3_);
+	ChangeVolumeSoundMem(volume + upperVolume, leaveCar_);
+	ChangeVolumeSoundMem(volume + upperVolume, comingCar_);
 
-	ChangeVolumeSoundMem(volume, softBrake_);
-	ChangeVolumeSoundMem(volume, normalCar_);
-	ChangeVolumeSoundMem(volume, broken_);
-	ChangeVolumeSoundMem(volume, combo_);
-	ChangeVolumeSoundMem(volume, Timeup_);
-	ChangeVolumeSoundMem(volume, AddTime_);
-	ChangeVolumeSoundMem(200, Crap_);
-	ChangeVolumeSoundMem(130, jingle_);
+	ChangeVolumeSoundMem(volume + upperVolume, softBrake_);
+	ChangeVolumeSoundMem(volume + upperVolume, normalCar_);
+	ChangeVolumeSoundMem(volume + upperVolume, broken_);
+	ChangeVolumeSoundMem(volume + upperVolume, combo_);
+	ChangeVolumeSoundMem(volume + upperVolume, Timeup_);
+	ChangeVolumeSoundMem(volume + upperVolume + 50, AddTime_);
+	ChangeVolumeSoundMem(200 + upperVolume + 20, Crap_);
+	ChangeVolumeSoundMem(130 + upperVolume + 20, jingle_);
 
 	int titleEexplosionVolume = 75;
-	ChangeVolumeSoundMem(titleEexplosionVolume, TitleExplosion1_);
-	ChangeVolumeSoundMem(titleEexplosionVolume, TitleExplosion2_);
-	ChangeVolumeSoundMem(titleEexplosionVolume, TitleExplosion3_);
-	ChangeVolumeSoundMem((titleEexplosionVolume * (0.666f)), TitleBroken_);
+	ChangeVolumeSoundMem(titleEexplosionVolume + upperVolume, TitleExplosion1_);
+	ChangeVolumeSoundMem(titleEexplosionVolume + upperVolume, TitleExplosion2_);
+	ChangeVolumeSoundMem(titleEexplosionVolume + upperVolume, TitleExplosion3_);
+	ChangeVolumeSoundMem((titleEexplosionVolume * (0.666f)) + upperVolume, TitleBroken_);
 }
 
 void SoundManager::TitleVolume()
 {
 	int volume = 200;
 
-	ChangeVolumeSoundMem(60, action_);
-	ChangeVolumeSoundMem(50, Timeup_);
+	ChangeVolumeSoundMem(60 + upperVolume, action_);
+	ChangeVolumeSoundMem(50 + upperVolume, Timeup_);
 
-	ChangeVolumeSoundMem(50, brake_);
-	ChangeVolumeSoundMem(40, softBrake_);
-
-
-	ChangeVolumeSoundMem(40, horn1_);
-	ChangeVolumeSoundMem(40, horn2_);
-	ChangeVolumeSoundMem(40, horn3_);
-	ChangeVolumeSoundMem(60, combo_);
+	ChangeVolumeSoundMem(50 + upperVolume, brake_);
+	ChangeVolumeSoundMem(40 + upperVolume, softBrake_);
 
 
-	ChangeVolumeSoundMem(60, leaveCar_);
-	ChangeVolumeSoundMem(60, comingCar_);
-	ChangeVolumeSoundMem(100, normalCar_);
+	ChangeVolumeSoundMem(40 + upperVolume, horn1_);
+	ChangeVolumeSoundMem(40 + upperVolume, horn2_);
+	ChangeVolumeSoundMem(40 + upperVolume, horn3_);
+	ChangeVolumeSoundMem(60 + upperVolume, combo_);
+
+
+	ChangeVolumeSoundMem(60 + upperVolume, leaveCar_);
+	ChangeVolumeSoundMem(60 + upperVolume, comingCar_);
+	ChangeVolumeSoundMem(100 + upperVolume, normalCar_);
 
 
 	//ChangeVolumeSoundMem(volume, explosion1_);
 	//ChangeVolumeSoundMem(volume, explosion2_);
 	//ChangeVolumeSoundMem(volume, explosion3_);
-	ChangeVolumeSoundMem(100, broken_);
+	ChangeVolumeSoundMem(100 + upperVolume, broken_);
 
 
 }
@@ -113,31 +112,30 @@ void SoundManager::IngameVolume()
 	int volume = 100;
 
 	int explosionVolume = 150;
-	ChangeVolumeSoundMem(volume, action_);
-	ChangeVolumeSoundMem(volume, BGM_);
-	ChangeVolumeSoundMem(volume, brake_);
-	ChangeVolumeSoundMem(volume, enter_);
-	ChangeVolumeSoundMem(explosionVolume, explosion1_);
-	ChangeVolumeSoundMem(explosionVolume, explosion2_);
-	ChangeVolumeSoundMem(explosionVolume, explosion3_);
-	ChangeVolumeSoundMem(volume, horn1_);
-	ChangeVolumeSoundMem(volume, horn2_);
-	ChangeVolumeSoundMem(volume, horn3_);
-	ChangeVolumeSoundMem(volume, leaveCar_);
-	ChangeVolumeSoundMem(volume, comingCar_);
-	ChangeVolumeSoundMem(volume, slow_);
+	ChangeVolumeSoundMem(volume + upperVolume , action_);
+	ChangeVolumeSoundMem(volume + upperVolume + 50, BGM_);
+	ChangeVolumeSoundMem(volume + upperVolume, brake_);
+	ChangeVolumeSoundMem(volume + upperVolume, enter_);
+	ChangeVolumeSoundMem(explosionVolume + upperVolume, explosion1_);
+	ChangeVolumeSoundMem(explosionVolume + upperVolume, explosion2_);
+	ChangeVolumeSoundMem(explosionVolume + upperVolume, explosion3_);
+	ChangeVolumeSoundMem(volume + upperVolume, horn1_);
+	ChangeVolumeSoundMem(volume + upperVolume, horn2_);
+	ChangeVolumeSoundMem(volume + upperVolume, horn3_);
+	ChangeVolumeSoundMem(volume + upperVolume, leaveCar_);
+	ChangeVolumeSoundMem(volume + upperVolume, comingCar_);
 
-	ChangeVolumeSoundMem(volume, softBrake_);
-	ChangeVolumeSoundMem(volume, normalCar_);
-	ChangeVolumeSoundMem(volume, broken_);
-	ChangeVolumeSoundMem(volume, combo_);
-	ChangeVolumeSoundMem(volume, Timeup_);
-	ChangeVolumeSoundMem(190, Buzzer_);
+	ChangeVolumeSoundMem(volume + upperVolume, softBrake_);
+	ChangeVolumeSoundMem(volume + upperVolume, normalCar_);
+	ChangeVolumeSoundMem(volume + upperVolume, broken_);
+	ChangeVolumeSoundMem(volume + upperVolume + 50, combo_);
+	ChangeVolumeSoundMem(volume + upperVolume, Timeup_);
+	ChangeVolumeSoundMem(190 + upperVolume, Buzzer_);
 }
 
 void SoundManager::ResultVolume()
 {
-	ChangeVolumeSoundMem(60, BGM_);
+	ChangeVolumeSoundMem(60 + upperVolume, BGM_);
 }
 
 void SoundManager::Action()

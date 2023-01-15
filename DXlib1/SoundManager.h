@@ -65,5 +65,8 @@ private:
 	int TitleExplosion2_;
 	int TitleExplosion3_;
 	int TitleBroken_;
+
+	int upperVolume = 50;
+
 };
 
