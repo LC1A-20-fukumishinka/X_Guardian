@@ -374,6 +374,7 @@ int spawnTimerMax = 90;
 	carManager.SetGaugeRate(gaugeRate);
 
 	gameManager.SetIsDeadAnimation(carManager.GetDeadAnimation());
+	gameManager.SetDeadAnimationPos(carManager.GetDeadCarPos());
 	xGuardian.Update(carManager.GetInputSignal());
 	roadSignManager.Update(carManager.GetInputSignal());
 	roadSignManager.conboToAlive(gameManager.GetCombo());

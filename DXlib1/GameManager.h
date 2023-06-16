@@ -45,6 +45,7 @@ public:
 
 	void SetIsDeadAnimation(bool isDeadAnimation);
 
+	void SetDeadAnimationPos(Vector3 carPos);
 	void Load();
 
 	void TitleDraw();
@@ -144,6 +145,7 @@ private:
 	float animationRate = 0.0f;
 	Vector3 cameraBasePos_;
 	Vector3 cameraBaseTargetPos_;
+	Vector3 CrashAnimationTargetPos_;
 
 	Vector3 cameraDeadAnimationPos_;
 

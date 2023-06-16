@@ -54,6 +54,8 @@ public:
 	void SetGaugeRate(float rate);
 
 	void SetLevel(int level);
+
+	Vector3 GetDeadCarPos();
 private:
 	void IngameUpdate();
 
@@ -104,6 +106,7 @@ private:
 
 	Vector3 guideObject_;
 
+	Vector3 deadCarPos_;
 	bool isDeadAnimation_ = false;
 
 	bool isResult_ = false;

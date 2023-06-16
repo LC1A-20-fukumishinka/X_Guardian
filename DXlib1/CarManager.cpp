@@ -194,6 +194,8 @@ void CarManager::Collision()
 						if (isIngame_)
 						{
 							isDeadAnimation_ = true;
+							Vector3 carLength = pCar->GetFrontPos() - pCar->GetTailPos();
+							deadCarPos_ = pCar->GetTailPos() + (carLength * 0.5f);
 							SetGameSpeed(0.01f);
 							sounds_->BGMStop();
 							sounds_->Slow();
@@ -622,6 +624,11 @@ void CarManager::SetGaugeRate(float rate)
 void CarManager::SetLevel(int level)
 {
 	level_ = level;
+}
+
+Vector3 CarManager::GetDeadCarPos()
+{
+	return deadCarPos_;
 }
 
 

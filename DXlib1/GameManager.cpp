@@ -50,7 +50,7 @@ void GameManager::Init()
 	const int comboObjectMaxCount = 30;
 	comboPos.reserve(comboObjectMaxCount);
 	comboPos.resize(comboObjectMaxCount);
-
+	CrashAnimationTargetPos_ = { 0.0f,0.0f ,0.0f };
 }
 
 void GameManager::Update()
@@ -117,8 +117,8 @@ void GameManager::Update()
 		animationRate = std::clamp(animationRate, 0.0f, 1.0f);
 
 		angle = transform(cameraDeadAnimationPos_, rotationY(rotation));
-
-		easeTargetPos = (cameraBaseTargetPos_ * (1 - animationRate));
+		//					通常時のターゲット位置							衝突演出時のターゲット位置
+		easeTargetPos = (cameraBaseTargetPos_ * (1 - animationRate)) + (CrashAnimationTargetPos_ * (animationRate));
 		animationEndPos = angle + easeTargetPos;
 		distance = animationEndPos - cameraBasePos_;
 
@@ -334,6 +334,11 @@ void GameManager::SetCameraPos(Vector3 camPos, Vector3 targetPos)
 void GameManager::SetIsDeadAnimation(bool isDeadAnimation)
 {
 	isDeadAnimation_ = isDeadAnimation;
+}
+
+void GameManager::SetDeadAnimationPos(Vector3 carPos)
+{
+	CrashAnimationTargetPos_ = carPos;
 }
 
 void GameManager::Load()
@@ -863,7 +868,7 @@ void GameManager::ComboObjectDraw()
 					worldMat = scale(Vector3(comboScale, comboScale * scaleRate, comboScale));
 
 					//								   一の位					  そこからずらす量
-					Vector3 easePos = e.pos + Vector3((2.5f * degetMoveCount ) - ((125.0f * comboScale) * (deget)), -15.0f * scaleRate, 0.0f);
+					Vector3 easePos = e.pos + Vector3((2.5f * degetMoveCount) - ((125.0f * comboScale) * (deget)), -15.0f * scaleRate, 0.0f);
 
 					easePos = easePos;
 
