@@ -58,6 +58,8 @@ public:
 
 	void CountDownDraw();
 
+	void ConcentLineDraw();
+
 	void CheckCarAllDead(bool isAllDead);
 
 	Matrix4 GetCamMat();
@@ -161,5 +163,9 @@ private:
 	int gameLevel_ = 0;
 	bool isLevelUp = false;
 	int elapsedTime_ = 0;
+
+	std::array<int, 2> concentLineHandles_;
+	int drawConcentLineNum = 0;
+	bool drawConcentTurnFlag = false;
 };
 

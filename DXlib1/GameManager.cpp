@@ -270,6 +270,11 @@ void GameManager::Draw()
 	TitleDraw();
 	PressAnyKeyDraw();
 	ComboObjectDraw();
+
+	if (isDeadAnimation_)
+	{
+		ConcentLineDraw();
+	}
 }
 
 void GameManager::PassCar(Vector3 pos)
@@ -361,6 +366,9 @@ void GameManager::Load()
 	timeTextObjectHandle_ = MV1LoadModel("Resources/time_ui/time_ui.mv1");
 	AddHandle_ = MV1LoadModel("Resources/add_sub/add.mv1");
 	SubHandle_ = MV1LoadModel("Resources/add_sub/sub.mv1");
+
+	concentLineHandles_[0] = LoadGraph("Resources/concent_line/concent_line_01.png");
+	concentLineHandles_[1] = LoadGraph("Resources/concent_line/concent_line_02.png");
 }
 
 void GameManager::TitleDraw()
@@ -791,6 +799,31 @@ void GameManager::PressAnyKeyDraw()
 
 void GameManager::CountDownDraw()
 {
+}
+
+void GameManager::ConcentLineDraw()
+{
+	if (drawConcentTurnFlag)
+	{
+		DrawTurnGraph(0, 0, concentLineHandles_[drawConcentLineNum], TRUE);
+	}
+	else
+	{
+		DrawGraph(0, 0, concentLineHandles_[drawConcentLineNum], TRUE);
+	}
+
+	drawConcentTurnFlag = !drawConcentTurnFlag;
+	if (drawConcentTurnFlag)
+	{
+		if (drawConcentLineNum == 0)
+		{
+			drawConcentLineNum = 1;
+		}
+		else
+		{
+			drawConcentLineNum = 0;
+		}
+	}
 }
 
 void GameManager::CheckCarAllDead(bool isAllDead)
