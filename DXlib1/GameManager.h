@@ -194,5 +194,7 @@ private:
 	bool menuScaleRoundTripFlag = true;
 	bool menuDone = false;
 	GameNum num = GameNum::SOLO;
+
+	bool isFlipConcentLine = false;
 };
 
