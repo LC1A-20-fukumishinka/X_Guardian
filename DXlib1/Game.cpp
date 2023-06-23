@@ -182,10 +182,10 @@ void Game::Draw()
 		DrawGraph(0, 0, screenNum, TRUE);
 		break;
 	case GameNum::PLAYER1:
-		DrawRectGraph(0, 0, 340, 0, 680, 720, screenNum, TRUE);
+		DrawRectGraph(0, 0, 340, 0, 640, 720, screenNum, TRUE);
 		break;
 	case GameNum::PLAYER2:
-		DrawRectGraph(680, 0, 340, 0, 680, 720, screenNum, TRUE);
+		DrawRectGraph(640, 0, 340, 0, 640, 720, screenNum, TRUE);
 		break;
 	default:
 		break;

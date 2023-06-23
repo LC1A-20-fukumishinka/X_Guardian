@@ -15,5 +15,7 @@ private:
 	std::unique_ptr<SoundManager> sounds;
 	void PlayModeChange();
 	bool isSolo = true;
+
+	std::array<int, 2> frames;
 };
 
