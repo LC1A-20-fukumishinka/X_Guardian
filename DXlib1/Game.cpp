@@ -89,7 +89,7 @@ Game::Game()
 	soundTimersMax_[static_cast<int>(TimerName::BROKEN)].Set(600, 1200);
 
 	int count = 0;
-	for (auto &e : soundTimers_)
+	for (auto& e : soundTimers_)
 	{
 		e = SetRandTimer(soundTimersMax_[count]);
 		e -= (120 * (count % 2));
@@ -97,7 +97,7 @@ Game::Game()
 	}
 
 	xGuardian.Init();
-	for (auto &e : isComboEffects)
+	for (auto& e : isComboEffects)
 	{
 		e = false;
 	}
@@ -160,6 +160,11 @@ void Game::Draw()
 	default:
 		break;
 	}
+
+	if (isMenu)
+	{
+		gameManager.MenuDraw();
+	}
 }
 
 void Game::Update()
@@ -167,6 +172,22 @@ void Game::Update()
 	//更新
 	Input::Update();
 
+
+
+	GameEndFlag = Input::isKey(KEY_INPUT_0);
+	if (Input::isKeyTrigger(KEY_INPUT_ESCAPE))
+	{
+		isMenu = !isMenu;
+		menuTextNumber = static_cast<int>(MenuTextNumbers::BACK);
+	}
+
+	if (isMenu)
+	{
+		MenuUpdate();
+	}
+	gameManager.SetMenuDatas(isMenu, menuTextNumber);
+
+	if (isMenu) return;
 	switch (gameManager.GetStatus())
 	{
 	case GameStatus::TITLE:
@@ -294,9 +315,9 @@ void Game::Update()
 		Vector3 drawPos = BasePos;
 
 		drawPos += Vector3(-75.0f, 0.0f, -275.0f);
-		
+
 		Vector3 boardBaseScale = Vector3(boardScale, boardScale - boardAnimationScale, boardScale);
-		Vector3 NotMoveAnimationScale = Vector3(0.0f, 0.05f,0.05f);
+		Vector3 NotMoveAnimationScale = Vector3(0.0f, 0.05f, 0.05f);
 		float rate = Easing::easeInBack(NotTrackMoveAnimationRate_);
 		NotMoveAnimationScale *= (1 - rate);
 		Matrix4 matScale = scale(boardBaseScale + NotMoveAnimationScale);
@@ -317,7 +338,7 @@ void Game::TitleUpdate()
 
 void Game::IngameUpdate()
 {
-int spawnTimerMax = 90;
+	int spawnTimerMax = 90;
 	if (carManager.GetDeadAnimation())
 	{
 		spawnTimer = spawnTimerMax;
@@ -332,7 +353,7 @@ int spawnTimerMax = 90;
 	//湧く処理
 	if (spawnTimer <= 0)
 	{
-		spawnTimer = spawnTimerMax - (gameManager.GetGameLevel()* 1.5f);
+		spawnTimer = spawnTimerMax - (gameManager.GetGameLevel() * 1.5f);
 
 		carManager.AddEnemyCar(false);
 	}
@@ -348,7 +369,7 @@ int spawnTimerMax = 90;
 	carManager.SetLevel(gameManager.GetGameLevel());
 	carManager.Update();
 	std::vector<Vector3> passCarsPos = carManager.GetPassCars();
-	for (auto &e:passCarsPos)
+	for (auto& e : passCarsPos)
 	{
 		gameManager.PassCar(e);
 	}
@@ -384,9 +405,50 @@ int spawnTimerMax = 90;
 		NotTrackMoveAnimationRate_ = 0.0f;
 		sounds->Buzzer();
 	}
-	NotTrackMoveAnimationRate_+= 0.04f;
+	NotTrackMoveAnimationRate_ += 0.04f;
 
 	NotTrackMoveAnimationRate_ = std::clamp(NotTrackMoveAnimationRate_, 0.0f, 1.0f);
+}
+
+void Game::MenuUpdate()
+{
+	//前の選択肢
+	if (Input::isKeyTrigger(KEY_INPUT_S) || Input::isKeyTrigger(KEY_INPUT_DOWN))
+	{
+		menuTextNumber++;
+	}
+
+	//次の選択肢
+	if (Input::isKeyTrigger(KEY_INPUT_W) || Input::isKeyTrigger(KEY_INPUT_UP))
+	{
+		menuTextNumber--;
+	}
+
+	menuTextNumber = std::clamp(menuTextNumber, 0, 3);
+	//選択肢の実行
+	if (Input::isKeyTrigger(KEY_INPUT_SPACE) || Input::isKeyTrigger(KEY_INPUT_RETURN))
+	{
+		switch (static_cast<MenuTextNumbers>(menuTextNumber))
+		{
+		case MenuTextNumbers::BACK:
+			break;
+		case MenuTextNumbers::RETRY:
+			gameManager.Retry();
+			SceneChange();
+			break;
+		case MenuTextNumbers::TITLE:
+			gameManager.ToTitle();
+			carManager.EndGame();
+			break;
+		case MenuTextNumbers::END:
+			GameEndFlag = true;
+			break;
+		default:
+			break;
+		}
+
+		isMenu = false;
+	}
 }
 
 
@@ -448,7 +510,7 @@ void Game::SceneChange()
 	{
 	case GameStatus::TITLE:
 		carManager.SetGameSpeed(1.0f);
-		
+
 		break;
 	case GameStatus::SELECT:
 		break;
@@ -469,7 +531,7 @@ void Game::SceneChange()
 void Game::SoundUpdate()
 {
 	int count = 0;
-	for (auto &e : soundTimers_)
+	for (auto& e : soundTimers_)
 	{
 		e--;
 
@@ -525,6 +587,11 @@ Matrix4 Game::ZSkew(float angle)
 		0.0f		,0.0f,0.0f,1.0f
 	};
 	return a;
+}
+
+bool Game::GameEnd()
+{
+	return GameEndFlag;
 }
 
 void TimerRange::Set(int min, int max)

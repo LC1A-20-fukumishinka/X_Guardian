@@ -13,7 +13,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
 	game.Init();
 	//ƒQ[ƒ€ƒ‹[ƒv
-	while (ProcessMessage() == 0 && CheckHitKey(KEY_INPUT_ESCAPE) == 0)
+	while (ProcessMessage() == 0 && !game.GameEnd())
 	{
 		game.Update();
 		//•`‰æ

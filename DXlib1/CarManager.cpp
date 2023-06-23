@@ -465,10 +465,7 @@ void CarManager::DrwaHud()
 
 void CarManager::LoadGraphics()
 {
-	//up = LoadGraph("Resources/Texture/upArrow.png");
-	//right = LoadGraph("Resources/Texture/rightArrow.png");
-	//down = LoadGraph("Resources/Texture/downArrow.png");
-	//left = LoadGraph("Resources/Texture/leftArrow.png");
+
 	up = LoadGraph("Resources/Texture/UP.png");
 	right = LoadGraph("Resources/Texture/RIGHT.png");
 	down = LoadGraph("Resources/Texture/DOWN.png");

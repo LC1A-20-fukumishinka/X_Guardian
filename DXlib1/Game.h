@@ -24,6 +24,14 @@ enum class TimerName
 	BROKEN,
 };
 
+enum class MenuTextNumbers
+{
+	BACK,
+	RETRY,
+	TITLE,
+	END,
+};
+
 struct TimerRange
 {
 int min = 100;
@@ -40,9 +48,13 @@ public:
 	void Finalize();
 	void Draw();
 	void Update();
+
+	bool GameEnd();
 private:
 	void TitleUpdate();
 	void IngameUpdate();
+
+	void MenuUpdate();
 private:
 	void BaseInitialize();
 
@@ -57,6 +69,7 @@ private:
 	int SetRandTimer(TimerRange range);
 
 	Matrix4 ZSkew(float angle);
+
 public:
 	int model;
 	int ground;
@@ -97,5 +110,13 @@ public:
 
 	GameStatus OldScene;
 	std::unique_ptr<SoundManager> sounds;
+
+	bool GameEndFlag = false;
+
+	bool isMenu = false;
+
+	int menuTextNumber = 0;
+
+	bool menuDone = false;
 };
 

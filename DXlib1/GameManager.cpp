@@ -5,6 +5,7 @@
 #include "Matrix4.h"
 #include <string>
 #include "SoundManager.h"
+#include "Input.h"
 using namespace std;
 GameManager::GameManager()
 {
@@ -51,6 +52,7 @@ void GameManager::Init()
 	comboPos.reserve(comboObjectMaxCount);
 	comboPos.resize(comboObjectMaxCount);
 	CrashAnimationTargetPos_ = { 0.0f,0.0f ,0.0f };
+	textScales = {1.0f, 1.25f, 1.25f, 0.75f};
 }
 
 void GameManager::Update()
@@ -69,10 +71,14 @@ void GameManager::Update()
 	switch (status_)
 	{
 	case GameStatus::TITLE:
-		if (CheckHitKeyAll() && !isInput_)
+		if (CheckHitKeyAll() && !isInput_ && !Input::isKey(KEY_INPUT_ESCAPE))
 		{
 			ToIngame();
 		}
+		animationRate -= 0.1f;
+
+		animationRate = std::clamp(animationRate, 0.0f, 1.0f);
+
 		break;
 	case GameStatus::SELECT:
 		break;
@@ -117,14 +123,6 @@ void GameManager::Update()
 		animationRate = std::clamp(animationRate, 0.0f, 1.0f);
 
 		angle = transform(cameraDeadAnimationPos_, rotationY(rotation));
-		//					通常時のターゲット位置							衝突演出時のターゲット位置
-		easeTargetPos = (cameraBaseTargetPos_ * (1 - animationRate)) + (CrashAnimationTargetPos_ * (animationRate));
-		animationEndPos = angle + easeTargetPos;
-		distance = animationEndPos - cameraBasePos_;
-
-
-		easePos = cameraBasePos_ + (distance * animationRate);
-		SetCameraPositionAndTargetAndUpVec(easePos, easeTargetPos, Vector3(0.0f, 1.0f, 0.0f));
 
 		elapsedTime_++;
 		break;
@@ -140,6 +138,15 @@ void GameManager::Update()
 	default:
 		break;
 	}
+
+	//					通常時のターゲット位置							衝突演出時のターゲット位置
+	easeTargetPos = (cameraBaseTargetPos_ * (1 - animationRate)) + (CrashAnimationTargetPos_ * (animationRate));
+	animationEndPos = angle + easeTargetPos;
+	distance = animationEndPos - cameraBasePos_;
+
+
+	easePos = cameraBasePos_ + (distance * animationRate);
+	SetCameraPositionAndTargetAndUpVec(easePos, easeTargetPos, Vector3(0.0f, 1.0f, 0.0f));
 
 	isNotAnimationEnd_ = false;
 	TitleObjectUpdate();
@@ -267,8 +274,12 @@ void GameManager::Draw()
 	}
 	scoreDraw();
 	ResultDraw();
-	TitleDraw();
-	PressAnyKeyDraw();
+
+	if (!isMenu)
+	{
+		TitleDraw();
+		PressAnyKeyDraw();
+	}
 	ComboObjectDraw();
 
 	if (isDeadAnimation_)
@@ -369,6 +380,13 @@ void GameManager::Load()
 
 	concentLineHandles_[0] = LoadGraph("Resources/concent_line/concent_line_01.png");
 	concentLineHandles_[1] = LoadGraph("Resources/concent_line/concent_line_02.png");
+
+	MenuText = LoadGraph("Resources/Texture/Menu_txt.png");
+
+	menuTexts[0] = LoadGraph("Resources/Texture/Back_txt.png");
+	menuTexts[1] = LoadGraph("Resources/Texture/Retry_txt.png");
+	menuTexts[2] = LoadGraph("Resources/Texture/Title_txt.png");
+	menuTexts[3] = LoadGraph("Resources/Texture/End_txt.png");
 }
 
 void GameManager::TitleDraw()
@@ -826,6 +844,53 @@ void GameManager::ConcentLineDraw()
 	}
 }
 
+void GameManager::MenuDraw()
+{
+	SetDrawBlendMode(DX_BLENDMODE_ALPHA, 100);
+	DrawBox(0, 0, 1280, 720, GetColor(0, 0, 0), TRUE);
+	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 100);
+
+	float xc = 640.0f;
+	float yc = 80.0f;
+	float textWidth = 100.0f;
+
+	float height = textWidth / 3.0f;
+
+	DrawExtendGraphF(xc - textWidth, yc - height,
+					 xc + textWidth, yc + height, MenuText, TRUE);
+
+	yc += 200.0f;
+
+	float menuEaseScale = Easing::EaseCalc(Easing::Out, Easing::Type::Cubic, menuScale);
+
+	float moveRate = (1.0f / 23.25f);
+	menuScale += moveRate;
+	menuScale = std::clamp(menuScale, 0.0f, 1.0f);
+	for (int i = 0;i < menuTexts.size();i++)
+	{
+		float drawWidth = textWidth * textScales[i];
+		float animationHeightScale = (1.0f * menuEaseScale) * height;
+
+		if (menuNumber == i)
+		{
+			DrawExtendGraphF(xc - drawWidth, yc - animationHeightScale,
+				xc + drawWidth, yc + height, menuTexts[i], TRUE);
+		}
+		else
+		{
+			DrawExtendGraphF(xc - drawWidth, yc - height,
+				xc + drawWidth, yc + height, menuTexts[i], TRUE);
+		}
+		yc += 100.0f;
+	}
+
+
+	if (menuScale >= 1.0f)
+	{
+		menuScale = 0.0f;
+	}
+}
+
 void GameManager::CheckCarAllDead(bool isAllDead)
 {
 	isCarAllDead_ = isAllDead;
@@ -960,6 +1025,23 @@ int GameManager::GetGameLevel()
 	return gameLevel_;
 }
 
+void GameManager::SetMenuDatas(bool isMenu, int menuNumber)
+{
+	if (this->menuNumber != menuNumber)
+	{
+		menuScale = 0.0f;
+	}
+
+	this->isMenu = isMenu;
+	this->menuNumber = menuNumber;
+}
+
+void GameManager::Retry()
+{
+	sounds_->BGMStop();
+	ToIngame();
+}
+
 void GameManager::ToIngame()
 {
 	score = 0;
@@ -985,12 +1067,19 @@ void GameManager::ToResult()
 
 void GameManager::ToTitle()
 {
+	//タイトルオブジェクトのアニメーションが始まるのでフラグをオンにする
+	isInput_ = true;
 	sounds_->StopJingle();
 	sounds_->TitleVolume();
 	sounds_->BGMStop();
 	sounds_->Enter();
 
 	status_ = GameStatus::TITLE;
+}
+
+void GameManager::SetMenuDone(bool menuDone)
+{
+	this->menuDone = menuDone;
 }
 
 

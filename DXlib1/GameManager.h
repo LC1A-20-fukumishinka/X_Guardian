@@ -60,6 +60,8 @@ public:
 
 	void ConcentLineDraw();
 
+	void MenuDraw();
+
 	void CheckCarAllDead(bool isAllDead);
 
 	Matrix4 GetCamMat();
@@ -76,11 +78,17 @@ public:
 	void AddTimeUpdate();
 
 	int GetGameLevel();
+
+	void SetMenuDatas(bool isMenu, int menuNumber);
+
+	void Retry();
+	void ToTitle();
+
+	void SetMenuDone(bool menuDone);
 private:
 	//sceneà⁄ìÆä÷êî
 	void ToIngame();
 	void ToResult();
-	void ToTitle();
 
 	void ToSelect();
 public:
@@ -167,5 +175,21 @@ private:
 	std::array<int, 2> concentLineHandles_;
 	int drawConcentLineNum = 0;
 	bool drawConcentTurnFlag = false;
+
+	int BackText;
+
+	std::array<int, 4> menuTexts;
+	std::array<float, 4> textScales;
+	int EndText;
+	int MenuText;
+	int RetryText;
+	int TitleText;
+
+	bool isMenu = false;
+	int menuNumber = 0;
+
+	float menuScale = 0.0f;
+	bool menuScaleRoundTripFlag = true;
+	bool menuDone = false;
 };
 
