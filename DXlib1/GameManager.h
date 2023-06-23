@@ -2,7 +2,7 @@
 #include "Vector3.h"
 #include <array>
 #include "Matrix4.h"
-
+#include "GameNum.h"
 class SoundManager;
 enum class GameStatus
 {
@@ -85,6 +85,8 @@ public:
 	void ToTitle();
 
 	void SetMenuDone(bool menuDone);
+
+	void SetGameNum(GameNum num);
 private:
 	//sceneà⁄ìÆä÷êî
 	void ToIngame();
@@ -191,5 +193,6 @@ private:
 	float menuScale = 0.0f;
 	bool menuScaleRoundTripFlag = true;
 	bool menuDone = false;
+	GameNum num = GameNum::SOLO;
 };
 

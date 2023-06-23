@@ -4,6 +4,7 @@
 #include "EaseClass.h"
 #include <algorithm>
 #include "SoundManager.h"
+#include "GameInput.h"
 #include "Input.h"
 
 using namespace std;
@@ -148,11 +149,11 @@ void CarManager::SetSignal()
 
 	if (!isDeadAnimation_)
 	{
-		if (CheckHitKey(KEY_INPUT_W) || CheckHitKey(KEY_INPUT_UP) || Input::isPad(XINPUT_BUTTON_DPAD_UP) || Input::isPad(XINPUT_BUTTON_Y) || Input::isPadThumb(XINPUT_THUMB_LEFTVERT) >= 0.5f)
+		if (GameInput::Straight(gameNumber) || Input::isPad(XINPUT_BUTTON_DPAD_UP) || Input::isPad(XINPUT_BUTTON_Y) || Input::isPadThumb(XINPUT_THUMB_LEFTVERT) >= 0.5f)
 		{
 			inputSignal = MoveType::STRAIGHT;
 		}
-		else if (CheckHitKey(KEY_INPUT_D) || CheckHitKey(KEY_INPUT_RIGHT) || Input::isPad(XINPUT_BUTTON_DPAD_RIGHT) || Input::isPad(XINPUT_BUTTON_B) || Input::isPadThumb(XINPUT_THUMB_LEFTSIDE) >= 0.5f)
+		else if (GameInput::TurnRight(gameNumber) )
 		{
 			inputSignal = MoveType::RIGHTTURN;
 		}
@@ -161,10 +162,6 @@ void CarManager::SetSignal()
 			inputSignal = MoveType::STOP;
 		}
 	}
-	//if (CheckHitKey(KEY_INPUT_S))
-	//{
-	//	inputSignal = MoveType::STOP;
-	//}
 
 	isChangeSignal = (oldSignal != inputSignal);
 	if (isChangeSignal)
@@ -626,6 +623,11 @@ void CarManager::SetLevel(int level)
 Vector3 CarManager::GetDeadCarPos()
 {
 	return deadCarPos_;
+}
+
+void CarManager::SetGameNumber(GameNum number)
+{
+	gameNumber = number;
 }
 
 

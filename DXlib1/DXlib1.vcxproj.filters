@@ -18,6 +18,9 @@
     <ClCompile Include="Vector3.cpp" />
     <ClCompile Include="XGuardian.cpp" />
     <ClCompile Include="Input.cpp" />
+    <ClCompile Include="playManager.cpp" />
+    <ClCompile Include="GameInput.cpp" />
+    <ClCompile Include="GameNum.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Car.h" />
@@ -36,5 +39,8 @@
     <ClInclude Include="Vector3.h" />
     <ClInclude Include="XGuardian.h" />
     <ClInclude Include="Input.h" />
+    <ClInclude Include="playManager.h" />
+    <ClInclude Include="GameInput.h" />
+    <ClInclude Include="GameNum.h" />
   </ItemGroup>
 </Project>

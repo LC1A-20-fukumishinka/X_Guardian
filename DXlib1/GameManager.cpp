@@ -6,6 +6,7 @@
 #include <string>
 #include "SoundManager.h"
 #include "Input.h"
+#include "GameInput.h"
 using namespace std;
 GameManager::GameManager()
 {
@@ -52,7 +53,7 @@ void GameManager::Init()
 	comboPos.reserve(comboObjectMaxCount);
 	comboPos.resize(comboObjectMaxCount);
 	CrashAnimationTargetPos_ = { 0.0f,0.0f ,0.0f };
-	textScales = {1.0f, 1.25f, 1.25f, 0.75f};
+	textScales = { 1.0f, 1.25f, 1.25f, 0.75f };
 }
 
 void GameManager::Update()
@@ -71,7 +72,7 @@ void GameManager::Update()
 	switch (status_)
 	{
 	case GameStatus::TITLE:
-		if (CheckHitKeyAll() && !isInput_ && !Input::isKey(KEY_INPUT_ESCAPE))
+		if (GameInput::Done(GameNum::SOLO) && !isInput_ && !Input::isKey(KEY_INPUT_ESCAPE))
 		{
 			ToIngame();
 		}
@@ -128,7 +129,7 @@ void GameManager::Update()
 		break;
 	case GameStatus::RESULT:
 		gameLevel_ = 0;
-		if (CheckHitKeyAll() && !isInput_ && isCarAllDead_)
+		if (GameInput::Done(GameNum::SOLO) && !isInput_ && isCarAllDead_)
 		{
 			ToTitle();
 		}
@@ -857,7 +858,7 @@ void GameManager::MenuDraw()
 	float height = textWidth / 3.0f;
 
 	DrawExtendGraphF(xc - textWidth, yc - height,
-					 xc + textWidth, yc + height, MenuText, TRUE);
+		xc + textWidth, yc + height, MenuText, TRUE);
 
 	yc += 200.0f;
 
@@ -866,7 +867,7 @@ void GameManager::MenuDraw()
 	float moveRate = (1.0f / 23.25f);
 	menuScale += moveRate;
 	menuScale = std::clamp(menuScale, 0.0f, 1.0f);
-	for (int i = 0;i < menuTexts.size();i++)
+	for (int i = 0; i < menuTexts.size(); i++)
 	{
 		float drawWidth = textWidth * textScales[i];
 		float animationHeightScale = (1.0f * menuEaseScale) * height;
@@ -1038,8 +1039,12 @@ void GameManager::SetMenuDatas(bool isMenu, int menuNumber)
 
 void GameManager::Retry()
 {
-	sounds_->BGMStop();
+	if (num != GameNum::PLAYER2)
+	{
+		sounds_->BGMStop();
+	}
 	ToIngame();
+
 }
 
 void GameManager::ToIngame()
@@ -1059,8 +1064,11 @@ void GameManager::ToIngame()
 
 void GameManager::ToResult()
 {
-	sounds_->Jingle();
-	sounds_->ResultVolume();
+	if (num != GameNum::PLAYER2)
+	{
+		sounds_->Jingle();
+		sounds_->ResultVolume();
+	}
 	status_ = GameStatus::RESULT;
 }
 
@@ -1069,10 +1077,14 @@ void GameManager::ToTitle()
 {
 	//タイトルオブジェクトのアニメーションが始まるのでフラグをオンにする
 	isInput_ = true;
-	sounds_->StopJingle();
-	sounds_->TitleVolume();
-	sounds_->BGMStop();
-	sounds_->Enter();
+
+	if (num != GameNum::PLAYER2)
+	{
+		sounds_->StopJingle();
+		sounds_->TitleVolume();
+		sounds_->BGMStop();
+		sounds_->Enter();
+	}
 
 	status_ = GameStatus::TITLE;
 }
@@ -1080,6 +1092,11 @@ void GameManager::ToTitle()
 void GameManager::SetMenuDone(bool menuDone)
 {
 	this->menuDone = menuDone;
+}
+
+void GameManager::SetGameNum(GameNum num)
+{
+	this->num = num;
 }
 
 

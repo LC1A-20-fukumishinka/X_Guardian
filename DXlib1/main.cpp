@@ -1,6 +1,5 @@
 #include"DxLib.h"
-#include"Game.h"
-
+#include "playManager.h"
 enum class Mode
 {
 	Setting,
@@ -9,16 +8,19 @@ enum class Mode
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 	LPSTR lpCmdLine, int nCmdShow)
 {
-	Game game;
+	playManager game;
 
 	game.Init();
+
+
 	//ゲームループ
 	while (ProcessMessage() == 0 && !game.GameEnd())
 	{
 		game.Update();
-		//描画
 
-		game.Draw();
+		//描画
+		game .Draw();
+
 		//フリップする
 		ScreenFlip();
 		WaitTimer(20);

@@ -139,10 +139,13 @@
     <ClCompile Include="Collision.cpp" />
     <ClCompile Include="EaseClass.cpp" />
     <ClCompile Include="Game.cpp" />
+    <ClCompile Include="GameInput.cpp" />
     <ClCompile Include="GameManager.cpp" />
+    <ClCompile Include="GameNum.cpp" />
     <ClCompile Include="Input.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Matrix4.cpp" />
+    <ClCompile Include="playManager.cpp" />
     <ClCompile Include="Primitive.cpp" />
     <ClCompile Include="Quaternion.cpp" />
     <ClCompile Include="RoadSign.cpp" />
@@ -158,9 +161,12 @@
     <ClInclude Include="Collision.h" />
     <ClInclude Include="EaseClass.h" />
     <ClInclude Include="Game.h" />
+    <ClInclude Include="GameInput.h" />
     <ClInclude Include="GameManager.h" />
+    <ClInclude Include="GameNum.h" />
     <ClInclude Include="Input.h" />
     <ClInclude Include="Matrix4.h" />
+    <ClInclude Include="playManager.h" />
     <ClInclude Include="Primitive.h" />
     <ClInclude Include="Quaternion.h" />
     <ClInclude Include="RoadSign.h" />

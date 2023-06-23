@@ -13,6 +13,7 @@
 #include <memory>
 #include "XGuardian.h"
 #include "RoadSignManager.h"
+#include "GameNum.h"
 using namespace DxLib;
 
 enum class TimerName
@@ -44,12 +45,20 @@ class Game
 public:
 	Game();
 	~Game();
-	void Init();
+	void Init(bool makeLighrFlag);
 	void Finalize();
+	void IngameDraw();
+
 	void Draw();
 	void Update();
 
 	bool GameEnd();
+
+	void SetGameNum(GameNum num);
+
+	void SetSoundManager(SoundManager *sounds);
+
+	GameStatus GetGameStatus();
 private:
 	void TitleUpdate();
 	void IngameUpdate();
@@ -109,7 +118,7 @@ public:
 	Vector3 cameraUp;
 
 	GameStatus OldScene;
-	std::unique_ptr<SoundManager> sounds;
+	SoundManager* sounds;
 
 	bool GameEndFlag = false;
 
@@ -118,5 +127,9 @@ public:
 	int menuTextNumber = 0;
 
 	bool menuDone = false;
+
+	int screenNum = -1;
+
+	int gameNumber = 0;
 };
 

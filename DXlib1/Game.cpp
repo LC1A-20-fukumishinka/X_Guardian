@@ -1,11 +1,10 @@
 #include "Game.h"
 #include "EaseClass.h"
 #include <algorithm>
+#include "GameInput.h"
 #include "Input.h"
-
 Game::Game()
 {
-
 	//通常
 	Vector3 cameraOrgPosition(0.0f, 70.0f, -130.0f + camZPos);
 	Vector3 cameraOrgUp(0.0f, 1.0f, 0.0f);
@@ -72,14 +71,8 @@ Game::Game()
 	int test = SetLightAmbColor(GetColorF(1.0f, 1.0f, 1.0f, 0.0f));
 
 	ChangeLightTypeDir(Vector3(0.0f, -1.0f, 1.0f));
-	leftLightHandle = CreateDirLightHandle(VGet(1.0f, -0.2f, 0.0f));
-	rightLightHandle = CreateDirLightHandle(VGet(-1.0f, -0.2f, 0.0f));
 
-	sounds = std::make_unique<SoundManager>();
-	sounds->Load();
-	sounds->TitleVolume();
-	carManager.SetSoundManager(sounds.get());
-	gameManager.SetSoundManager(sounds.get());
+
 	soundTimers_.resize(5);
 	soundTimersMax_.resize(5);
 	soundTimersMax_[static_cast<int>(TimerName::WHISTLE)].Set(600, 1200);
@@ -108,18 +101,26 @@ Game::~Game()
 {
 }
 
-void Game::Init()
+void Game::Init(bool makeLighrFlag)
 {
 	RoadSign::LoadModel();
 	carManager.LoadGraphics();
 	xGuardian.LoadModel();
+	screenNum = MakeScreen(1280, 720, TRUE);
+
+	if (makeLighrFlag)
+	{
+		leftLightHandle = CreateDirLightHandle(VGet(1.0f, -0.2f, 0.0f));
+		rightLightHandle = CreateDirLightHandle(VGet(-1.0f, -0.2f, 0.0f));
+	}
+
 }
 
 void Game::Finalize()
 {
 }
 
-void Game::Draw()
+void Game::IngameDraw()
 {
 	ClearDrawScreen();
 	//DrawAxis3D(200.0f);
@@ -165,17 +166,43 @@ void Game::Draw()
 	{
 		gameManager.MenuDraw();
 	}
+
+}
+
+void Game::Draw()
+{
+	if (gameNumber != static_cast<int>(GameNum::PLAYER2))
+	{
+		SetDrawScreen(DX_SCREEN_BACK);
+	}
+
+	switch (static_cast<GameNum>(gameNumber))
+	{
+	case GameNum::SOLO:
+		DrawGraph(0, 0, screenNum, TRUE);
+		break;
+	case GameNum::PLAYER1:
+		DrawRectGraph(0, 0, 340, 0, 680, 720, screenNum, TRUE);
+		break;
+	case GameNum::PLAYER2:
+		DrawRectGraph(680, 0, 340, 0, 680, 720, screenNum, TRUE);
+		break;
+	default:
+		break;
+	}
 }
 
 void Game::Update()
 {
-	//更新
-	Input::Update();
+	carManager.SetGameNumber(static_cast<GameNum>(gameNumber));
+	SetDrawScreen(screenNum);
 
-
-
-	GameEndFlag = Input::isKey(KEY_INPUT_0);
-	if (Input::isKeyTrigger(KEY_INPUT_ESCAPE))
+	const int WindowWidth = 1280;
+	const int WindowHeight = 720;
+	SetCameraNearFar(1.0f, 10000.0f);
+	SetCameraScreenCenter(WindowWidth / 2.0f, WindowHeight / 2.0f);
+	SetCameraPositionAndTargetAndUpVec(cameraPosition, cameraTarget, cameraUp);
+	if (GameInput::Pause(static_cast<GameNum>(gameNumber)))
 	{
 		isMenu = !isMenu;
 		menuTextNumber = static_cast<int>(MenuTextNumbers::BACK);
@@ -466,7 +493,6 @@ void Game::BaseInitialize()
 
 	SetUseZBuffer3D(TRUE);
 	SetWriteZBuffer3D(TRUE);
-
 	//クリップ面
 	SetCameraNearFar(1.0f, 10000.0f);
 	SetCameraScreenCenter(WindowWidth / 2.0f, WindowHeight / 2.0f);
@@ -592,6 +618,25 @@ Matrix4 Game::ZSkew(float angle)
 bool Game::GameEnd()
 {
 	return GameEndFlag;
+}
+
+void Game::SetGameNum(GameNum num)
+{
+	gameNumber = static_cast<int>(num);
+}
+
+void Game::SetSoundManager(SoundManager* sounds)
+{
+	this->sounds = sounds;
+	sounds->TitleVolume();
+	carManager.SetSoundManager(sounds);
+	gameManager.SetSoundManager(sounds);
+
+}
+
+GameStatus Game::GetGameStatus()
+{
+	return gameManager.GetStatus();
 }
 
 void TimerRange::Set(int min, int max)

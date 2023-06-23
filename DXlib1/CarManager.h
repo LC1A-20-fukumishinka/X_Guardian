@@ -5,6 +5,7 @@
 #include <vector>
 #include <list>
 #include "Matrix4.h"
+#include "GameNum.h"
 class SoundManager;
 class CarManager
 {
@@ -56,6 +57,8 @@ public:
 	void SetLevel(int level);
 
 	Vector3 GetDeadCarPos();
+
+	void SetGameNumber(GameNum number);
 private:
 	void IngameUpdate();
 
@@ -128,5 +131,7 @@ private:
 	CarBlastParticle ArrowBlast;
 	std::vector<CarBlastParticle> TitleParticles;
 	SoundManager *sounds_ = nullptr;
+
+	GameNum gameNumber = GameNum::SOLO;
 };
 
