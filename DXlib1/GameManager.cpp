@@ -79,7 +79,7 @@ void GameManager::Update()
 		animationRate -= 0.1f;
 
 		animationRate = std::clamp(animationRate, 0.0f, 1.0f);
-
+		isSolo = (gameNumber == GameNum::SOLO);
 		break;
 	case GameStatus::SELECT:
 		break;
@@ -92,8 +92,13 @@ void GameManager::Update()
 		{
 			gameTimer_++;
 		}
+
+		if (!isSolo)
+		{
+			int hoge = 0;
+		}
 		//isClear_ = normaCars >= maxNormaCount;
-		isFailed_ = gameTimer_ >= TimeLimit;
+		isFailed_ = ((isSolo && gameTimer_ >= TimeLimit));
 
 		isGameOver = (isClear_ || isFailed_);
 
@@ -114,6 +119,7 @@ void GameManager::Update()
 		{
 			if (isOlddeadAnimation)
 			{
+				life--;
 				gameTimer_ += 60 * SubSec;
 				SubSecObjectAnimationRate_ = 0.0f;
 			}
@@ -324,6 +330,8 @@ void GameManager::PassCar(Vector3 pos)
 		AddSecObjectAnimationRate_ = 0.0f;
 	}
 	normaCars++;
+
+	DrawGraph(320, 0, frameHandle, TRUE);
 }
 
 void GameManager::StopCar()
@@ -388,6 +396,10 @@ void GameManager::Load()
 	menuTexts[1] = LoadGraph("Resources/Texture/Retry_txt.png");
 	menuTexts[2] = LoadGraph("Resources/Texture/Title_txt.png");
 	menuTexts[3] = LoadGraph("Resources/Texture/End_txt.png");
+
+	P1frameHandle = LoadGraph("Resources/Texture/frame_1p.png");
+	P2frameHandle = LoadGraph("Resources/Texture/frame_2p.png");
+	frameHandle = P1frameHandle;
 }
 
 void GameManager::TitleDraw()
@@ -1043,7 +1055,7 @@ void GameManager::SetMenuDatas(bool isMenu, int menuNumber)
 
 void GameManager::Retry()
 {
-	if (num != GameNum::PLAYER2)
+	if (gameNumber != GameNum::PLAYER2)
 	{
 		sounds_->BGMStop();
 	}
@@ -1055,6 +1067,7 @@ void GameManager::ToIngame()
 {
 	score = 0;
 	combo = 0;
+	life = 3;
 	normaCars = 0;
 	gameTimer_ = 0;
 	elapsedTime_ = 0;
@@ -1068,12 +1081,13 @@ void GameManager::ToIngame()
 
 void GameManager::ToResult()
 {
-	if (num != GameNum::PLAYER2)
+	if (gameNumber != GameNum::PLAYER2)
 	{
 		sounds_->Jingle();
 		sounds_->ResultVolume();
 	}
 	status_ = GameStatus::RESULT;
+	isFailed_ = false;
 }
 
 
@@ -1082,7 +1096,7 @@ void GameManager::ToTitle()
 	//タイトルオブジェクトのアニメーションが始まるのでフラグをオンにする
 	isInput_ = true;
 
-	if (num != GameNum::PLAYER2)
+	if (gameNumber != GameNum::PLAYER2)
 	{
 		sounds_->StopJingle();
 		sounds_->TitleVolume();
@@ -1100,7 +1114,21 @@ void GameManager::SetMenuDone(bool menuDone)
 
 void GameManager::SetGameNum(GameNum num)
 {
-	this->num = num;
+	this->gameNumber = num;
+
+	if (gameNumber == GameNum::PLAYER1)
+	{
+		frameHandle = P1frameHandle;
+	}
+	else if(gameNumber == GameNum::PLAYER1)
+	{
+		frameHandle = P2frameHandle;
+	}
+}
+
+bool GameManager::GetisGameOver()
+{
+	return (status_ == GameStatus::INGAME && !isSolo && life <= 0 && animationRate <= 0.0f);
 }
 
 

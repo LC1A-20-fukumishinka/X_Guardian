@@ -17,5 +17,9 @@ private:
 	bool isSolo = true;
 
 	std::array<int, 2> frames;
+
+	bool ALose = false;
+	bool BLose = false;
+	bool isFinish = false;
 };
 

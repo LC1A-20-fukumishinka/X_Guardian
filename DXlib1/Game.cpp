@@ -229,6 +229,7 @@ void Game::Update()
 			carManager.AddPlayerCar();
 			carManager.AddEnemyCar(true);
 		}
+
 		break;
 	case GameStatus::SELECT:
 		break;
@@ -373,8 +374,12 @@ void Game::IngameUpdate()
 	}
 	else
 	{
-		spawnTimer--;
-		playerSpawnTimer--;
+		//スローモーション中は生成しない
+		if (!carManager.GetSlowmotion())
+		{
+			spawnTimer--;
+			playerSpawnTimer--;
+		}
 	}
 
 	//湧く処理
@@ -615,6 +620,16 @@ Matrix4 Game::ZSkew(float angle)
 	return a;
 }
 
+void Game::ToResult()
+{
+	gameManager.ToResult();
+}
+
+bool Game::isGameOver()
+{
+	return gameManager.GetisGameOver();
+}
+
 bool Game::GameEnd()
 {
 	return GameEndFlag;
@@ -623,6 +638,7 @@ bool Game::GameEnd()
 void Game::SetGameNum(GameNum num)
 {
 	gameNumber = static_cast<int>(num);
+	gameManager.SetGameNum(num);
 }
 
 void Game::SetSoundManager(SoundManager* sounds)

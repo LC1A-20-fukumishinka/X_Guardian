@@ -13,8 +13,6 @@ void playManager::Init()
 
 	a.SetGameNum(GameNum::PLAYER1);
 	b.SetGameNum(GameNum::PLAYER2);
-	frames[0] = LoadGraph("Resources/Texture/frame_1p.png");
-	frames[1] = LoadGraph("Resources/Texture/frame_2p.png");
 }
 
 void playManager::Update()
@@ -24,6 +22,14 @@ void playManager::Update()
 		PlayModeChange();
 	}
 
+	if (isFinish)
+	{
+		a.ToResult();
+		b.ToResult();
+		BLose = false;
+		ALose = false;
+		isFinish = false;
+	}
 	if (isSolo)
 	{
 		a.SetGameNum(GameNum::SOLO);
@@ -39,7 +45,12 @@ void playManager::Update()
 	{
 		b.Update();
 		b.IngameDraw();
+		BLose = b.isGameOver();
+		ALose = a.isGameOver();
+		isFinish = BLose || ALose;
 	}
+
+
 }
 
 void playManager::Finalize()
@@ -54,8 +65,6 @@ void playManager::Draw()
 	if (!isSolo)
 	{
 		b.Draw();
-		DrawGraph(0,0,frames[0],TRUE);
-		DrawGraph(640, 0, frames[1], TRUE);
 
 	}
 }

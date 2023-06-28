@@ -59,6 +59,10 @@ public:
 	void SetSoundManager(SoundManager *sounds);
 
 	GameStatus GetGameStatus();
+
+	void ToResult();
+
+	bool isGameOver();
 private:
 	void TitleUpdate();
 	void IngameUpdate();

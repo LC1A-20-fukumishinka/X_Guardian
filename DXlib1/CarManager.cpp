@@ -630,6 +630,11 @@ void CarManager::SetGameNumber(GameNum number)
 	gameNumber = number;
 }
 
+bool CarManager::GetSlowmotion()
+{
+	return (sGameSpeed < 1.0f);
+}
+
 
 void CarManager::IngameUpdate()
 {

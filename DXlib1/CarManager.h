@@ -59,6 +59,8 @@ public:
 	Vector3 GetDeadCarPos();
 
 	void SetGameNumber(GameNum number);
+
+	bool GetSlowmotion();
 private:
 	void IngameUpdate();
 

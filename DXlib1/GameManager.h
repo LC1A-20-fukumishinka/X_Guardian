@@ -84,13 +84,15 @@ public:
 	void Retry();
 	void ToTitle();
 
+	void ToResult();
 	void SetMenuDone(bool menuDone);
 
 	void SetGameNum(GameNum num);
+
+	bool GetisGameOver();
 private:
 	//sceneà⁄ìÆä÷êî
 	void ToIngame();
-	void ToResult();
 
 	void ToSelect();
 public:
@@ -193,8 +195,15 @@ private:
 	float menuScale = 0.0f;
 	bool menuScaleRoundTripFlag = true;
 	bool menuDone = false;
-	GameNum num = GameNum::SOLO;
+	GameNum gameNumber = GameNum::SOLO;
 
 	bool isFlipConcentLine = false;
+	bool isSolo = true;
+	int life = 3;
+
+	int P1frameHandle = -1;
+	int P2frameHandle = -1;
+
+	int frameHandle = -1;
 };
 
