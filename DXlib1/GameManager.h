@@ -33,6 +33,7 @@ public:
 	void Finalize();
 	void Draw();
 
+	void FrameDraw();
 	void PassCar(Vector3 pos);
 
 	void StopCar();
@@ -68,7 +69,7 @@ public:
 
 	int GetCombo();
 
-	void SetSoundManager(SoundManager *sound);
+	void SetSoundManager(SoundManager* sound);
 
 
 	void ComboObjectUpdate();
@@ -163,7 +164,7 @@ private:
 
 	Vector3 cameraDeadAnimationPos_;
 
-	SoundManager *sounds_ = nullptr;
+	SoundManager* sounds_ = nullptr;
 
 	bool isOlddeadAnimation = false;
 
@@ -205,5 +206,6 @@ private:
 	int P2frameHandle = -1;
 
 	int frameHandle = -1;
+	int lifeHandle = -1;
 };
 

@@ -224,16 +224,19 @@ std::vector<Vector3> CarManager::GetPassCars()
 			}
 		}
 	}
-	for (auto& e : enemyCars_)
+	if (gameNumber == GameNum::SOLO)
 	{
-		if (e->GetIsAlive())
+		for (auto& e : enemyCars_)
 		{
-
-			if (e->GetIsPass())
+			if (e->GetIsAlive())
 			{
-				retPos.emplace_back(e->GetFrontPos());
-				e->Count();
-				passCarCount++;
+
+				if (e->GetIsPass())
+				{
+					retPos.emplace_back(e->GetFrontPos());
+					e->Count();
+					passCarCount++;
+				}
 			}
 		}
 	}
@@ -764,6 +767,12 @@ bool CarManager::AddEnemyCar(bool isTitle)
 			desc.type = MoveType::RIGHTTURN;
 			desc.color = Color::PINK;
 			desc.length -= 3.0f;
+
+			if (rand() % 2)
+			{
+				desc.model = ModelType::EMERGENCY;
+				desc.color = Color::GREEN;
+			}
 		}
 		desc.angle = Vector3(0, 0, -1);
 		desc.startPos = Vector3(sCarWidthPos, 0.0f, 500.0f);

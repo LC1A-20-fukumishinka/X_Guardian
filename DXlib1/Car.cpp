@@ -23,7 +23,7 @@ const float Car::sCarDistanceLimit = 10.0f;
 vector<int> Car::sNormalCarModelHandles;
 vector<int> Car::sTrackCarModelHandles;
 vector<int> Car::sArrowModelHandle;
-
+int Car::sAmbulanceCarModelHandle;
 float Car::pressAnimationRate = 0.0f;
 
 SoundManager *Car::sSounds = nullptr;
@@ -70,7 +70,14 @@ void Car::Init(CarInitializeDesc desc)
 	isPlayer_ = desc.isPlayer;
 	type_ = desc.type;
 	model_ = desc.model;
-	enemyStopTimer_ = sMaxEnemyStopTimer;
+	if (model_ == ModelType::EMERGENCY)
+	{
+		enemyStopTimer_ = 0;
+	}
+	else
+	{
+		enemyStopTimer_ = sMaxEnemyStopTimer;
+	}
 	//ƒJƒvƒZƒ‹‚Ì‰Šú‰»ˆ—
 	colObject_->startPosition = frontPos_;
 	colObject_->endPosition = (frontPos_ + (-angle_ * carLength_));
@@ -191,12 +198,16 @@ void Car::Draw()
 		drawModelHandle = sNormalCarModelHandles[color_];
 		arrowModelHandle = sArrowModelHandle[0];
 	}
-	else
+	else if(model_ == ModelType::TRACK)
 	{
 		drawModelHandle = sTrackCarModelHandles[color_];
 		arrowModelHandle = sArrowModelHandle[1];
 	}
-
+	else
+	{
+		drawModelHandle = sAmbulanceCarModelHandle;
+		arrowModelHandle = sArrowModelHandle[1];
+	}
 	Matrix4 worldMat;
 	Matrix4 arrowMat;
 	float carScale = 0.04f;
@@ -255,7 +266,7 @@ void Car::Draw()
 		Vector3 jump = Vector3(0.0f, 50.0f, 0.0f);
 
 		float carHeight = 10.0f;
-		if (model_ == ModelType::TRACK)
+		if (model_ == ModelType::TRACK || model_ == ModelType::EMERGENCY)
 		{
 			carHeight = 5.0f;
 		}
@@ -424,6 +435,7 @@ void Car::LoadModel(int arrow, int turnArrow)
 	sArrowModelHandle[0] = arrow;
 	sArrowModelHandle[1] = turnArrow;
 	//sArrowModelHandle = MV1LoadModel("Resources/caution/caution.mv1");
+	sAmbulanceCarModelHandle = MV1LoadModel("Resources/ambulance/ambulance.mv1");
 }
 
 void Car::SetPressAnimationRate(float rate)

@@ -15,6 +15,7 @@ enum class ModelType
 {
 	NORMAL,
 	TRACK,
+	EMERGENCY,
 };
 
 enum class Color
@@ -87,6 +88,7 @@ private:
 	//Modelƒnƒ“ƒhƒ‹
 	static std::vector<int> sNormalCarModelHandles;
 	static std::vector<int> sTrackCarModelHandles;
+	static int sAmbulanceCarModelHandle;
 	static std::vector<int> sArrowModelHandle;
 	static float sGameSpeed;
 

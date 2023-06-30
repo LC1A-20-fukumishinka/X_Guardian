@@ -190,6 +190,7 @@ void Game::Draw()
 	default:
 		break;
 	}
+	gameManager.FrameDraw();
 }
 
 void Game::Update()

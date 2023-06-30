@@ -293,6 +293,34 @@ void GameManager::Draw()
 	{
 		ConcentLineDraw();
 	}
+
+}
+
+void GameManager::FrameDraw()
+{
+	int lifeGraphWidth = 31;
+
+	int lifeHeight = 300;
+
+	int sukima = 47;
+	if (gameNumber == GameNum::PLAYER1)
+	{
+		DrawGraph(0, 0, frameHandle, TRUE);
+
+		for (int i = 0; i < life; i++)
+		{
+			DrawGraph(630 - lifeGraphWidth, lifeHeight + (i * sukima), lifeHandle, TRUE);
+		}
+	}
+	else if (gameNumber == GameNum::PLAYER2)
+	{
+		DrawGraph(640, 0, frameHandle, TRUE);
+
+		for (int i = 0; i < life; i++)
+		{
+			DrawGraph(650, lifeHeight + (i * sukima), lifeHandle, TRUE);
+		}
+	}
 }
 
 void GameManager::PassCar(Vector3 pos)
@@ -331,7 +359,6 @@ void GameManager::PassCar(Vector3 pos)
 	}
 	normaCars++;
 
-	DrawGraph(320, 0, frameHandle, TRUE);
 }
 
 void GameManager::StopCar()
@@ -399,6 +426,8 @@ void GameManager::Load()
 
 	P1frameHandle = LoadGraph("Resources/Texture/frame_1p.png");
 	P2frameHandle = LoadGraph("Resources/Texture/frame_2p.png");
+	lifeHandle = LoadGraph("Resources/Texture/HP_UI.png");
+
 	frameHandle = P1frameHandle;
 }
 
@@ -456,71 +485,72 @@ void GameManager::scoreDraw()
 	float scoreScale = 0.03f;
 	float comboScale = 0.03f;
 	float timeScale = 0.03f;
-
-#pragma region scoreNumber
-	//scoreNumber•\Ž¦
+	if (gameNumber == GameNum::SOLO)
 	{
-		int deget = 0;
-
-		std::vector<int> scoreNums;
-		scoreNums.resize(5);
-		int tmpScore = score;
-		for (int i = 1; i <= scoreNums.size(); i++)
+#pragma region scoreNumber
+		//scoreNumber•\Ž¦
 		{
-			int tmpDegit = tmpScore % 10;
-			scoreNums[scoreNums.size() - i] = tmpDegit;
+			int deget = 0;
 
-			tmpScore /= 10;
+			std::vector<int> scoreNums;
+			scoreNums.resize(5);
+			int tmpScore = score;
+			for (int i = 1; i <= scoreNums.size(); i++)
+			{
+				int tmpDegit = tmpScore % 10;
+				scoreNums[scoreNums.size() - i] = tmpDegit;
+
+				tmpScore /= 10;
+			}
+			for (auto& e : scoreNums)
+			{
+
+				Matrix4 worldMat;
+				worldMat = scale(Vector3(scoreScale, scoreScale, scoreScale));
+
+				worldMat *= cameraPosture;
+
+
+				Vector3 easePos = scoreNumberObjectPos_ + Vector3(-10.0f + ((125.0f * scoreScale) * deget), 0.0f, 0.0f);
+
+				easePos = transform(easePos, cameraPosture);
+
+
+				float easeRate = Easing::easeOutBack(rate[deget]);
+				easePos += (moveVec * (1 - easeRate));
+
+				worldMat *= translate(easePos);
+
+				deget++;
+				MV1SetMatrix(numberObjects_[e], worldMat);
+
+				MV1DrawModel(numberObjects_[e]);
+			}
 		}
-		for (auto& e : scoreNums)
-		{
+#pragma endregion
 
+#pragma region scoreText
+		{
 			Matrix4 worldMat;
 			worldMat = scale(Vector3(scoreScale, scoreScale, scoreScale));
 
 			worldMat *= cameraPosture;
 
 
-			Vector3 easePos = scoreNumberObjectPos_ + Vector3(-10.0f + ((125.0f * scoreScale) * deget), 0.0f, 0.0f);
-
-			easePos = transform(easePos, cameraPosture);
+			Vector3 easePos = transform(scoreObjectPos_, cameraPosture);
 
 
-			float easeRate = Easing::easeOutBack(rate[deget]);
+			float easeRate = Easing::easeOutBack(rate[10]);
 			easePos += (moveVec * (1 - easeRate));
 
+
 			worldMat *= translate(easePos);
+			MV1SetMatrix(scoreTextObject_, worldMat);
 
-			deget++;
-			MV1SetMatrix(numberObjects_[e], worldMat);
-
-			MV1DrawModel(numberObjects_[e]);
+			MV1DrawModel(scoreTextObject_);
 		}
-	}
 #pragma endregion
-
-#pragma region scoreText
-	{
-		Matrix4 worldMat;
-		worldMat = scale(Vector3(scoreScale, scoreScale, scoreScale));
-
-		worldMat *= cameraPosture;
-
-
-		Vector3 easePos = transform(scoreObjectPos_, cameraPosture);
-
-
-		float easeRate = Easing::easeOutBack(rate[10]);
-		easePos += (moveVec * (1 - easeRate));
-
-
-		worldMat *= translate(easePos);
-		MV1SetMatrix(scoreTextObject_, worldMat);
-
-		MV1DrawModel(scoreTextObject_);
 	}
-#pragma endregion
-
 #pragma region comboNum
 	{
 		int deget = 0;
@@ -543,9 +573,7 @@ void GameManager::scoreDraw()
 
 			worldMat *= cameraPosture;
 
-
 			Vector3 easePos = comboNumberObjectPos_ + Vector3(-10.0f + ((125.0f * comboScale) * (deget)), 0.0f, 0.0f);
-
 			easePos = transform(easePos, cameraPosture);
 
 			float easeRate = Easing::easeOutBack(rate[deget + 11]);
@@ -583,144 +611,149 @@ void GameManager::scoreDraw()
 		MV1DrawModel(comboTextObject_);
 	}
 #pragma endregion
-
-#pragma region timeNumber
+	if (gameNumber == GameNum::SOLO)
 	{
-		int deget = 0;
-
-		std::vector<int> timeNums;
-		timeNums.resize(2);
-		int tmpTime = TimeLimit - gameTimer_;
-
-		bool isNotTimeup = (tmpTime > 0);
-		tmpTime /= 60;
-
-		tmpTime = std::clamp(tmpTime, 0, 99);
-		if (isNotTimeup)
+#pragma region timeNumber
 		{
-			tmpTime++;
+			int deget = 0;
+
+			std::vector<int> timeNums;
+			timeNums.resize(2);
+			int tmpTime = TimeLimit - gameTimer_;
+
+			bool isNotTimeup = (tmpTime > 0);
+			tmpTime /= 60;
+
+			tmpTime = std::clamp(tmpTime, 0, 99);
+			if (isNotTimeup)
+			{
+				tmpTime++;
+			}
+			for (int i = 1; i <= timeNums.size(); i++)
+			{
+				int tmpDegit = tmpTime % 10;
+				timeNums[timeNums.size() - i] = tmpDegit;
+
+				tmpTime /= 10;
+			}
+			for (auto& e : timeNums)
+			{
+
+				Matrix4 worldMat;
+				worldMat = scale(Vector3(timeScale * 2, timeScale * 2, timeScale * 2));
+
+				worldMat *= cameraPosture;
+
+
+				Vector3 easePos = timeNumberObjectPos_ + Vector3(-10.0f + (7.0f * (deget)), 0.0f, 0.0f);
+
+				float easeRate = Easing::easeOutBack(rate[deget + 11]);
+				easePos += (moveVec * (1 - easeRate));
+
+				worldMat *= translate(easePos);
+
+				deget++;
+				MV1SetMatrix(numberObjects_[e], worldMat);
+
+				MV1DrawModel(numberObjects_[e]);
+			}
 		}
-		for (int i = 1; i <= timeNums.size(); i++)
-		{
-			int tmpDegit = tmpTime % 10;
-			timeNums[timeNums.size() - i] = tmpDegit;
-
-			tmpTime /= 10;
-		}
-		for (auto& e : timeNums)
-		{
-
-			Matrix4 worldMat;
-			worldMat = scale(Vector3(timeScale * 2, timeScale * 2, timeScale * 2));
-
-			worldMat *= cameraPosture;
-
-
-			Vector3 easePos = timeNumberObjectPos_ + Vector3(-10.0f + (7.0f * (deget)), 0.0f, 0.0f);
-
-			float easeRate = Easing::easeOutBack(rate[deget + 11]);
-			easePos += (moveVec * (1 - easeRate));
-
-			worldMat *= translate(easePos);
-
-			deget++;
-			MV1SetMatrix(numberObjects_[e], worldMat);
-
-			MV1DrawModel(numberObjects_[e]);
-		}
-	}
 
 #pragma endregion
 
 #pragma region timeText
-	{
-		Matrix4 worldMat;
-		worldMat = scale(Vector3(timeScale, timeScale, timeScale));
+		{
+			Matrix4 worldMat;
+			worldMat = scale(Vector3(timeScale, timeScale, timeScale));
 
-		worldMat *= cameraPosture;
-
-
-		Vector3 easePos = timeObjectPos_;
+			worldMat *= cameraPosture;
 
 
-		float easeRate = Easing::easeOutBack(rate[14]);
-		easePos += (moveVec * (1 - easeRate));
+			Vector3 easePos = timeObjectPos_;
 
 
-		worldMat *= translate(easePos);
-		MV1SetMatrix(timeTextObjectHandle_, worldMat);
+			float easeRate = Easing::easeOutBack(rate[14]);
+			easePos += (moveVec * (1 - easeRate));
 
-		MV1DrawModel(timeTextObjectHandle_);
-	}
+
+			worldMat *= translate(easePos);
+
+			MV1SetMatrix(timeTextObjectHandle_, worldMat);
+
+			MV1DrawModel(timeTextObjectHandle_);
+		}
 #pragma endregion
 
 
-	Vector3 iconMovePos = Vector3(15.0f, 0.0f, 0.0f);
-	Vector3 iconBasePos = Vector3(-23.0f, 0.0f, 0.0f);
+		Vector3 iconMovePos = Vector3(15.0f, 0.0f, 0.0f);
+		Vector3 iconBasePos = Vector3(-23.0f, 0.0f, 0.0f);
 
 #pragma region Addtime
-	if (AddSecObjectAnimationRate_ < 1.0f)
-	{
-		Matrix4 worldMat;
-		Matrix4 iconMat;
+		if (AddSecObjectAnimationRate_ < 1.0f)
+		{
+			Matrix4 worldMat;
+			Matrix4 iconMat;
 
-		float scaleRate = (1 - Easing::easeInExpo(AddSecObjectAnimationRate_));
-		float baseScale = timeScale * 2 * scaleRate;
-		worldMat = scale(Vector3(baseScale, timeScale * 2, timeScale * 2));
+			float scaleRate = (1 - Easing::easeInExpo(AddSecObjectAnimationRate_));
+			float baseScale = timeScale * 2 * scaleRate;
+			worldMat = scale(Vector3(baseScale, timeScale * 2, timeScale * 2));
 
-		worldMat *= cameraPosture;
-		iconMat = worldMat;
+			worldMat *= cameraPosture;
+			iconMat = worldMat;
 
-		Vector3 easePos = timeNumberObjectPos_ - iconMovePos + iconBasePos;
-		Vector3 iconEasePos = timeNumberObjectPos_ - iconMovePos + iconBasePos;
+			Vector3 easePos = timeNumberObjectPos_ - iconMovePos + iconBasePos;
+			Vector3 iconEasePos = timeNumberObjectPos_ - iconMovePos + iconBasePos;
 
-		float easeRate = Easing::easeOutExpo(AddSecObjectAnimationRate_);
-		easePos += ((iconMovePos * easeRate) + Vector3(+3.5f * scaleRate, 0.0f, 0.0f));
-		iconEasePos += ((iconMovePos * easeRate) + Vector3(-3.5f * scaleRate, 0.0f, 0.0f));
+			float easeRate = Easing::easeOutExpo(AddSecObjectAnimationRate_);
+			easePos += ((iconMovePos * easeRate) + Vector3(+3.5f * scaleRate, 0.0f, 0.0f));
+			iconEasePos += ((iconMovePos * easeRate) + Vector3(-3.5f * scaleRate, 0.0f, 0.0f));
 
-		worldMat *= translate(easePos);
-		iconMat *= translate(iconEasePos);
-		MV1SetMatrix(numberObjects_[AddSec], worldMat);
+			worldMat *= translate(easePos);
+			iconMat *= translate(iconEasePos);
+			MV1SetMatrix(numberObjects_[AddSec], worldMat);
 
-		MV1DrawModel(numberObjects_[AddSec]);
+			MV1DrawModel(numberObjects_[AddSec]);
 
-		MV1SetMatrix(AddHandle_, iconMat);
+			MV1SetMatrix(AddHandle_, iconMat);
 
-		MV1DrawModel(AddHandle_);
+			MV1DrawModel(AddHandle_);
 
-	}
+		}
 #pragma endregion
+
 #pragma region Subtime
-	if (SubSecObjectAnimationRate_ < 1.0f)
-	{
-		float scaleRate = (1 - Easing::easeInExpo(SubSecObjectAnimationRate_));
-		float baseScale = timeScale * 2 * scaleRate;
-		Matrix4 worldMat;
-		Matrix4 iconMat;
-		worldMat = scale(Vector3(baseScale, timeScale * 2, timeScale * 2));
+		if (SubSecObjectAnimationRate_ < 1.0f)
+		{
+			float scaleRate = (1 - Easing::easeInExpo(SubSecObjectAnimationRate_));
+			float baseScale = timeScale * 2 * scaleRate;
+			Matrix4 worldMat;
+			Matrix4 iconMat;
+			worldMat = scale(Vector3(baseScale, timeScale * 2, timeScale * 2));
 
-		worldMat *= cameraPosture;
-		iconMat = worldMat;
+			worldMat *= cameraPosture;
+			iconMat = worldMat;
 
-		Vector3 easePos = timeNumberObjectPos_ + iconMovePos + iconBasePos;
-		Vector3 iconEasePos = timeNumberObjectPos_ + iconMovePos + iconBasePos;
+			Vector3 easePos = timeNumberObjectPos_ + iconMovePos + iconBasePos;
+			Vector3 iconEasePos = timeNumberObjectPos_ + iconMovePos + iconBasePos;
 
-		float easeRate = Easing::easeOutExpo(SubSecObjectAnimationRate_);
-		easePos += (-iconMovePos * easeRate) + Vector3(+3.5f * scaleRate, 0.0f, 0.0f);
-		iconEasePos += (-iconMovePos * easeRate) + Vector3(-3.5f * scaleRate, 0.0f, 0.0f);
+			float easeRate = Easing::easeOutExpo(SubSecObjectAnimationRate_);
+			easePos += (-iconMovePos * easeRate) + Vector3(+3.5f * scaleRate, 0.0f, 0.0f);
+			iconEasePos += (-iconMovePos * easeRate) + Vector3(-3.5f * scaleRate, 0.0f, 0.0f);
 
-		worldMat *= translate(easePos);
-		iconMat *= translate(iconEasePos);
-		MV1SetMatrix(numberObjects_[3], worldMat);
+			worldMat *= translate(easePos);
+			iconMat *= translate(iconEasePos);
+			MV1SetMatrix(numberObjects_[3], worldMat);
 
-		MV1DrawModel(numberObjects_[3]);
+			MV1DrawModel(numberObjects_[3]);
 
-		MV1SetMatrix(SubHandle_, iconMat);
+			MV1SetMatrix(SubHandle_, iconMat);
 
-		MV1DrawModel(SubHandle_);
+			MV1DrawModel(SubHandle_);
+
+		}
+#pragma endregion
 
 	}
-#pragma endregion
 }
 
 void GameManager::ResultDraw()
@@ -1120,7 +1153,7 @@ void GameManager::SetGameNum(GameNum num)
 	{
 		frameHandle = P1frameHandle;
 	}
-	else if(gameNumber == GameNum::PLAYER1)
+	else if (gameNumber == GameNum::PLAYER2)
 	{
 		frameHandle = P2frameHandle;
 	}
