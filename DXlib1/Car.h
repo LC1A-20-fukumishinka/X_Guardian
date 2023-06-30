@@ -73,6 +73,8 @@ public:
 	bool GetIsPass();
 
 	bool GetIsSignalStop();
+
+	bool GetIsFront();
 private:
 	static const float sTurnStartPos;
 	static const float sStopPos;
@@ -112,7 +114,8 @@ private:
 
 	bool JudgmentToStop(bool isCrossIn);
 
-
+	//先頭車両かどうか
+	bool isFront = false;
 	int enemyStopTimer_ = 60;
 	//カプセル状の当たり判定使わないかも
 	std::unique_ptr<Capsule> colObject_;

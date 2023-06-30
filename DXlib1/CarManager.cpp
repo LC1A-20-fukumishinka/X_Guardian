@@ -153,7 +153,7 @@ void CarManager::SetSignal()
 		{
 			inputSignal = MoveType::STRAIGHT;
 		}
-		else if (GameInput::TurnRight(gameNumber) )
+		else if (GameInput::TurnRight(gameNumber))
 		{
 			inputSignal = MoveType::RIGHTTURN;
 		}
@@ -638,6 +638,35 @@ bool CarManager::GetSlowmotion()
 	return (sGameSpeed < 1.0f);
 }
 
+void CarManager::TimeOverDeath()
+{
+	isTimeOverDeath = true;
+	for (auto& pCar : playerCars_)
+	{
+		if (pCar->GetIsAlive() && pCar->GetIsFront())
+		{
+			deadPlayerCar_ = pCar;
+			deadAnimationTimer_ = 0;
+			if (isIngame_)
+			{
+				isDeadAnimation_ = true;
+				Vector3 carLength = pCar->GetFrontPos() - pCar->GetTailPos();
+				deadCarPos_ = pCar->GetTailPos() + (carLength * 0.5f);
+				SetGameSpeed(0.01f);
+				sounds_->BGMStop();
+				sounds_->Slow();
+				inputSignal = MoveType::STOP;
+			}
+			break;
+		}
+	}
+}
+
+bool CarManager::GetIsTimeOverDeath()
+{
+	return isTimeOverDeath;
+}
+
 
 void CarManager::IngameUpdate()
 {
@@ -646,20 +675,27 @@ void CarManager::IngameUpdate()
 	{
 		deadAnimationTimer_++;
 		deadPlayerCar_.lock()->Update();
-		deadEnemyCar_.lock()->Update();
+		if (!isTimeOverDeath)
+		{
+			deadEnemyCar_.lock()->Update();
+		}
 
 		if (deadAnimationTimer_ >= sDeadAnimationTimerMax)
 		{
 			isDeadAnimation_ = false;
 			deadPlayerCar_.lock()->Dead();
-			deadEnemyCar_.lock()->Dead();
+			if (!isTimeOverDeath)
+			{
+				deadEnemyCar_.lock()->Dead();
+				enemyBlast.Init(deadEnemyCar_.lock()->GetModelType(), deadEnemyCar_.lock()->GetFrontPos(), deadEnemyCar_.lock()->GetCarColor());
+			}
 			SetGameSpeed(1.0f);
 			sounds_->ContinueBGM();
 			sounds_->Explosion();
 			sounds_->Broken();
 
 			playerBlast.Init(deadPlayerCar_.lock()->GetModelType(), deadPlayerCar_.lock()->GetFrontPos(), deadPlayerCar_.lock()->GetCarColor());
-			enemyBlast.Init(deadEnemyCar_.lock()->GetModelType(), deadEnemyCar_.lock()->GetFrontPos(), deadEnemyCar_.lock()->GetCarColor());
+			isTimeOverDeath = false;
 		}
 	}
 	else

@@ -61,6 +61,10 @@ public:
 	void SetGameNumber(GameNum number);
 
 	bool GetSlowmotion();
+
+	void TimeOverDeath();
+
+	bool GetIsTimeOverDeath();
 private:
 	void IngameUpdate();
 
@@ -135,5 +139,7 @@ private:
 	SoundManager *sounds_ = nullptr;
 
 	GameNum gameNumber = GameNum::SOLO;
+
+	bool isTimeOverDeath = false;
 };
 

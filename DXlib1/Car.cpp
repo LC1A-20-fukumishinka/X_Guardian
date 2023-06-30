@@ -405,6 +405,11 @@ bool Car::GetIsSignalStop()
 	return isStopSignal;
 }
 
+bool Car::GetIsFront()
+{
+	return isFront;
+}
+
 void Car::SetSignal(MoveType isStopSignal)
 {
 	sInputSignal = isStopSignal;
@@ -521,6 +526,9 @@ bool Car::JudgmentToStop(bool isCrossIn)
 
 	//信号が赤だった    停止位置 & 停止指示中だった
 	bool isSignal = (isStopPosIn && isStopSignal);
+
+	//自分が先頭車両かどうかを判定する
+	isFront = isSignal && isPlayer_;
 
 	//前が詰まった
 	bool isTrafficJam = false;

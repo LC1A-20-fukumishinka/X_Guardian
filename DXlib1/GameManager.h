@@ -204,8 +204,11 @@ private:
 
 	int P1frameHandle = -1;
 	int P2frameHandle = -1;
+	int P1UIframeHandle = -1;
+	int P2UIframeHandle = -1;
 
 	int frameHandle = -1;
 	int lifeHandle = -1;
+	int lifeEmptyHandle = -1;
 };
 

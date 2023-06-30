@@ -182,10 +182,10 @@ void Game::Draw()
 		DrawGraph(0, 0, screenNum, TRUE);
 		break;
 	case GameNum::PLAYER1:
-		DrawRectGraph(0, 0, 340, 0, 640, 720, screenNum, TRUE);
+		DrawRectGraph(0, 0, 360, 0, 600, 720, screenNum, TRUE);
 		break;
 	case GameNum::PLAYER2:
-		DrawRectGraph(640, 0, 340, 0, 640, 720, screenNum, TRUE);
+		DrawRectGraph(680, 0, 360, 0, 600, 720, screenNum, TRUE);
 		break;
 	default:
 		break;
@@ -407,19 +407,27 @@ void Game::IngameUpdate()
 		gameManager.PassCar(e);
 	}
 
-	if (carManager.GetAnyCarStop())
+	if (carManager.GetAnyCarStop() && !carManager.GetIsTimeOverDeath())
 	{
 		comboTimer++;
-
+		liveLimit++;
 		const int comboLimit = 40;
+
+		const int LiveLimitMax = 120;
 		if (comboTimer >= comboLimit)
 		{
 			gameManager.StopCar();
+		}
+
+		if (liveLimit >= LiveLimitMax)
+		{
+			carManager.TimeOverDeath();
 		}
 	}
 	else
 	{
 		comboTimer = 0;
+		liveLimit = 0;
 	}
 
 	float gaugeRate = static_cast<float>(comboTimer) / 30.0f;

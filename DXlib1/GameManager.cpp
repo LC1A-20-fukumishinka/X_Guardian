@@ -302,23 +302,44 @@ void GameManager::FrameDraw()
 
 	int lifeHeight = 300;
 
-	int sukima = 47;
+	int sukima = 95;
+
+	int drawHandle = lifeHandle;
 	if (gameNumber == GameNum::PLAYER1)
 	{
 		DrawGraph(0, 0, frameHandle, TRUE);
+		DrawGraph(600, 0, P1UIframeHandle, TRUE);
 
-		for (int i = 0; i < life; i++)
+		for (int i = 0; i < 3; i++)
 		{
-			DrawGraph(630 - lifeGraphWidth, lifeHeight + (i * sukima), lifeHandle, TRUE);
+			if (3-i <= life)
+			{
+				drawHandle = lifeHandle;
+			}
+			else
+			{
+				drawHandle = lifeEmptyHandle;
+			}
+			DrawGraph(640 - lifeGraphWidth - 6, 53 + (i * sukima), drawHandle, TRUE);
 		}
 	}
 	else if (gameNumber == GameNum::PLAYER2)
 	{
-		DrawGraph(640, 0, frameHandle, TRUE);
+		DrawGraph(680, 0, frameHandle, TRUE);
+		DrawGraph(600, 350, P2UIframeHandle, TRUE);
 
-		for (int i = 0; i < life; i++)
+
+		for (int i = 0; i < 3; i++)
 		{
-			DrawGraph(650, lifeHeight + (i * sukima), lifeHandle, TRUE);
+			if (i < life)
+			{
+				drawHandle = lifeHandle;
+			}
+			else
+			{
+				drawHandle = lifeEmptyHandle;
+			}
+			DrawGraph(640 - lifeGraphWidth + 4, 362 + (i * sukima), drawHandle, TRUE);
 		}
 	}
 }
@@ -426,8 +447,11 @@ void GameManager::Load()
 
 	P1frameHandle = LoadGraph("Resources/Texture/frame_1p.png");
 	P2frameHandle = LoadGraph("Resources/Texture/frame_2p.png");
-	lifeHandle = LoadGraph("Resources/Texture/HP_UI.png");
+	P1UIframeHandle = LoadGraph("Resources/Texture/frame_1p_UI.png");
+	P2UIframeHandle = LoadGraph("Resources/Texture/frame_2p_UI.png");
 
+	lifeHandle = LoadGraph("Resources/Texture/HP_UI_01.png");
+	lifeEmptyHandle = LoadGraph("Resources/Texture/HP_UI_02.png");
 	frameHandle = P1frameHandle;
 }
 

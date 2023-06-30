@@ -135,5 +135,7 @@ public:
 	int screenNum = -1;
 
 	int gameNumber = 0;
+
+	int liveLimit = 0;
 };
 
