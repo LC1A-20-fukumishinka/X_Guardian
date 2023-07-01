@@ -120,7 +120,7 @@ void CarManager::Draw()
 {
 	for (auto& e : playerCars_)
 	{
-		if (e->GetIsAlive())
+		if (/*e->GetIsAlive()*/true)
 		{
 			e->Draw();
 		}

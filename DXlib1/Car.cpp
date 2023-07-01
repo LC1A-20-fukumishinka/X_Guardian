@@ -534,25 +534,33 @@ bool Car::JudgmentToStop(bool isCrossIn)
 	bool isTrafficJam = false;
 
 	//前の車両が存在していたら
-	if (!frontCar_.expired() && frontCar_.lock()->GetIsAlive())
+	if (!frontCar_.expired())
 	{
-		//二台の車両の距離
-		Vector3 distance = (frontCar_.lock()->GetTailPos() - GetFrontPos());
 
-
-		//距離が近すぎるか確認
-		if ((distance.length() <= sCarDistanceLimit))
+		if (frontCar_.lock()->GetIsAlive())
 		{
-			derayTimer_ = sMaxDerayTimer;
+			//二台の車両の距離
+			Vector3 distance = (frontCar_.lock()->GetTailPos() - GetFrontPos());
+
+
+			//距離が近すぎるか確認
+			if ((distance.length() <= sCarDistanceLimit))
+			{
+				derayTimer_ = sMaxDerayTimer;
+			}
+
+			if (derayTimer_ > 0)
+			{
+				derayTimer_ -= 1 * sGameSpeed;
+				isTrafficJam = true;
+			}
 		}
-
-		if (derayTimer_ > 0)
+		else if (!frontCar_.lock()->GetIsAlive())
 		{
-			derayTimer_ -= 1 * sGameSpeed;
-			isTrafficJam = true;
+			derayTimer_ = 0;
+			isTrafficJam = false;
 		}
 	}
-
 
 	//止まるかどうか
 	bool isStop = (isSignal || isTrafficJam);
