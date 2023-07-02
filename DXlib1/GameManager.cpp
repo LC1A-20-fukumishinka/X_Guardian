@@ -92,11 +92,6 @@ void GameManager::Update()
 		{
 			gameTimer_++;
 		}
-
-		if (!isSolo)
-		{
-			int hoge = 0;
-		}
 		//isClear_ = normaCars >= maxNormaCount;
 		isFailed_ = ((isSolo && gameTimer_ >= TimeLimit));
 
@@ -113,6 +108,7 @@ void GameManager::Update()
 		{
 			animationRate += 0.1f;
 			rotation += 0.002f;
+
 			combo = 0;
 		}
 		else
@@ -312,7 +308,7 @@ void GameManager::FrameDraw()
 
 		for (int i = 0; i < 3; i++)
 		{
-			if (3-i <= life)
+			if (3 - i <= life)
 			{
 				drawHandle = lifeHandle;
 			}
@@ -384,7 +380,14 @@ void GameManager::PassCar(Vector3 pos)
 
 void GameManager::StopCar()
 {
-	combo = 0;
+	if (gameNumber == GameNum::SOLO)
+	{
+		combo = 0;
+	}
+	else
+	{
+		isSendObstacles = true;
+	}
 }
 
 GameStatus GameManager::GetStatus()
@@ -401,7 +404,6 @@ void GameManager::SetCameraPos(Vector3 camPos, Vector3 targetPos)
 {
 	cameraBasePos_ = camPos;
 	cameraBaseTargetPos_ = targetPos;
-
 }
 
 void GameManager::SetIsDeadAnimation(bool isDeadAnimation)
@@ -1186,6 +1188,16 @@ void GameManager::SetGameNum(GameNum num)
 bool GameManager::GetisGameOver()
 {
 	return (status_ == GameStatus::INGAME && !isSolo && life <= 0 && animationRate <= 0.0f);
+}
+
+int GameManager::SendObstacles()
+{
+	if (!isSendObstacles)return 0;
+
+	isSendObstacles = false;
+	int sendObstaclesCount = combo;
+	combo = 0;
+	return sendObstaclesCount;
 }
 
 

@@ -63,6 +63,10 @@ public:
 	void ToResult();
 
 	bool isGameOver();
+
+	int SendObstacles();
+
+	void ReceiveObstacles(int ReceiveObstaclesCount);
 private:
 	void TitleUpdate();
 	void IngameUpdate();
@@ -137,5 +141,7 @@ public:
 	int gameNumber = 0;
 
 	int liveLimit = 0;
+
+	int SendObstaclesCount = 0;
 };
 

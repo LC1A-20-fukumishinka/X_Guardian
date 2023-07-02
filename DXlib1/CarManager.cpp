@@ -61,6 +61,9 @@ CarManager::CarManager()
 	guideObject_ = Vector3(20.0f, 35.0f, -160.0f);
 
 	TitleParticles.resize(60);
+
+	ObstaclesTime = 0;
+	ObstaclesLevel = 0;
 }
 
 CarManager::~CarManager()
@@ -71,6 +74,9 @@ void CarManager::Init()
 {
 	Car::SetSignal(MoveType::STRAIGHT);
 	isIngame_ = true;
+
+	ObstaclesTime = 0;
+	ObstaclesLevel = 0;
 	SetGameSpeed(1.0f);
 }
 
@@ -120,7 +126,7 @@ void CarManager::Draw()
 {
 	for (auto& e : playerCars_)
 	{
-		if (/*e->GetIsAlive()*/true)
+		if (e->GetIsAlive())
 		{
 			e->Draw();
 		}
@@ -667,6 +673,12 @@ bool CarManager::GetIsTimeOverDeath()
 	return isTimeOverDeath;
 }
 
+void CarManager::ReceiveObstacles(int level, int time)
+{
+	ObstaclesLevel = level;
+	ObstaclesTime = time;
+}
+
 
 void CarManager::IngameUpdate()
 {
@@ -700,6 +712,16 @@ void CarManager::IngameUpdate()
 	}
 	else
 	{
+		isSpawnObstacles = (ObstaclesTime > 0);
+		if (isSpawnObstacles)
+		{
+			ObstaclesTime--;
+		}
+		else
+		{
+			ObstaclesTime = 0;
+			ObstaclesLevel = 0;
+		}
 		Collision();
 
 		for (auto& e : playerCars_)
@@ -773,6 +795,8 @@ bool CarManager::AddEnemyCar(bool isTitle)
 {
 	bool isNothing = (aliveEnemyCars_.size() <= 0);
 	bool isAreaSafe = false;
+
+	bool isAmbulanceSpawn = (gameNumber != GameNum::SOLO && isSpawnObstacles);
 	if (!isNothing)
 	{
 		isAreaSafe = (aliveEnemyCars_.back().lock()->GetTailPos().z < 470.0f);
@@ -803,13 +827,36 @@ bool CarManager::AddEnemyCar(bool isTitle)
 			desc.type = MoveType::RIGHTTURN;
 			desc.color = Color::PINK;
 			desc.length -= 3.0f;
-
-			if (rand() % 2)
-			{
-				desc.model = ModelType::EMERGENCY;
-				desc.color = Color::GREEN;
-			}
 		}
+
+		switch (ObstaclesLevel)
+		{
+		case 0:	//ƒŒƒxƒ‹‚O‚È‚ç‹~‹}ŽÔ‚ª”­¶‚µ‚È‚¢
+			isAmbulanceSpawn = false;
+			break;
+		case 1:	//ƒŒƒxƒ‹‚P‚È‚çƒgƒ‰ƒbƒN‚Ì”¼•ª‚ª‹~‹}ŽÔ‚É‚È‚é
+			isAmbulanceSpawn = (isAmbulanceSpawn && isTrack && (rand() % 2));
+			break;
+		case 2:	//ƒŒƒxƒ‹‚Q‚È‚çæ—pŽÔ‚Ì”¼•ª‚ª‹~‹}ŽÔ‚É‚È‚é
+			isAmbulanceSpawn = (isAmbulanceSpawn && !isTrack && (rand() % 2));
+			break;
+		case 3:	//ƒŒƒxƒ‹‚R‚È‚çæ—pŽÔ‚ª‚·‚×‚Ä‹~‹}ŽÔ‚É‚È‚é
+			isAmbulanceSpawn = (isAmbulanceSpawn && !isTrack);
+			break;
+		default:
+			break;
+		}
+		//”¼•ª‚ÌŠm—¦‚Åƒgƒ‰ƒbƒN‚ª‹~‹}ŽÔ‚É‚È‚é
+		if (isAmbulanceSpawn)
+		{
+			desc = sTrackCar;
+			desc.type = MoveType::RIGHTTURN;
+			desc.color = Color::PINK;
+			desc.length -= 3.0f;
+			desc.model = ModelType::EMERGENCY;
+			desc.color = Color::GREEN;
+		}
+
 		desc.angle = Vector3(0, 0, -1);
 		desc.startPos = Vector3(sCarWidthPos, 0.0f, 500.0f);
 		desc.isPlayer = false;

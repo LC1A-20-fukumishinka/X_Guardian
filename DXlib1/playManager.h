@@ -21,5 +21,8 @@ private:
 	bool ALose = false;
 	bool BLose = false;
 	bool isFinish = false;
+
+	int aObstaclesCount = 0;
+	int bObstaclesCount = 0;
 };
 

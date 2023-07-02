@@ -91,6 +91,9 @@ public:
 	void SetGameNum(GameNum num);
 
 	bool GetisGameOver();
+
+	int SendObstacles();
+
 private:
 	//sceneˆÚ“®ŠÖ”
 	void ToIngame();
@@ -102,6 +105,7 @@ private:
 
 	int score = 0;
 	int combo = 0;
+	bool isSendObstacles = false;
 
 	int maxNormaCount = 25;
 

@@ -48,6 +48,9 @@ void playManager::Update()
 		BLose = b.isGameOver();
 		ALose = a.isGameOver();
 		isFinish = BLose || ALose;
+
+		a.ReceiveObstacles(b.SendObstacles());
+		b.ReceiveObstacles(a.SendObstacles());
 	}
 
 

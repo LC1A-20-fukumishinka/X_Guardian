@@ -65,6 +65,8 @@ public:
 	void TimeOverDeath();
 
 	bool GetIsTimeOverDeath();
+
+	void ReceiveObstacles(int level, int time);
 private:
 	void IngameUpdate();
 
@@ -141,5 +143,9 @@ private:
 	GameNum gameNumber = GameNum::SOLO;
 
 	bool isTimeOverDeath = false;
+
+	int ObstaclesLevel = 0;
+	int ObstaclesTime = 0;
+	bool isSpawnObstacles = false;
 };
 

@@ -413,7 +413,7 @@ void Game::IngameUpdate()
 		liveLimit++;
 		const int comboLimit = 40;
 
-		const int LiveLimitMax = 120;
+		const int LiveLimitMax = 12000;
 		if (comboTimer >= comboLimit)
 		{
 			gameManager.StopCar();
@@ -440,6 +440,11 @@ void Game::IngameUpdate()
 	xGuardian.Update(carManager.GetInputSignal());
 	roadSignManager.Update(carManager.GetInputSignal());
 	roadSignManager.conboToAlive(gameManager.GetCombo());
+
+	if (SendObstaclesCount <= 0)
+	{
+		SendObstaclesCount = gameManager.SendObstacles();
+	}
 
 	if (carManager.GetIsNotTrackMove())
 	{
@@ -637,6 +642,23 @@ void Game::ToResult()
 bool Game::isGameOver()
 {
 	return gameManager.GetisGameOver();
+}
+
+int Game::SendObstacles()
+{
+	int sendData = SendObstaclesCount;
+	SendObstaclesCount = 0;
+	return sendData;
+}
+
+void Game::ReceiveObstacles(int ReceiveObstaclesCount)
+{
+	if (ReceiveObstaclesCount <= 10)return;
+
+	int level = ReceiveObstaclesCount / 10;
+	int time = 600;
+
+	carManager.ReceiveObstacles(level, time);
 }
 
 bool Game::GameEnd()
