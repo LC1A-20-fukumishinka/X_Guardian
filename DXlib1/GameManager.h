@@ -94,6 +94,11 @@ public:
 
 	int SendObstacles();
 
+	/// <summary>
+	/// ‹~‹}Ô‚ğoŒ»‚³‚¹‚é‚æ‚¤‚É—v¿‚·‚é
+	/// </summary>
+	/// <returns></returns>
+	int RequestToPopAmbulance();
 private:
 	//sceneˆÚ“®ŠÖ”
 	void ToIngame();
@@ -214,5 +219,10 @@ private:
 	int frameHandle = -1;
 	int lifeHandle = -1;
 	int lifeEmptyHandle = -1;
+
+	/// <summary>
+	/// ‘Šè‚ÉoŒ»‚³‚¹‚Ä‚à‚ç‚¤‹~‹}Ô‚Ì”
+	/// </summary>
+	int requestToPopAmbulanceCount = 0;
 };
 

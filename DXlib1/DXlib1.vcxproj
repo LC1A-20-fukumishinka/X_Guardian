@@ -133,6 +133,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="angryParticle.cpp" />
     <ClCompile Include="Car.cpp" />
     <ClCompile Include="CarBlastParticle.cpp" />
     <ClCompile Include="CarManager.cpp" />
@@ -155,6 +156,7 @@
     <ClCompile Include="XGuardian.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="angryParticle.h" />
     <ClInclude Include="Car.h" />
     <ClInclude Include="CarBlastParticle.h" />
     <ClInclude Include="CarManager.h" />

@@ -67,6 +67,8 @@ public:
 	bool GetIsTimeOverDeath();
 
 	void ReceiveObstacles(int level, int time);
+
+	void ReceiveCountPopAmbulance(int spawnAmbulanceCount);
 private:
 	void IngameUpdate();
 
@@ -146,6 +148,7 @@ private:
 
 	int ObstaclesLevel = 0;
 	int ObstaclesTime = 0;
+	int spawnAmbulanceCount = 0;
 	bool isSpawnObstacles = false;
 };
 

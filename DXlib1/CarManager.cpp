@@ -679,6 +679,11 @@ void CarManager::ReceiveObstacles(int level, int time)
 	ObstaclesTime = time;
 }
 
+void CarManager::ReceiveCountPopAmbulance(int spawnAmbulanceCount)
+{
+	this->spawnAmbulanceCount += spawnAmbulanceCount;
+}
+
 
 void CarManager::IngameUpdate()
 {
@@ -796,7 +801,7 @@ bool CarManager::AddEnemyCar(bool isTitle)
 	bool isNothing = (aliveEnemyCars_.size() <= 0);
 	bool isAreaSafe = false;
 
-	bool isAmbulanceSpawn = (gameNumber != GameNum::SOLO && isSpawnObstacles);
+	bool isAmbulanceSpawn = (gameNumber != GameNum::SOLO && spawnAmbulanceCount > 0);
 	if (!isNothing)
 	{
 		isAreaSafe = (aliveEnemyCars_.back().lock()->GetTailPos().z < 470.0f);
@@ -829,26 +834,9 @@ bool CarManager::AddEnemyCar(bool isTitle)
 			desc.length -= 3.0f;
 		}
 
-		switch (ObstaclesLevel)
-		{
-		case 0:	//ƒŒƒxƒ‹‚O‚È‚ç‹~‹}ŽÔ‚ª”­¶‚µ‚È‚¢
-			isAmbulanceSpawn = false;
-			break;
-		case 1:	//ƒŒƒxƒ‹‚P‚È‚çƒgƒ‰ƒbƒN‚Ì”¼•ª‚ª‹~‹}ŽÔ‚É‚È‚é
-			isAmbulanceSpawn = (isAmbulanceSpawn && isTrack && (rand() % 2));
-			break;
-		case 2:	//ƒŒƒxƒ‹‚Q‚È‚çæ—pŽÔ‚Ì”¼•ª‚ª‹~‹}ŽÔ‚É‚È‚é
-			isAmbulanceSpawn = (isAmbulanceSpawn && !isTrack && (rand() % 2));
-			break;
-		case 3:	//ƒŒƒxƒ‹‚R‚È‚çæ—pŽÔ‚ª‚·‚×‚Ä‹~‹}ŽÔ‚É‚È‚é
-			isAmbulanceSpawn = (isAmbulanceSpawn && !isTrack);
-			break;
-		default:
-			break;
-		}
-		//”¼•ª‚ÌŠm—¦‚Åƒgƒ‰ƒbƒN‚ª‹~‹}ŽÔ‚É‚È‚é
 		if (isAmbulanceSpawn)
 		{
+			spawnAmbulanceCount--;
 			desc = sTrackCar;
 			desc.type = MoveType::RIGHTTURN;
 			desc.color = Color::PINK;

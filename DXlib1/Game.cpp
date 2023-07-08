@@ -3,6 +3,9 @@
 #include <algorithm>
 #include "GameInput.h"
 #include "Input.h"
+
+const int Game::SoloModeTimerMax = 90;
+const int Game::VSModeTimerMax = 120;
 Game::Game()
 {
 	//í èÌ
@@ -367,7 +370,19 @@ void Game::TitleUpdate()
 
 void Game::IngameUpdate()
 {
-	int spawnTimerMax = 90;
+	int spawnTimerMax;
+	if (static_cast<GameNum>(gameNumber)== GameNum::SOLO)
+	{
+		spawnTimerMax = SoloModeTimerMax;
+	}
+	else
+	{
+		int subTime = gameManager.GetCombo();
+		subTime = std::clamp(subTime, 0, 100);
+
+		float rate = 1.0f - (static_cast<float>(subTime) / 200);
+		spawnTimerMax = static_cast<int>(VSModeTimerMax * rate);
+	}
 	if (carManager.GetDeadAnimation())
 	{
 		spawnTimer = spawnTimerMax;
@@ -419,7 +434,7 @@ void Game::IngameUpdate()
 			gameManager.StopCar();
 		}
 
-		if (liveLimit >= LiveLimitMax)
+		if (static_cast<GameNum>(gameNumber) != GameNum::SOLO && liveLimit >= LiveLimitMax)
 		{
 			carManager.TimeOverDeath();
 		}
@@ -646,19 +661,15 @@ bool Game::isGameOver()
 
 int Game::SendObstacles()
 {
-	int sendData = SendObstaclesCount;
-	SendObstaclesCount = 0;
-	return sendData;
+
+	return gameManager.RequestToPopAmbulance();
 }
 
 void Game::ReceiveObstacles(int ReceiveObstaclesCount)
 {
-	if (ReceiveObstaclesCount <= 10)return;
+	if (ReceiveObstaclesCount <= 0)return;
 
-	int level = ReceiveObstaclesCount / 10;
-	int time = 600;
-
-	carManager.ReceiveObstacles(level, time);
+	carManager.ReceiveCountPopAmbulance(ReceiveObstaclesCount);
 }
 
 bool Game::GameEnd()

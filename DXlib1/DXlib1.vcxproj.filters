@@ -21,6 +21,7 @@
     <ClCompile Include="playManager.cpp" />
     <ClCompile Include="GameInput.cpp" />
     <ClCompile Include="GameNum.cpp" />
+    <ClCompile Include="angryParticle.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Car.h" />
@@ -42,5 +43,6 @@
     <ClInclude Include="playManager.h" />
     <ClInclude Include="GameInput.h" />
     <ClInclude Include="GameNum.h" />
+    <ClInclude Include="angryParticle.h" />
   </ItemGroup>
 </Project>

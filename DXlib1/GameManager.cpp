@@ -343,6 +343,14 @@ void GameManager::FrameDraw()
 void GameManager::PassCar(Vector3 pos)
 {
 	combo++;
+	if (combo % 50 == 0)
+	{
+		requestToPopAmbulanceCount += 5;
+	}
+	else if (combo % 10 == 0)
+	{
+		requestToPopAmbulanceCount++;
+	}
 
 	score++;
 
@@ -367,7 +375,7 @@ void GameManager::PassCar(Vector3 pos)
 	itr->comboCount = combo;
 	itr->pos = pos;
 	itr->pos += Vector3(0.0f, 10.0f, 0.0f);
-	if (combo % 5 == 0)
+	if (gameNumber == GameNum::SOLO && combo % 5 == 0)
 	{
 		gameTimer_ -= (60 * AddSec);
 		sounds_->AddTime();
@@ -432,7 +440,7 @@ void GameManager::Load()
 	scoreTextObject_ = MV1LoadModel("Resources/score/score.mv1");
 	comboTextObject_ = MV1LoadModel("Resources/combo/combo.mv1");
 	TitleObject_ = MV1LoadModel("Resources/title/title.mv1");
-	pressAnyKeyHandle_ = MV1LoadModel("Resources/press_any_key/press_any_key.mv1");
+	pressAnyKeyHandle_ = MV1LoadModel("Resources/press_to_space/press_to_space.mv1");
 	timeTextObjectHandle_ = MV1LoadModel("Resources/time_ui/time_ui.mv1");
 	AddHandle_ = MV1LoadModel("Resources/add_sub/add.mv1");
 	SubHandle_ = MV1LoadModel("Resources/add_sub/sub.mv1");
@@ -1122,6 +1130,13 @@ void GameManager::Retry()
 
 }
 
+int GameManager::RequestToPopAmbulance()
+{
+	int tmpRequestToPopAmbulanceCount = requestToPopAmbulanceCount;
+	requestToPopAmbulanceCount = 0;
+	return tmpRequestToPopAmbulanceCount;
+}
+
 void GameManager::ToIngame()
 {
 	score = 0;
@@ -1132,8 +1147,11 @@ void GameManager::ToIngame()
 	elapsedTime_ = 0;
 	gameLevel_ = 0;
 	sounds_->IngameVolume();
-	sounds_->Enter();
-	sounds_->BGM();
+	if (gameNumber != GameNum::PLAYER2)
+	{
+		sounds_->Enter();
+		sounds_->BGM();
+	}
 	status_ = GameStatus::INGAME;
 }
 
