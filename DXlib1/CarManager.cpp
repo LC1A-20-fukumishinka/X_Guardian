@@ -804,7 +804,14 @@ bool CarManager::AddEnemyCar(bool isTitle)
 	bool isAmbulanceSpawn = (gameNumber != GameNum::SOLO && spawnAmbulanceCount > 0);
 	if (!isNothing)
 	{
-		isAreaSafe = (aliveEnemyCars_.back().lock()->GetTailPos().z < 470.0f);
+		float zPos = 0;
+		for (auto& e : aliveEnemyCars_)
+		{
+			float tmpZ = e.lock()->GetTailPos().z;
+
+			zPos = std::max<float>(zPos, tmpZ);
+		}
+		isAreaSafe = (zPos < 470.0f);
 	}
 	bool isSpawn = (isNothing || isAreaSafe);
 
@@ -878,7 +885,16 @@ bool CarManager::AddEnemyCar(bool isTitle)
 
 bool CarManager::AddPlayerCar()
 {
-	bool isSpawn = (alivePlayerCars_.size() < 5);
+
+	float zPos = 0;
+	for (auto &e : alivePlayerCars_)
+	{
+		float tmpZ = e.lock()->GetTailPos().z;
+
+		zPos = std::min<float>(zPos, tmpZ);
+	}
+
+	bool isSpawn = (alivePlayerCars_.size() < 5 && zPos >= -250.0f);
 
 	if (isSpawn)
 	{

@@ -150,6 +150,9 @@ void GameManager::Update()
 
 	easePos = cameraBasePos_ + (distance * animationRate);
 	SetCameraPositionAndTargetAndUpVec(easePos, easeTargetPos, Vector3(0.0f, 1.0f, 0.0f));
+	
+	//見下ろしカメラ（デバッグ用）
+	//SetCameraPositionAndTargetAndUpVec(Vector3(0,500, -120), Vector3(0, 0, -100), Vector3(0.0f, 1.0f, 0.0f));
 
 	isNotAnimationEnd_ = false;
 	TitleObjectUpdate();
