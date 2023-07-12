@@ -69,6 +69,8 @@ public:
 	void ReceiveObstacles(int level, int time);
 
 	void ReceiveCountPopAmbulance(int spawnAmbulanceCount);
+
+	Vector3 GetFirstCarPos();
 private:
 	void IngameUpdate();
 
@@ -84,7 +86,7 @@ private:
 	static int up, right, down, left, stop;
 	static int sNextModel, sStraight, sStop,sRight;
 
-	static int sActFrameModel, sGuideModel;
+	static int sActFrameModel, sGuideModel, s2PGuideModel;
 	static const int sDeadAnimationTimerMax;
 
 	static std::vector<int> sArrowModelHandle;

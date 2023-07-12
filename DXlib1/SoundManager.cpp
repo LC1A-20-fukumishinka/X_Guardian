@@ -34,7 +34,7 @@ void SoundManager::Load()
 	Buzzer_ = LoadSoundMem("Resources/sound/buzzer.mp3");
 
 	jingle_ = LoadSoundMem("Resources/sound/result.mp3");
-
+	Siren_ = LoadSoundMem("Resources/sound/siren.wav");
 
 	int TitleExplosion1_ = DuplicateSoundMem(explosion1_);
 	int TitleExplosion2_ = DuplicateSoundMem(explosion2_);
@@ -69,6 +69,7 @@ void SoundManager::ChangeInitializeVolume()
 	ChangeVolumeSoundMem(volume + upperVolume + 50, AddTime_);
 	ChangeVolumeSoundMem(200 + upperVolume + 20, Crap_);
 	ChangeVolumeSoundMem(130 + upperVolume + 20, jingle_);
+	ChangeVolumeSoundMem(200, Siren_);
 
 	int titleEexplosionVolume = 75;
 	ChangeVolumeSoundMem(titleEexplosionVolume + upperVolume, TitleExplosion1_);
@@ -380,6 +381,11 @@ void SoundManager::Buzzer()
 void SoundManager::Jingle()
 {
 	PlaySoundMem(jingle_, DX_PLAYTYPE_BACK);
+}
+
+void SoundManager::Siren()
+{
+	PlaySoundMem(Siren_, DX_PLAYTYPE_BACK);
 }
 
 void SoundManager::StopJingle()

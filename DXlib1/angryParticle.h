@@ -5,7 +5,7 @@
 struct angryParticleObject
 {
 	Vector3 pos = Vector3();
-	float scale = 0.0f;
+	float objectScale = 0.0f;
 	Vector3 speed = Vector3();
 
 	Vector3 color = Vector3();
@@ -24,6 +24,18 @@ class angryParticle
 {
 
 	static int angryParticleModelHandle;
+	static const int SpawnTimerMax;
+public:
+	void Init();
+	void Update();
+	void Finalize();
+	void Draw();
 
+
+	void Spawn(const Vector3& pos);
+private:
+
+	int SpawnTimer = 0;
+	std::vector<angryParticleObject> particles_;
 };
 

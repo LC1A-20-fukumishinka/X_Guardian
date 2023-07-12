@@ -3,6 +3,7 @@
 #include <array>
 #include "Matrix4.h"
 #include "GameNum.h"
+
 class SoundManager;
 enum class GameStatus
 {
@@ -180,6 +181,9 @@ private:
 	int AddSec = 3;
 	int SubSec = 3;
 
+	int winHandle_ = -1;
+	int loseHandle_ = -1;
+
 	std::vector<UpperComboObject> comboPos;
 
 	int gameLevel_ = 0;
@@ -224,5 +228,6 @@ private:
 	/// ‘Šè‚ÉoŒ»‚³‚¹‚Ä‚à‚ç‚¤‹~‹}Ô‚Ì”
 	/// </summary>
 	int requestToPopAmbulanceCount = 0;
+	bool isWin = true;
 };
 

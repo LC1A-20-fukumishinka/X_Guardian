@@ -14,6 +14,8 @@
 #include "XGuardian.h"
 #include "RoadSignManager.h"
 #include "GameNum.h"
+#include "angryParticle.h"
+
 using namespace DxLib;
 
 enum class TimerName
@@ -145,5 +147,7 @@ public:
 	int liveLimit = 0;
 
 	int SendObstaclesCount = 0;
+
+	angryParticle angryParticles;
 };
 

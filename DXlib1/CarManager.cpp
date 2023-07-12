@@ -17,7 +17,7 @@ const int CarManager::sDeadAnimationTimerMax = 60;
 
 int CarManager::up, CarManager::right, CarManager::down, CarManager::left, CarManager::stop;
 int CarManager::sNextModel, CarManager::sStraight, CarManager::sStop, CarManager::sRight;
-int CarManager::sActFrameModel, CarManager::sGuideModel;
+int CarManager::sActFrameModel, CarManager::sGuideModel, CarManager::s2PGuideModel;
 
 vector<int> CarManager::sArrowModelHandle;
 int CarManager::sCautionHandle;
@@ -345,6 +345,10 @@ void CarManager::DrwaHud()
 		Matrix4 worldMat;
 
 		float guideScale = 0.03f;
+		if (gameNumber != GameNum::SOLO)
+		{
+			guideScale *= 0.8;
+		}
 		worldMat = scale(Vector3(guideScale, guideScale, guideScale));
 
 		Vector3 yVec(0.0f, 5.0f, 0.0f);
@@ -360,6 +364,10 @@ void CarManager::DrwaHud()
 
 		Vector3 easePos = guideObject_;
 
+		if (gameNumber != GameNum::SOLO)
+		{
+			easePos.x = 7.0f;
+		}
 		Vector3 moveVec(-10.0f, -100.0f, 0.0f);
 
 		moveVec = transform(moveVec, camMat_);
@@ -482,7 +490,7 @@ void CarManager::LoadGraphics()
 
 	//c•WŽ¯
 	sGuideModel = MV1LoadModel("Resources/operate_ui/operate_ui.mv1");
-
+	s2PGuideModel = MV1LoadModel("Resources/operate_ui/operate_ui.mv1");
 	//action˜g
 	sActFrameModel = MV1LoadModel("Resources/action/action.mv1");
 
@@ -684,6 +692,13 @@ void CarManager::ReceiveCountPopAmbulance(int spawnAmbulanceCount)
 	this->spawnAmbulanceCount += spawnAmbulanceCount;
 }
 
+Vector3 CarManager::GetFirstCarPos()
+{
+	if (alivePlayerCars_.empty())return Vector3();
+
+	return alivePlayerCars_.front().lock()->GetCenterPos();
+}
+
 
 void CarManager::IngameUpdate()
 {
@@ -744,14 +759,16 @@ void CarManager::IngameUpdate()
 			}
 		}
 	}
-
+	if (!alivePlayerCars_.empty())
+	{
+	}
 }
 
 void CarManager::OutGameUpdate()
 {
 	//Car::SetSignal();
 	nextAnimationRate_ -= 0.02f;
-
+	isDeadAnimation_ = false;
 
 
 

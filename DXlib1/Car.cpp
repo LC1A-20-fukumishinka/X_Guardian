@@ -99,6 +99,7 @@ void Car::Init(CarInitializeDesc desc)
 
 	isNowStop_ = false;
 	isOldStop_ = false;
+	isPlayedSirenSound_ = false;
 }
 
 void Car::Update()
@@ -330,6 +331,11 @@ Vector3 Car::GetFrontPos()
 	return frontPos;
 }
 
+Vector3 Car::GetCenterPos()
+{
+	return frontPos_ - (angle_ * (carLength_ / 2));
+}
+
 MoveType Car::GetMoveType()
 {
 	return type_;
@@ -508,6 +514,12 @@ bool Car::JudgmentToStop(bool isCrossIn)
 	{
 		bool inAria = (frontPos_.z <= sStopPos && frontPos_.z >= (sStopPos - sStopLength));
 		isStopPosIn = (!isCrossIn && inAria);
+
+		if (!isPlayedSirenSound_ && model_ == ModelType::EMERGENCY && inAria)
+		{
+			sSounds->Siren();
+			isPlayedSirenSound_ = true;
+		}
 	}
 
 	//í‚é~éwé¶íÜ

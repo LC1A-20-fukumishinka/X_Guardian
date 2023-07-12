@@ -117,6 +117,7 @@ void Game::Init(bool makeLighrFlag)
 		rightLightHandle = CreateDirLightHandle(VGet(-1.0f, -0.2f, 0.0f));
 	}
 
+	angryParticles.Init();
 }
 
 void Game::Finalize()
@@ -169,7 +170,7 @@ void Game::IngameDraw()
 	{
 		gameManager.MenuDraw();
 	}
-
+	angryParticles.Draw();
 }
 
 void Game::Draw()
@@ -339,17 +340,32 @@ void Game::Update()
 
 
 	{
+
 		float boardScale = 0.1f;
+		float NotMoveAnimationScaleRate = 0.05f;
+		if (static_cast<GameNum>(gameNumber) != GameNum::SOLO)
+		{
+			boardScale *= 0.5f;
+			NotMoveAnimationScaleRate = 0.02f;
+		}
+
 		float boardAnimationScale = boardScale / 20.0f;
 
 		boardAnimationScale *= (1.0f - easeRate);
 
 		Vector3 drawPos = BasePos;
 
-		drawPos += Vector3(-75.0f, 0.0f, -275.0f);
+		if (static_cast<GameNum>(gameNumber) == GameNum::SOLO)
+		{
+			drawPos += Vector3(-75.0f, 0.0f, -275.0f);
+		}
+		else
+		{
+			drawPos += Vector3(75.0f, 0.0f, -275.0f);
+		}
 
 		Vector3 boardBaseScale = Vector3(boardScale, boardScale - boardAnimationScale, boardScale);
-		Vector3 NotMoveAnimationScale = Vector3(0.0f, 0.05f, 0.05f);
+		Vector3 NotMoveAnimationScale = Vector3(0.0f, NotMoveAnimationScaleRate, NotMoveAnimationScaleRate);
 		float rate = Easing::easeInBack(NotTrackMoveAnimationRate_);
 		NotMoveAnimationScale *= (1 - rate);
 		Matrix4 matScale = scale(boardBaseScale + NotMoveAnimationScale);
@@ -361,6 +377,8 @@ void Game::Update()
 		boardMat *= matRot;
 		boardMat *= translate(drawPos);
 	}
+
+	angryParticles.Update();
 }
 
 void Game::TitleUpdate()
@@ -424,11 +442,22 @@ void Game::IngameUpdate()
 
 	if (carManager.GetAnyCarStop() && !carManager.GetIsTimeOverDeath())
 	{
-		comboTimer++;
-		liveLimit++;
+		if (!carManager.GetSlowmotion())
+		{
+			comboTimer++;
+			liveLimit++;
+		}
+
 		const int comboLimit = 40;
 
-		const int LiveLimitMax = 12000;
+		const int LiveLimitMax = 120;
+		if (carManager.GetSlowmotion() && liveLimit >= (LiveLimitMax - 10))
+		{
+			liveLimit = (LiveLimitMax - 10);
+		}
+
+		angryParticles.Spawn(carManager.GetFirstCarPos());
+
 		if (comboTimer >= comboLimit)
 		{
 			gameManager.StopCar();

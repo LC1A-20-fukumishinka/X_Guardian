@@ -33,6 +33,7 @@ public:
 	void AddTime();
 	void Buzzer();
 	void Jingle();
+	void Siren();
 
 	void StopJingle();
 
@@ -60,11 +61,13 @@ private:
 	int Crap_;
 	int Buzzer_;
 	int jingle_;
+	int Siren_;
 
 	int TitleExplosion1_;
 	int TitleExplosion2_;
 	int TitleExplosion3_;
 	int TitleBroken_;
+
 
 	int upperVolume = 50;
 

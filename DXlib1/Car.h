@@ -57,6 +57,8 @@ public:
 
 	Vector3 GetFrontPos();
 
+	Vector3 GetCenterPos();
+
 	MoveType GetMoveType();
 
 	ModelType GetModelType();
@@ -137,6 +139,7 @@ private:
 
 	bool isNowStop_ =false;
 	bool isOldStop_ = false;
+	bool isPlayedSirenSound_ = false;
 	int derayTimer_ = 0;
 
 	int color_ = 0;

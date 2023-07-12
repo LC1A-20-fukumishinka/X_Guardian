@@ -39,7 +39,7 @@ void GameManager::Init()
 #pragma endregion
 
 
-	titleObjectPos_ = Vector3(5, 50.0f, -120.0f);
+	titleObjectPos_ = Vector3(4, 50.0f, -120.0f);
 	titleObjectAnimationRate_ = 1.0f;
 
 	pressAnyKeyObjectPos_ = Vector3(0.0f, 10.0f, -120.0f);
@@ -54,6 +54,7 @@ void GameManager::Init()
 	comboPos.resize(comboObjectMaxCount);
 	CrashAnimationTargetPos_ = { 0.0f,0.0f ,0.0f };
 	textScales = { 1.0f, 1.25f, 1.25f, 0.75f };
+
 }
 
 void GameManager::Update()
@@ -128,6 +129,7 @@ void GameManager::Update()
 		angle = transform(cameraDeadAnimationPos_, rotationY(rotation));
 
 		elapsedTime_++;
+
 		break;
 	case GameStatus::RESULT:
 		gameLevel_ = 0;
@@ -150,7 +152,7 @@ void GameManager::Update()
 
 	easePos = cameraBasePos_ + (distance * animationRate);
 	SetCameraPositionAndTargetAndUpVec(easePos, easeTargetPos, Vector3(0.0f, 1.0f, 0.0f));
-	
+
 	//見下ろしカメラ（デバッグ用）
 	//SetCameraPositionAndTargetAndUpVec(Vector3(0,500, -120), Vector3(0, 0, -100), Vector3(0.0f, 1.0f, 0.0f));
 
@@ -162,7 +164,6 @@ void GameManager::Update()
 	ComboObjectUpdate();
 
 	isInput_ = (CheckHitKeyAll() || isNotAnimationEnd_);
-
 }
 
 void GameManager::TitleObjectUpdate()
@@ -386,7 +387,6 @@ void GameManager::PassCar(Vector3 pos)
 		AddSecObjectAnimationRate_ = 0.0f;
 	}
 	normaCars++;
-
 }
 
 void GameManager::StopCar()
@@ -466,13 +466,24 @@ void GameManager::Load()
 	lifeHandle = LoadGraph("Resources/Texture/HP_UI_01.png");
 	lifeEmptyHandle = LoadGraph("Resources/Texture/HP_UI_02.png");
 	frameHandle = P1frameHandle;
+
+	winHandle_ = MV1LoadModel("Resources/win/win.mv1");
+	loseHandle_ = MV1LoadModel("Resources/lose/lose.mv1");
 }
 
 void GameManager::TitleDraw()
 {
 	Matrix4 cameraPosture = Posture((cameraBaseTargetPos_ - cameraBasePos_), Vector3(0.0f, 1.0f, 0.0f));
 	Matrix4 worldMat;
-	worldMat = scale(Vector3(0.1f, 0.1f, 0.1f));
+
+	if (gameNumber == GameNum::SOLO)
+	{
+		worldMat = scale(Vector3(0.1f, 0.1f, 0.1f));
+	}
+	else
+	{
+		worldMat = scale(Vector3(0.06f, 0.06f, 0.06f));
+	}
 
 	worldMat *= cameraPosture;
 
@@ -817,41 +828,86 @@ void GameManager::ResultDraw()
 	moveVec = transform(moveVec, cameraPosture);
 	//scoreResultNumber表示
 	{
-		int i = 0;
-
-		std::vector<int> scoreNums;
-		scoreNums.resize(5);
-		int tmpScore = score;
-		for (int i = 1; i <= scoreNums.size(); i++)
+		if (gameNumber == GameNum::SOLO)
 		{
-			int degit = tmpScore % 10;
-			scoreNums[scoreNums.size() - i] = degit;
+			int i = 0;
 
-			tmpScore /= 10;
+			std::vector<int> scoreNums;
+			scoreNums.resize(5);
+			int tmpScore = score;
+			for (int i = 1; i <= scoreNums.size(); i++)
+			{
+				int degit = tmpScore % 10;
+				scoreNums[scoreNums.size() - i] = degit;
+
+				tmpScore /= 10;
+			}
+			for (auto& e : scoreNums)
+			{
+
+				Matrix4 worldMat;
+				worldMat = scale(Vector3(0.1f, 0.1f, 0.1f));
+
+				worldMat *= cameraPosture;
+
+
+				Vector3 easePos = scoreResultNumberObjectPos_;
+				float easeRate = Easing::easeOutBack(rate[i]);
+				easePos += (moveVec * (1 - easeRate));
+
+				worldMat *= translate(easePos);
+
+				i++;
+				MV1SetMatrix(numberObjects_[e], worldMat);
+
+				MV1DrawModel(numberObjects_[e]);
+			}
 		}
-		for (auto& e : scoreNums)
+		else
 		{
 
 			Matrix4 worldMat;
-			worldMat = scale(Vector3(0.1f, 0.1f, 0.1f));
+
+			float animationRate = sin(level_ * (DX_PI_F / 180.0f));
+			float scaleRate = animationRate * 0.01;
+				if (life <= 0)
+				{
+					worldMat = scale(Vector3(0.1f + scaleRate, 0.1f + scaleRate, 0.1f + scaleRate));
+				}
+				else
+				{
+					scaleRate *= 2.0f;
+					worldMat = scale(Vector3(0.2f + scaleRate, 0.2f + scaleRate, 0.1f + scaleRate));
+				}
 
 			worldMat *= cameraPosture;
 
 
-			Vector3 easePos = scoreResultNumberObjectPos_ + Vector3(-10.0f + (10.0f * i), 0.0f, 0.0f);
+			Vector3 easePos = scoreResultNumberObjectPos_;
+			easePos.y = 40.0f + sin(level_ * (DX_PI_F / 180.0f)) + 1.0f;
 
-			float easeRate = Easing::easeOutBack(rate[i]);
+			float easeRate = Easing::easeOutBack(rate[0]);
+
+
 			easePos += (moveVec * (1 - easeRate));
+
+			easePos.x = 0.0f;
 
 			worldMat *= translate(easePos);
 
-			i++;
-			MV1SetMatrix(numberObjects_[e], worldMat);
+			int drawHandle = winHandle_;
+			if (life <= 0)
+			{
+				drawHandle = loseHandle_;
+			}
+			MV1SetMatrix(drawHandle, worldMat);
 
-			MV1DrawModel(numberObjects_[e]);
+			MV1DrawModel(drawHandle);
 		}
 	}
 
+
+	if (gameNumber == GameNum::SOLO)
 	{
 		Matrix4 worldMat;
 		worldMat = scale(Vector3(0.1f, 0.1f, 0.1f));
@@ -877,8 +933,14 @@ void GameManager::PressAnyKeyDraw()
 {
 	Matrix4 cameraPosture = Posture((cameraBaseTargetPos_ - cameraBasePos_), Vector3(0.0f, 1.0f, 0.0f));
 	Matrix4 worldMat;
-	worldMat = scale(Vector3(0.05f, 0.05f, 0.05f));
-
+	if (gameNumber == GameNum::SOLO)
+	{
+		worldMat = scale(Vector3(0.05f, 0.05f, 0.05f));
+	}
+	else
+	{
+		worldMat = scale(Vector3(0.04f, 0.04f, 0.04f));
+	}
 	worldMat *= cameraPosture;
 
 	pressAnyKeyObjectPos_.y = sin(level_ * (DX_PI_F / 180.0f)) * 1 + 10.0f;
@@ -887,6 +949,10 @@ void GameManager::PressAnyKeyDraw()
 
 	Vector3 easePos = pressAnyKeyObjectPos_;
 
+	if (gameNumber != GameNum::SOLO)
+	{
+		easePos.y += 5.0f;
+	}
 	Vector3 moveVec(0.0f, 100.0f, 0.0f);
 
 	moveVec = transform(moveVec, cameraPosture);
@@ -1168,6 +1234,7 @@ void GameManager::ToResult()
 	}
 	status_ = GameStatus::RESULT;
 	isFailed_ = false;
+	level_ = 0;
 }
 
 
@@ -1175,7 +1242,8 @@ void GameManager::ToTitle()
 {
 	//タイトルオブジェクトのアニメーションが始まるのでフラグをオンにする
 	isInput_ = true;
-
+	isDeadAnimation_ = false;
+	isOlddeadAnimation = false;
 	if (gameNumber != GameNum::PLAYER2)
 	{
 		sounds_->StopJingle();
