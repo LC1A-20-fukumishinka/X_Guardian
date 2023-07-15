@@ -344,7 +344,7 @@ void GameManager::FrameDraw()
 	}
 }
 
-void GameManager::PassCar(Vector3 pos)
+void GameManager::PassCar(Vector3 pos, bool SoloHardMode)
 {
 	combo++;
 	if (combo % 50 == 0)
@@ -381,6 +381,14 @@ void GameManager::PassCar(Vector3 pos)
 	itr->pos += Vector3(0.0f, 10.0f, 0.0f);
 	if (gameNumber == GameNum::SOLO && combo % 5 == 0)
 	{
+		if (SoloHardMode)
+		{
+			AddSec = 1.5f;
+		}
+		else
+		{
+			AddSec = 2.5f;
+		}
 		gameTimer_ -= static_cast<int>(60 * AddSec);
 		sounds_->AddTime();
 		sounds_->Crap();

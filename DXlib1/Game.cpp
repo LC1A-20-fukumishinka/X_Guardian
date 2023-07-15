@@ -393,15 +393,14 @@ void Game::IngameUpdate()
 	int spawnTimerMax;
 	if (static_cast<GameNum>(gameNumber) == GameNum::SOLO)
 	{
-		//if (isHighSpeedMode_)
-		//{
-		//	spawnTimerMax = 60;
-		//}
-		//else
-		//{
-		//	spawnTimerMax = SoloModeTimerMax;
-		//}
-		spawnTimerMax = SoloModeTimerMax;
+		if (isHighSpeedMode_)
+		{
+			spawnTimerMax = 60;
+		}
+		else
+		{
+			spawnTimerMax = SoloModeTimerMax;
+		}
 
 	}
 	else
@@ -438,7 +437,7 @@ void Game::IngameUpdate()
 	if (spawnTimer <= 0)
 	{
 
-		bool isSoloHiSpeedMode = false/*isHighSpeedMode_ && static_cast<GameNum>(gameNumber) == GameNum::SOLO*/;
+		bool isSoloHiSpeedMode = isHighSpeedMode_&& static_cast<GameNum>(gameNumber) == GameNum::SOLO;
 		carManager.AddEnemyCar(false, isSoloHiSpeedMode);
 		if (carManager.sendIsTrackSpawn())
 		{
@@ -467,7 +466,7 @@ void Game::IngameUpdate()
 	std::vector<Vector3> passCarsPos = carManager.GetPassCars();
 	for (auto& e : passCarsPos)
 	{
-		gameManager.PassCar(e);
+		gameManager.PassCar(e, isHighSpeedMode_);
 	}
 
 	if (carManager.GetAnyCarStop() && !carManager.GetIsTimeOverDeath())

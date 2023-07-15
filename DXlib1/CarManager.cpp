@@ -867,18 +867,18 @@ bool CarManager::AddEnemyCar(bool isTitle, bool isSoloHardMode)
 		bool isTrack = (carType <= trackProbability);
 
 
-		////ソロモードのハードモード
-		//if (isSoloHardMode && gameNumber == GameNum::SOLO)
-		//{
-		//	if (carType >= 70)
-		//	{
-		//		isAmbulanceSpawn = true;
-		//	}
-		//	else if(carType >= 40)
-		//	{
-		//		isTrack = true;
-		//	}
-		//}
+		//ソロモードのハードモード
+		if (isSoloHardMode && gameNumber == GameNum::SOLO)
+		{
+			if (carType >= 90)
+			{
+				isAmbulanceSpawn = true;
+			}
+			else if(carType >= 60)
+			{
+				isTrack = true;
+			}
+		}
 
 		CarInitializeDesc desc = sNormalCar;
 		desc.type = MoveType::STRAIGHT;

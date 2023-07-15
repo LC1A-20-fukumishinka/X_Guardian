@@ -35,7 +35,7 @@ public:
 	void Draw();
 
 	void FrameDraw();
-	void PassCar(Vector3 pos);
+	void PassCar(Vector3 pos, bool SoloHardMode);
 
 	void StopCar();
 
