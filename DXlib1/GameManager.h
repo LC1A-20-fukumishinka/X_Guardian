@@ -178,7 +178,7 @@ private:
 
 	bool isOlddeadAnimation = false;
 
-	int AddSec = 3;
+	float AddSec = 2.5f;
 	int SubSec = 3;
 
 	int winHandle_ = -1;

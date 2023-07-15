@@ -34,7 +34,7 @@ public:
 	void Buzzer();
 	void Jingle();
 	void Siren();
-
+	void SirenStop();
 	void StopJingle();
 
 	void TitleExplosion();

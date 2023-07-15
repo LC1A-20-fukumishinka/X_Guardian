@@ -163,7 +163,7 @@ void GameManager::Update()
 	AddTimeUpdate();
 	ComboObjectUpdate();
 
-	isInput_ = (CheckHitKeyAll() || isNotAnimationEnd_);
+	isInput_ = (isNotAnimationEnd_);
 }
 
 void GameManager::TitleObjectUpdate()
@@ -381,7 +381,7 @@ void GameManager::PassCar(Vector3 pos)
 	itr->pos += Vector3(0.0f, 10.0f, 0.0f);
 	if (gameNumber == GameNum::SOLO && combo % 5 == 0)
 	{
-		gameTimer_ -= (60 * AddSec);
+		gameTimer_ -= static_cast<int>(60 * AddSec);
 		sounds_->AddTime();
 		sounds_->Crap();
 		AddSecObjectAnimationRate_ = 0.0f;
@@ -391,14 +391,7 @@ void GameManager::PassCar(Vector3 pos)
 
 void GameManager::StopCar()
 {
-	if (gameNumber == GameNum::SOLO)
-	{
-		combo = 0;
-	}
-	else
-	{
-		isSendObstacles = true;
-	}
+	combo = 0;
 }
 
 GameStatus GameManager::GetStatus()
@@ -851,7 +844,7 @@ void GameManager::ResultDraw()
 				worldMat *= cameraPosture;
 
 
-				Vector3 easePos = scoreResultNumberObjectPos_;
+				Vector3 easePos = scoreResultNumberObjectPos_ + Vector3(-10.0f + (10.0f * i), 0.0f, 0.0f);
 				float easeRate = Easing::easeOutBack(rate[i]);
 				easePos += (moveVec * (1 - easeRate));
 
@@ -870,15 +863,15 @@ void GameManager::ResultDraw()
 
 			float animationRate = sin(level_ * (DX_PI_F / 180.0f));
 			float scaleRate = animationRate * 0.01;
-				if (life <= 0)
-				{
-					worldMat = scale(Vector3(0.1f + scaleRate, 0.1f + scaleRate, 0.1f + scaleRate));
-				}
-				else
-				{
-					scaleRate *= 2.0f;
-					worldMat = scale(Vector3(0.2f + scaleRate, 0.2f + scaleRate, 0.1f + scaleRate));
-				}
+			if (life <= 0)
+			{
+				worldMat = scale(Vector3(0.1f + scaleRate, 0.1f + scaleRate, 0.1f + scaleRate));
+			}
+			else
+			{
+				scaleRate *= 2.0f;
+				worldMat = scale(Vector3(0.2f + scaleRate, 0.2f + scaleRate, 0.1f + scaleRate));
+			}
 
 			worldMat *= cameraPosture;
 
@@ -1244,6 +1237,7 @@ void GameManager::ToTitle()
 	isInput_ = true;
 	isDeadAnimation_ = false;
 	isOlddeadAnimation = false;
+	life = 3;
 	if (gameNumber != GameNum::PLAYER2)
 	{
 		sounds_->StopJingle();

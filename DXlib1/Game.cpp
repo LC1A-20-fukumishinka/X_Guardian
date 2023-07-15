@@ -231,9 +231,11 @@ void Game::Update()
 		if (spawnTimer <= 0)
 		{
 			spawnTimer = 90;
-			carManager.AddPlayerCar();
-			carManager.AddEnemyCar(true);
+			carManager.AddPlayerCar(true);
+			carManager.AddEnemyCar(true, false);
 		}
+
+		isHighSpeedMode_ = Input::isKey(KEY_INPUT_0);
 
 		break;
 	case GameStatus::SELECT:
@@ -389,16 +391,30 @@ void Game::TitleUpdate()
 void Game::IngameUpdate()
 {
 	int spawnTimerMax;
-	if (static_cast<GameNum>(gameNumber)== GameNum::SOLO)
+	if (static_cast<GameNum>(gameNumber) == GameNum::SOLO)
 	{
+		//if (isHighSpeedMode_)
+		//{
+		//	spawnTimerMax = 60;
+		//}
+		//else
+		//{
+		//	spawnTimerMax = SoloModeTimerMax;
+		//}
 		spawnTimerMax = SoloModeTimerMax;
+
 	}
 	else
 	{
 		int subTime = gameManager.GetCombo();
 		subTime = std::clamp(subTime, 0, 100);
 
-		float rate = 1.0f - (static_cast<float>(subTime) / 200);
+		float SpawnSpeedRate = 0.5f;
+		if (!isHighSpeedMode_)
+		{
+			SpawnSpeedRate = (static_cast<float>(subTime) / 200);
+		}
+		float rate = 1.0f - SpawnSpeedRate;
 		spawnTimerMax = static_cast<int>(VSModeTimerMax * rate);
 	}
 	if (carManager.GetDeadAnimation())
@@ -416,23 +432,37 @@ void Game::IngameUpdate()
 		}
 	}
 
+	int level = gameManager.GetGameLevel();
+
 	//óNÇ≠èàóù
 	if (spawnTimer <= 0)
 	{
-		spawnTimer = spawnTimerMax - (gameManager.GetGameLevel() * 1.5f);
 
-		carManager.AddEnemyCar(false);
+		bool isSoloHiSpeedMode = false/*isHighSpeedMode_ && static_cast<GameNum>(gameNumber) == GameNum::SOLO*/;
+		carManager.AddEnemyCar(false, isSoloHiSpeedMode);
+		if (carManager.sendIsTrackSpawn())
+		{
+			level = std::max<int>(level, 10);
+		}
+		if (isHighSpeedMode_)
+		{
+			spawnTimer = spawnTimerMax - (level * 1.5f);
+		}
+		else
+		{
+			spawnTimer = spawnTimerMax - (level * 1.5f);
+		}
 	}
 
 	if (playerSpawnTimer <= 0)
 	{
 		playerSpawnTimer = (spawnTimerMax - 30);
-		carManager.AddPlayerCar();
+		carManager.AddPlayerCar(false);
 	}
 
 
 	carManager.SetSignal();
-	carManager.SetLevel(gameManager.GetGameLevel());
+	carManager.SetLevel(level);
 	carManager.Update();
 	std::vector<Vector3> passCarsPos = carManager.GetPassCars();
 	for (auto& e : passCarsPos)
@@ -456,7 +486,10 @@ void Game::IngameUpdate()
 			liveLimit = (LiveLimitMax - 10);
 		}
 
-		angryParticles.Spawn(carManager.GetFirstCarPos());
+		if (static_cast<GameNum>(gameNumber) != GameNum::SOLO)
+		{
+			angryParticles.Spawn(carManager.GetFirstCarPos());
+		}
 
 		if (comboTimer >= comboLimit)
 		{
@@ -550,7 +583,7 @@ void Game::BaseInitialize()
 	ChangeWindowMode(true);
 	SetGraphMode(WindowWidth, WindowHeight, 32);
 	SetBackgroundColor(0, 0, 64);
-	SetWindowText(_T("3008_è\éöòHÇÃéÁåÏê_"));
+	SetWindowText(_T("è\éöòHÇÃéÁåÏê_"));
 	if (DxLib_Init() == -1)return;
 	SetDrawScreen(DX_SCREEN_BACK);
 

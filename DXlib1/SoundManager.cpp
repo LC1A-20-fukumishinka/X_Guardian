@@ -69,7 +69,7 @@ void SoundManager::ChangeInitializeVolume()
 	ChangeVolumeSoundMem(volume + upperVolume + 50, AddTime_);
 	ChangeVolumeSoundMem(200 + upperVolume + 20, Crap_);
 	ChangeVolumeSoundMem(130 + upperVolume + 20, jingle_);
-	ChangeVolumeSoundMem(200, Siren_);
+	ChangeVolumeSoundMem(150, Siren_);
 
 	int titleEexplosionVolume = 75;
 	ChangeVolumeSoundMem(titleEexplosionVolume + upperVolume, TitleExplosion1_);
@@ -386,6 +386,11 @@ void SoundManager::Jingle()
 void SoundManager::Siren()
 {
 	PlaySoundMem(Siren_, DX_PLAYTYPE_BACK);
+}
+
+void SoundManager::SirenStop()
+{
+	StopSoundMem(Siren_);
 }
 
 void SoundManager::StopJingle()

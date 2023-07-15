@@ -148,6 +148,7 @@ public:
 
 	int SendObstaclesCount = 0;
 
+	bool isHighSpeedMode_ = false;
 	angryParticle angryParticles;
 };
 

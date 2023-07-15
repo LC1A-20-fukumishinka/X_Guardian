@@ -100,6 +100,8 @@ void Car::Init(CarInitializeDesc desc)
 	isNowStop_ = false;
 	isOldStop_ = false;
 	isPlayedSirenSound_ = false;
+	isArrowSubstantiation = false;
+	isBackArrowSubstantiation = false;
 }
 
 void Car::Update()
@@ -182,6 +184,17 @@ void Car::Update()
 		clearAnimationRate_ += 0.05f;
 
 		clearAnimationRate_ = std::clamp(clearAnimationRate_, 0.0f, 1.0f);
+	}
+
+
+	if (!isArrowSubstantiation && !frontCar_.expired() && !frontCar_.lock()->GetIsAlive())
+	{
+		ArrowSubstantiation();
+	}
+
+	if (!backCar_.expired() && isBackArrowSubstantiation)
+	{
+		backCar_.lock()->ArrowSubstantiation();
 	}
 }
 
@@ -302,6 +315,14 @@ void Car::Draw()
 
 	if(isPlayer_ && !isCounted_)
 	{
+		if (isArrowSubstantiation)
+		{
+			MV1SetOpacityRate(arrowModelHandle, 1.0f);
+		}
+		else
+		{
+			MV1SetOpacityRate(arrowModelHandle, 0.5f);
+		}
 		//–îˆó•`‰æ
 		MV1SetDifColorScale(arrowModelHandle, GetColorF(1.0f, 1.0f, 1.0f, 1.0f));
 		MV1SetMatrix(arrowModelHandle, arrowMat);
@@ -354,6 +375,12 @@ Capsule *Car::GetCapsule()
 void Car::SetFrontCar(std::weak_ptr<Car> frontCar)
 {
 	frontCar_ = frontCar;
+}
+
+void Car::SetBackCar(std::weak_ptr<Car> backCar)
+{
+	backCar_ = backCar;
+
 }
 
 void Car::Dead()
@@ -414,6 +441,11 @@ bool Car::GetIsSignalStop()
 bool Car::GetIsFront()
 {
 	return isFront;
+}
+
+void Car::ArrowSubstantiation()
+{
+	isArrowSubstantiation = true;
 }
 
 void Car::SetSignal(MoveType isStopSignal)
@@ -539,6 +571,12 @@ bool Car::JudgmentToStop(bool isCrossIn)
 	//M†‚ªÔ‚¾‚Á‚½    ’â~ˆÊ’u & ’â~w¦’†‚¾‚Á‚½
 	bool isSignal = (isStopPosIn && isStopSignal);
 
+
+	//’Ê‰ß‚µ‚½‚çŒã‚ë‚ÌÔ—¼‚Ì–îˆó‚ğÀ‘Ì‰»
+	if ( isStopPosIn && !isStopSignal && isPlayer_)
+	{
+		isBackArrowSubstantiation = true;
+	}
 	//©•ª‚ªæ“ªÔ—¼‚©‚Ç‚¤‚©‚ğ”»’è‚·‚é
 	isFront = isSignal && isPlayer_;
 

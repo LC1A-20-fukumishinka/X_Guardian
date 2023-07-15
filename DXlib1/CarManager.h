@@ -18,8 +18,8 @@ public:
 	void Finalize();
 	void Draw();
 
-	bool AddPlayerCar();
-	bool AddEnemyCar(bool isTitle);
+	bool AddPlayerCar(bool isTitle);
+	bool AddEnemyCar(bool isTitle, bool isSoloHardMode);
 
 	void SetSignal();
 
@@ -71,6 +71,8 @@ public:
 	void ReceiveCountPopAmbulance(int spawnAmbulanceCount);
 
 	Vector3 GetFirstCarPos();
+
+	bool sendIsTrackSpawn();
 private:
 	void IngameUpdate();
 
@@ -152,5 +154,9 @@ private:
 	int ObstaclesTime = 0;
 	int spawnAmbulanceCount = 0;
 	bool isSpawnObstacles = false;
+
+	bool isTrackSpawn = false;
+
+	bool isBeforeAmbulanceAppeared = false;
 };
 

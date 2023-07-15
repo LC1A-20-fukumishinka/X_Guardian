@@ -77,6 +77,7 @@ void CarManager::Init()
 
 	ObstaclesTime = 0;
 	ObstaclesLevel = 0;
+	spawnAmbulanceCount = 0;
 	SetGameSpeed(1.0f);
 }
 
@@ -201,6 +202,7 @@ void CarManager::Collision()
 							deadCarPos_ = pCar->GetTailPos() + (carLength * 0.5f);
 							SetGameSpeed(0.01f);
 							sounds_->BGMStop();
+							sounds_->SirenStop();
 							sounds_->Slow();
 							inputSignal = MoveType::STOP;
 						}
@@ -374,8 +376,17 @@ void CarManager::DrwaHud()
 		float easeRate = Easing::easeOutBack(inputRate);
 		easePos += (moveVec * (1 - easeRate));
 		worldMat *= translate(easePos);
-		MV1SetMatrix(sGuideModel, worldMat);
-		MV1DrawModel(sGuideModel);
+		if (gameNumber == GameNum::PLAYER2)
+		{
+			MV1SetMatrix(s2PGuideModel, worldMat);
+			MV1DrawModel(s2PGuideModel);
+		}
+		else
+		{
+			MV1SetMatrix(sGuideModel, worldMat);
+			MV1DrawModel(sGuideModel);
+		}
+
 	}
 #pragma endregion
 
@@ -431,7 +442,7 @@ void CarManager::DrwaHud()
 				tmpRate *= 2.0f;
 				easeRate = Easing::easeInQuad(1.0f - tmpRate);
 			}
-
+			MV1SetOpacityRate(nextDrawHandle, 1.0f);
 			MV1SetDifColorScale(nextDrawHandle, GetColorF(1.0f, 1.0f, 1.0f, easeRate));
 			MV1SetMatrix(nextDrawHandle, worldMat);
 			MV1DrawModel(nextDrawHandle);
@@ -490,7 +501,7 @@ void CarManager::LoadGraphics()
 
 	//縦標識
 	sGuideModel = MV1LoadModel("Resources/operate_ui/operate_ui.mv1");
-	s2PGuideModel = MV1LoadModel("Resources/operate_ui/operate_ui.mv1");
+	s2PGuideModel = MV1LoadModel("Resources/operate_ui_arrow/operate_ui_arrow.mv1");
 	//action枠
 	sActFrameModel = MV1LoadModel("Resources/action/action.mv1");
 
@@ -699,6 +710,13 @@ Vector3 CarManager::GetFirstCarPos()
 	return alivePlayerCars_.front().lock()->GetCenterPos();
 }
 
+bool CarManager::sendIsTrackSpawn()
+{
+	bool tmpIsTrackSpawn = isTrackSpawn;
+	isTrackSpawn = false;
+	return tmpIsTrackSpawn;
+}
+
 
 void CarManager::IngameUpdate()
 {
@@ -769,6 +787,7 @@ void CarManager::OutGameUpdate()
 	//Car::SetSignal();
 	nextAnimationRate_ -= 0.02f;
 	isDeadAnimation_ = false;
+	spawnAmbulanceCount = 0;
 
 
 
@@ -813,12 +832,12 @@ void CarManager::OutGameUpdate()
 	}
 }
 
-bool CarManager::AddEnemyCar(bool isTitle)
+bool CarManager::AddEnemyCar(bool isTitle, bool isSoloHardMode)
 {
 	bool isNothing = (aliveEnemyCars_.size() <= 0);
 	bool isAreaSafe = false;
 
-	bool isAmbulanceSpawn = (gameNumber != GameNum::SOLO && spawnAmbulanceCount > 0);
+	bool isAmbulanceSpawn = (gameNumber != GameNum::SOLO && spawnAmbulanceCount > 0 && !isBeforeAmbulanceAppeared);
 	if (!isNothing)
 	{
 		float zPos = 0;
@@ -839,6 +858,7 @@ bool CarManager::AddEnemyCar(bool isTitle)
 		//トラックになる確率
 		int trackProbability = (level_ * 1.5f);
 
+
 		if (isTitle)
 		{
 			trackProbability = 50;
@@ -847,17 +867,22 @@ bool CarManager::AddEnemyCar(bool isTitle)
 		bool isTrack = (carType <= trackProbability);
 
 
+		////ソロモードのハードモード
+		//if (isSoloHardMode && gameNumber == GameNum::SOLO)
+		//{
+		//	if (carType >= 70)
+		//	{
+		//		isAmbulanceSpawn = true;
+		//	}
+		//	else if(carType >= 40)
+		//	{
+		//		isTrack = true;
+		//	}
+		//}
+
 		CarInitializeDesc desc = sNormalCar;
 		desc.type = MoveType::STRAIGHT;
 		desc.color = Color::BLUE;
-		if (isTrack)
-		{
-			desc = sTrackCar;
-			desc.type = MoveType::RIGHTTURN;
-			desc.color = Color::PINK;
-			desc.length -= 3.0f;
-		}
-
 		if (isAmbulanceSpawn)
 		{
 			spawnAmbulanceCount--;
@@ -867,7 +892,18 @@ bool CarManager::AddEnemyCar(bool isTitle)
 			desc.length -= 3.0f;
 			desc.model = ModelType::EMERGENCY;
 			desc.color = Color::GREEN;
+
 		}
+		else if (isTrack)
+		{
+			desc = sTrackCar;
+			desc.type = MoveType::RIGHTTURN;
+			desc.color = Color::PINK;
+			desc.length -= 3.0f;
+			isTrackSpawn = true;
+		}
+
+
 
 		desc.angle = Vector3(0, 0, -1);
 		desc.startPos = Vector3(sCarWidthPos, 0.0f, 500.0f);
@@ -893,6 +929,8 @@ bool CarManager::AddEnemyCar(bool isTitle)
 				enemyEndCar = e;
 
 				aliveEnemyCars_.emplace_back(e);
+
+				isBeforeAmbulanceAppeared = (desc.model == ModelType::EMERGENCY);
 				break;
 			}
 		}
@@ -900,11 +938,11 @@ bool CarManager::AddEnemyCar(bool isTitle)
 	return isSpawn;
 }
 
-bool CarManager::AddPlayerCar()
+bool CarManager::AddPlayerCar(bool isTitle)
 {
 
 	float zPos = 0;
-	for (auto &e : alivePlayerCars_)
+	for (auto& e : alivePlayerCars_)
 	{
 		float tmpZ = e.lock()->GetTailPos().z;
 
@@ -942,9 +980,27 @@ bool CarManager::AddPlayerCar()
 				e->Init(desc);
 
 				//ひとつ前の車両が存在するなら
-				if (!playerEndCar.expired())
+				if (isTitle)
 				{
-					e->SetFrontCar(playerEndCar);
+					e->ArrowSubstantiation();
+				}
+				else
+				{
+
+					if (!playerEndCar.expired())
+					{
+						e->SetFrontCar(playerEndCar);
+						playerEndCar.lock()->SetBackCar(e);
+
+						if (e == playerEndCar.lock())
+						{
+							e->ArrowSubstantiation();
+						}
+					}
+					else
+					{
+						e->ArrowSubstantiation();
+					}
 				}
 				//自分が最後尾車両になる
 				playerEndCar = e;

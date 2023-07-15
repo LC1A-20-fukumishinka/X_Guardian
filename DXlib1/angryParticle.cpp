@@ -2,24 +2,32 @@
 #include "EaseClass.h"
 #include "DxLib.h"
 #include "Matrix4.h"
-
+#include <algorithm>
 int angryParticle::angryParticleModelHandle = -1;
 const int angryParticle::SpawnTimerMax = 30;
 void angryParticleObject::Init(Vector3 pos, Vector3 angle, float power)
 {
 	this->pos = pos;
+	pos.z -= -10.0f;
 	this->speed = angle * power;
 	alpha = 1.0f;
+	objectScale = 0.0f;
 }
 
 void angryParticleObject::Update()
 {
 	//座標に移動量を加算
 	pos += speed;
+
+	speed.y *= 0.97f;
+
+	speed.x *= 1.03f;
 	//透明度を下げていく
 	alpha -= (1.0f / 30.0f);
 
 	isAlive = (alpha >= 0.0f);
+
+	objectScale += (1.0f / 30.0f);
 }
 
 void angryParticleObject::Draw(int handle)
@@ -30,7 +38,10 @@ void angryParticleObject::Draw(int handle)
 
 	//アフィン変換
 	Matrix4 world = identity();
-	world = scale(Vector3(0.01f, 0.01f, 0.01f));
+
+	float scaleRate = Easing::EaseCalc(Easing::Out, Easing::Type::Cubic, objectScale);
+	scaleRate *= 0.005f;
+	world = scale(Vector3(scaleRate, scaleRate, scaleRate));
 	world *= translate(pos);
 
 	//作った行列をセット市描画
@@ -87,6 +98,15 @@ void angryParticle::Spawn(const Vector3& pos)
 				float xMove = static_cast<float>(rand() % 100) / 100.0f;
 				xMove -= 0.5f;
 				xMove *= 0.5f;
+
+				if (xMove <= 0.0f)
+				{
+					xMove = std::clamp(xMove, -0.5f, -0.1f);
+				}
+				else
+				{
+					xMove = std::clamp(xMove,  0.1f, 0.5f);
+				}
 				e.Init(pos, Vector3(xMove, 1.0f, 0.0f), 1.0f);
 				e.isAlive = true;
 				break;

@@ -66,6 +66,9 @@ public:
 	Capsule *GetCapsule();
 	void SetFrontCar(std::weak_ptr<Car> frontCar);
 
+	void SetBackCar(std::weak_ptr<Car> backCar);
+
+
 	void Dead();
 	void Count();
 
@@ -77,6 +80,8 @@ public:
 	bool GetIsSignalStop();
 
 	bool GetIsFront();
+
+	void ArrowSubstantiation();
 private:
 	static const float sTurnStartPos;
 	static const float sStopPos;
@@ -147,7 +152,12 @@ private:
 	ModelType model_ = ModelType::NORMAL;
 
 	std::weak_ptr<Car> frontCar_;
+	std::weak_ptr<Car> backCar_;
 
+
+	bool isArrowSubstantiation = false;
+
+	bool isBackArrowSubstantiation = false;
 private:
 	float clearAnimationRate_ = 0.0f;
 };
