@@ -126,6 +126,8 @@ private:
 	Vector3 scoreObjectPos_;
 	Vector3 scoreNumberObjectPos_;
 	float scoreObjectAnimationRate_ = 0.0f;
+	float addScoreAnimationRate_ = 0.0f;
+
 
 	Vector3 scoreResultObjectPos_;
 	Vector3 scoreResultNumberObjectPos_;
@@ -140,6 +142,8 @@ private:
 	Vector3 timeObjectPos_;
 	Vector3 timeNumberObjectPos_;
 	float timeObjectAnimationRate_ = 0.0f;
+	float countDownAnimationRate_ = 0.0f;
+	int oldCount = 0;
 
 	int TitleObject_;
 	Vector3 titleObjectPos_;

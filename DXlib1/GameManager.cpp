@@ -127,7 +127,11 @@ void GameManager::Update()
 		animationRate = std::clamp(animationRate, 0.0f, 1.0f);
 
 		angle = transform(cameraDeadAnimationPos_, rotationY(rotation));
+		addScoreAnimationRate_ += (1.0f / 30.0f);
+		addScoreAnimationRate_ = std::clamp(addScoreAnimationRate_, 0.0f, 1.0f);
 
+		countDownAnimationRate_ += (1.0f / 10.0f);
+		countDownAnimationRate_ = std::clamp(countDownAnimationRate_, 0.0f, 1.0f);
 		elapsedTime_++;
 
 		break;
@@ -357,7 +361,7 @@ void GameManager::PassCar(Vector3 pos, bool SoloHardMode)
 	}
 
 	score++;
-
+	addScoreAnimationRate_ = 0.0f;
 	int tmpTimer = comboPos.begin()->comboCount;
 
 	//コンボ対象の選択
@@ -551,16 +555,23 @@ void GameManager::scoreDraw()
 
 				tmpScore /= 10;
 			}
+
+			//拡縮アニメーション用変数
+			float addScoreEaseRate = Easing::EaseCalc(Easing::Out, Easing::Type::Cubic, addScoreAnimationRate_);
+			addScoreEaseRate = 1.0f + (0.2f * (1.0f - addScoreEaseRate));
+			float drawRate = scoreScale * addScoreEaseRate;
 			for (auto& e : scoreNums)
 			{
 
 				Matrix4 worldMat;
-				worldMat = scale(Vector3(scoreScale, scoreScale, scoreScale));
+
+
+				worldMat = scale(Vector3(drawRate, drawRate, drawRate));
 
 				worldMat *= cameraPosture;
 
 
-				Vector3 easePos = scoreNumberObjectPos_ + Vector3(-10.0f + ((125.0f * scoreScale) * deget), 0.0f, 0.0f);
+				Vector3 easePos = scoreNumberObjectPos_ + Vector3(-10.0f + ((125.0f * drawRate) * deget), 0.0f, 0.0f);
 
 				easePos = transform(easePos, cameraPosture);
 
@@ -614,15 +625,21 @@ void GameManager::scoreDraw()
 
 			tmpCombo /= 10;
 		}
+
+		//拡縮アニメーション用変数
+		float addComboEaseRate = Easing::EaseCalc(Easing::Out, Easing::Type::Cubic, addScoreAnimationRate_);
+		addComboEaseRate = 1.0f + (0.2f * (1.0f - addComboEaseRate));
+		float drawRate = scoreScale * addComboEaseRate;
+
 		for (auto& e : comboNums)
 		{
 
 			Matrix4 worldMat;
-			worldMat = scale(Vector3(comboScale, comboScale, comboScale));
+			worldMat = scale(Vector3(drawRate, drawRate, drawRate));
 
 			worldMat *= cameraPosture;
 
-			Vector3 easePos = comboNumberObjectPos_ + Vector3(-10.0f + ((125.0f * comboScale) * (deget)), 0.0f, 0.0f);
+			Vector3 easePos = comboNumberObjectPos_ + Vector3(-10.0f + ((125.0f * drawRate) * (deget)), 0.0f, 0.0f);
 			easePos = transform(easePos, cameraPosture);
 
 			float easeRate = Easing::easeOutBack(rate[deget + 11]);
@@ -665,13 +682,17 @@ void GameManager::scoreDraw()
 #pragma region timeNumber
 		{
 			int deget = 0;
-
 			std::vector<int> timeNums;
 			timeNums.resize(2);
 			int tmpTime = TimeLimit - gameTimer_;
-
 			bool isNotTimeup = (tmpTime > 0);
 			tmpTime /= 60;
+
+			if (tmpTime != oldCount)
+			{
+				countDownAnimationRate_ = 0.0f;
+			}
+			oldCount = tmpTime;
 
 			tmpTime = std::clamp(tmpTime, 0, 99);
 			if (isNotTimeup)
@@ -685,11 +706,16 @@ void GameManager::scoreDraw()
 
 				tmpTime /= 10;
 			}
+
+			//拡縮アニメーション用変数
+			float countdownEaseRate = Easing::EaseCalc(Easing::Out, Easing::Type::Cubic, countDownAnimationRate_);
+			countdownEaseRate = 1.0f + (0.2f * (1.0f - countdownEaseRate));
+			float drawRate = timeScale * countdownEaseRate * 2;
 			for (auto& e : timeNums)
 			{
 
 				Matrix4 worldMat;
-				worldMat = scale(Vector3(timeScale * 2, timeScale * 2, timeScale * 2));
+				worldMat = scale(Vector3(drawRate, drawRate, drawRate));
 
 				worldMat *= cameraPosture;
 
