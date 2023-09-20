@@ -171,6 +171,9 @@ void Game::IngameDraw()
 		break;
 	}
 
+
+	gameManager.ModeSelectDraw2D();
+
 	if (isMenu)
 	{
 		gameManager.MenuDraw();

@@ -10,7 +10,8 @@
 using namespace std;
 
 const int GameManager::gameLevelMax = 20;
-
+const float GameManager::pickupModeScale = 0.25f;
+const float GameManager::unPickupModeScale = 0.1f;
 GameManager::GameManager()
 {
 }
@@ -96,9 +97,15 @@ void GameManager::Update(bool isSoloMode)
 		break;
 	case GameStatus::SELECT:
 
-		if (GameInput::Done(GameNum::SOLO) && !isInput_ && !Input::isKey(KEY_INPUT_ESCAPE))
+		if (GameInput::Done(GameNum::SOLO) && !isInput_ && !Input::isKey(KEY_INPUT_ESCAPE) && (baseScaleRate >= 1.0f))
+		{
+			modeSelected = true; 
+			sounds_->Enter();
+		}
+		if (modeSelected && !isInput_ && !Input::isKey(KEY_INPUT_ESCAPE) && (baseScaleRate <= 0.0f))
 		{
 			ToIngame();
+			modeSelected = false;
 		}
 		break;
 	case GameStatus::INGAME:
@@ -164,6 +171,26 @@ void GameManager::Update(bool isSoloMode)
 	default:
 		break;
 	}
+
+	//モード選択のスケール設定
+	if (this->isSoloMode)
+	{
+		leftModeScaleRate += 0.2f;
+	}
+	else
+	{
+		leftModeScaleRate -= 0.2f;
+	}
+	if (status_ == GameStatus::SELECT && !modeSelected && titleObjectAnimationRate_ <= 0.0f)
+	{
+		baseScaleRate += 0.15f;
+	}
+	else
+	{
+		baseScaleRate -= 0.15f;
+	}
+	leftModeScaleRate = std::clamp(leftModeScaleRate, 0.0f, 1.0f);
+	baseScaleRate = std::clamp(baseScaleRate, 0.0f, 1.0f);
 
 	//					通常時のターゲット位置							衝突演出時のターゲット位置
 	easeTargetPos = (cameraBaseTargetPos_ * (1 - animationRate)) + (CrashAnimationTargetPos_ * (animationRate));
@@ -505,6 +532,9 @@ void GameManager::Load()
 	ScoreModeHandle_ = MV1LoadModel("Resources/mode_select/score_mode.mv1");
 	VSModeHandle_ = MV1LoadModel("Resources/mode_select/vs_mode.mv1");
 
+	VSModeTextureHandle_ = LoadGraph("Resources/Texture/VS_mode.png");
+	ScoreModeTextureHandle_ = LoadGraph("Resources/Texture/SCORE_mode.png");
+
 	concentLineHandles_[0] = LoadGraph("Resources/Texture/concent_line_01.png");
 	concentLineHandles_[1] = LoadGraph("Resources/Texture/concent_line_02.png");
 
@@ -577,8 +607,41 @@ void GameManager::ModeSelectDraw()
 	MV1SetMatrix(VSModeHandle_, worldMat * translate(VSModeObjectPos));
 	MV1SetMatrix(ScoreModeHandle_, worldMat * translate(ScoreModeObjectPos));
 
-	MV1DrawModel(VSModeHandle_);
-	MV1DrawModel(ScoreModeHandle_);
+	//MV1DrawModel(VSModeHandle_);
+	//MV1DrawModel(ScoreModeHandle_);
+
+}
+
+void GameManager::ModeSelectDraw2D()
+{
+
+	Vector3 scoreCenterPos = { 400.0f, 360.0f, 0.0f };
+	Vector3 vsCenterPos = { 820.0f, 360.0f, 0.0f };
+
+	Vector3 modeScale = { 1024.0f, 1118.0f , 0 };
+
+	float easePickupModeRate = Easing::EaseCalc(Easing::EaseMove::InOut, Easing::Type::Cubic, leftModeScaleRate);
+	float leftModeRate = (unPickupModeScale * (1.0f - easePickupModeRate))+(pickupModeScale * easePickupModeRate);
+	float rightModeRate = (unPickupModeScale * easePickupModeRate)+(pickupModeScale * (1.0f - easePickupModeRate));
+
+	float easeBaseModeRate = Easing::EaseCalc(Easing::EaseMove::Out, Easing::Type::Back, baseScaleRate);
+
+	leftModeRate *= easeBaseModeRate;
+	rightModeRate *= easeBaseModeRate;
+	SetDrawBlendMode(DX_BLENDMODE_NOBLEND, 100);
+
+	{
+		Vector3 LT = scoreCenterPos - (modeScale * leftModeRate);
+		Vector3 BR = scoreCenterPos + (modeScale * leftModeRate);
+		DrawExtendGraph(LT.x, LT.y, BR.x, BR.y, ScoreModeTextureHandle_, TRUE);
+	}
+
+	{
+
+		Vector3 LT = vsCenterPos - (modeScale * rightModeRate);
+		Vector3 BR = vsCenterPos + (modeScale * rightModeRate);
+		DrawExtendGraph(LT.x, LT.y, BR.x, BR.y, VSModeTextureHandle_, TRUE);
+	}
 }
 
 void GameManager::TitleDraw()

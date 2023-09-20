@@ -53,6 +53,8 @@ public:
 
 	void ModeSelectDraw();
 
+	void ModeSelectDraw2D();
+
 	void TitleDraw();
 
 	void scoreDraw();
@@ -241,12 +243,25 @@ private:
 
 	int VSModeHandle_ = -1;
 	int ScoreModeHandle_ = -1;
+
+	int VSModeTextureHandle_ = -1;
+	int ScoreModeTextureHandle_ = -1;
+
+	float leftModeScaleRate = 0.0f;
+	float baseScaleRate = 0.0f;
+
+	bool modeSelected = false;
+
+	static const float pickupModeScale;
+	static const float unPickupModeScale;
+
 	Vector3 SelectedModeObjectPos_;
 	Vector3 NotSelectedModeObjectPos_;
 	float ModeAnimationRate_ = 0.0f;
 
 	bool isSoloMode = true;
 
+	bool ToIngameFlag = false;
 public:
 	static const int gameLevelMax;
 };
