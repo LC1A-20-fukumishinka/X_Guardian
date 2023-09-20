@@ -73,7 +73,7 @@ public:
 
 	int GetCombo();
 
-	void SetSoundManager(SoundManager* sound);
+	void SetSoundManager(SoundManager *sound);
 
 
 	void ComboObjectUpdate();
@@ -183,7 +183,7 @@ private:
 
 	Vector3 cameraDeadAnimationPos_;
 
-	SoundManager* sounds_ = nullptr;
+	SoundManager *sounds_ = nullptr;
 
 	bool isOlddeadAnimation = false;
 
@@ -246,5 +246,8 @@ private:
 	float ModeAnimationRate_ = 0.0f;
 
 	bool isSoloMode = true;
+
+public:
+	static const int gameLevelMax;
 };
 

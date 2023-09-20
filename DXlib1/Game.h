@@ -91,8 +91,10 @@ private:
 
 	Matrix4 ZSkew(float angle);
 
-	static const int SoloModeTimerMax;
+	static const int SoloModeLimitMax;
+	static const int SoloModeLimitMin;
 	static const int VSModeTimerMax;
+	static const int SoloModeEnemyLimitMax;
 public:
 	int model;
 	int ground;

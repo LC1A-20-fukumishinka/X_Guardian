@@ -4,8 +4,13 @@
 #include "GameInput.h"
 #include "Input.h"
 
-const int Game::SoloModeTimerMax = 90;
+
+const int Game::SoloModeLimitMax = 60;		//プレイヤーの湧き速度（レベル0）
+const int Game::SoloModeLimitMin = 60;		//プレイヤーの湧き速度（レベル最大）
+
 const int Game::VSModeTimerMax = 120;
+
+const int Game::SoloModeEnemyLimitMax = 90;	//プレイヤーの湧き速度（レベル最大）
 Game::Game()
 {
 	//通常
@@ -401,6 +406,10 @@ void Game::TitleUpdate()
 void Game::IngameUpdate()
 {
 	int spawnTimerMax;
+
+	//ゲームレベル
+	int level = gameManager.GetGameLevel();
+
 	if (static_cast<GameNum>(gameNumber) == GameNum::SOLO)
 	{
 		if (isHighSpeedMode_)
@@ -409,7 +418,8 @@ void Game::IngameUpdate()
 		}
 		else
 		{
-			spawnTimerMax = SoloModeTimerMax;
+			/*spawnTimerMax = (SoloModeLimitMax * (1.0f - levelRate)) + (SoloModeLimitMin * levelRate);*/
+			spawnTimerMax = SoloModeEnemyLimitMax;
 		}
 
 	}
@@ -426,10 +436,13 @@ void Game::IngameUpdate()
 		float rate = 1.0f - SpawnSpeedRate;
 		spawnTimerMax = static_cast<int>(VSModeTimerMax * rate);
 	}
+
+	//接触時リセット
 	if (carManager.GetDeadAnimation())
 	{
+		const int collisionPenalty = 30;
 		spawnTimer = spawnTimerMax;
-		playerSpawnTimer = spawnTimerMax;
+		playerSpawnTimer = spawnTimerMax + collisionPenalty;
 	}
 	else
 	{
@@ -441,18 +454,19 @@ void Game::IngameUpdate()
 		}
 	}
 
-	int level = gameManager.GetGameLevel();
-
 	//湧く処理
 	if (spawnTimer <= 0)
 	{
 
 		bool isSoloHiSpeedMode = isHighSpeedMode_ && static_cast<GameNum>(gameNumber) == GameNum::SOLO;
 		carManager.AddEnemyCar(false, isSoloHiSpeedMode);
+
+		//一般車両がトラックにビタ付けで突進してくるのを回避するプログラム
 		if (carManager.sendIsTrackSpawn())
 		{
 			level = std::max<int>(level, 10);
 		}
+
 		if (isHighSpeedMode_)
 		{
 			spawnTimer = spawnTimerMax - (level * 1.5f);
@@ -465,7 +479,8 @@ void Game::IngameUpdate()
 
 	if (playerSpawnTimer <= 0)
 	{
-		playerSpawnTimer = (spawnTimerMax - 30);
+		float levelRate = static_cast<float>(level) / GameManager::gameLevelMax;
+		playerSpawnTimer = (SoloModeLimitMax * (1.0f - levelRate)) + (SoloModeLimitMin * levelRate);
 		carManager.AddPlayerCar(false);
 	}
 

@@ -8,6 +8,9 @@
 #include "Input.h"
 #include "GameInput.h"
 using namespace std;
+
+const int GameManager::gameLevelMax = 20;
+
 GameManager::GameManager()
 {
 }
@@ -102,7 +105,7 @@ void GameManager::Update(bool isSoloMode)
 
 		gameLevel_ = (elapsedTime_ / (5 * sec));
 
-		gameLevel_ = std::clamp(gameLevel_, 0, 20);
+		gameLevel_ = std::clamp(gameLevel_, 0, gameLevelMax);
 		if (!isDeadAnimation_)
 		{
 			gameTimer_++;
@@ -335,7 +338,7 @@ void GameManager::Draw()
 	if (!isMenu)
 	{
 		TitleDraw();
-		//PressAnyKeyDraw();
+		PressAnyKeyDraw();
 	}
 	ComboObjectDraw();
 
