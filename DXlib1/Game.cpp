@@ -6,7 +6,7 @@
 
 
 const int Game::SoloModeLimitMax = 60;		//プレイヤーの湧き速度（レベル0）
-const int Game::SoloModeLimitMin = 60;		//プレイヤーの湧き速度（レベル最大）
+const int Game::SoloModeLimitMin = 45;		//プレイヤーの湧き速度（レベル最大）
 
 const int Game::VSModeTimerMax = 120;
 
