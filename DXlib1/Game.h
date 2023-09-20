@@ -71,6 +71,8 @@ public:
 	void ReceiveObstacles(int ReceiveObstaclesCount);
 
 	void SetIsSoloMode(bool isSoloMode);
+
+	bool GetToIngame();
 private:
 	void TitleUpdate();
 	void IngameUpdate();

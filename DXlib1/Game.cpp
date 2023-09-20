@@ -766,6 +766,11 @@ void Game::SetIsSoloMode(bool isSoloMode)
 	gameManager.SetIsSoloMode(isSoloMode);
 }
 
+bool Game::GetToIngame()
+{
+	return gameManager.GetToIngameFlag();
+}
+
 bool Game::GameEnd()
 {
 	return GameEndFlag;

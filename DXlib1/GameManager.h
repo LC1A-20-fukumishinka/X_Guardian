@@ -107,6 +107,8 @@ public:
 	int RequestToPopAmbulance();
 
 	void SetIsSoloMode(bool isSoloMode);
+
+	bool GetToIngameFlag();
 private:
 	//sceneˆÚ“®ŠÖ”
 	void ToIngame();

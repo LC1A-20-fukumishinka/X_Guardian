@@ -47,7 +47,7 @@ void playManager::Update()
 	}
 
 	GameInput::Update();
-	if (a.GetGameStatus() == GameStatus::SELECT && GameInput::Done(GameNum::SOLO))
+	if (a.GetToIngame())
 	{
 		isSolo = isSoloModeSelect;
 	}

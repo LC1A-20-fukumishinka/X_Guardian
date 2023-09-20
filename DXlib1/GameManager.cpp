@@ -99,13 +99,14 @@ void GameManager::Update(bool isSoloMode)
 
 		if (GameInput::Done(GameNum::SOLO) && !isInput_ && !Input::isKey(KEY_INPUT_ESCAPE) && (baseScaleRate >= 1.0f))
 		{
-			modeSelected = true; 
+			modeSelected = true;
 			sounds_->Enter();
 		}
 		if (modeSelected && !isInput_ && !Input::isKey(KEY_INPUT_ESCAPE) && (baseScaleRate <= 0.0f))
 		{
 			ToIngame();
 			modeSelected = false;
+			ToIngameFlag = true;
 		}
 		break;
 	case GameStatus::INGAME:
@@ -621,8 +622,8 @@ void GameManager::ModeSelectDraw2D()
 	Vector3 modeScale = { 1024.0f, 1118.0f , 0 };
 
 	float easePickupModeRate = Easing::EaseCalc(Easing::EaseMove::InOut, Easing::Type::Cubic, leftModeScaleRate);
-	float leftModeRate = (unPickupModeScale * (1.0f - easePickupModeRate))+(pickupModeScale * easePickupModeRate);
-	float rightModeRate = (unPickupModeScale * easePickupModeRate)+(pickupModeScale * (1.0f - easePickupModeRate));
+	float leftModeRate = (unPickupModeScale * (1.0f - easePickupModeRate)) + (pickupModeScale * easePickupModeRate);
+	float rightModeRate = (unPickupModeScale * easePickupModeRate) + (pickupModeScale * (1.0f - easePickupModeRate));
 
 	float easeBaseModeRate = Easing::EaseCalc(Easing::EaseMove::Out, Easing::Type::Back, baseScaleRate);
 
@@ -1406,6 +1407,13 @@ void GameManager::SetIsSoloMode(bool isSoloMode)
 	this->isSoloMode = isSoloMode;
 }
 
+bool GameManager::GetToIngameFlag()
+{
+	if (!ToIngameFlag) return false;
+	ToIngameFlag = false;
+	return 	true;
+}
+
 void GameManager::ToIngame()
 {
 	score = 0;
@@ -1418,7 +1426,6 @@ void GameManager::ToIngame()
 	sounds_->IngameVolume();
 	if (gameNumber != GameNum::PLAYER2)
 	{
-		sounds_->Enter();
 		sounds_->BGM();
 	}
 	status_ = GameStatus::INGAME;
@@ -1445,6 +1452,11 @@ void GameManager::ToTitle()
 	isDeadAnimation_ = false;
 	isOlddeadAnimation = false;
 	life = 3;
+
+
+	modeSelected = false;
+	ToIngameFlag = true;
+
 	if (gameNumber != GameNum::PLAYER2)
 	{
 		sounds_->StopJingle();
