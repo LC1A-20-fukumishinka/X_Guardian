@@ -39,7 +39,7 @@ void GameManager::Init()
 #pragma endregion
 
 
-	titleObjectPos_ = Vector3(4, 50.0f, -120.0f);
+	titleObjectPos_ = Vector3(4, 40.0f, -120.0f);
 	titleObjectAnimationRate_ = 1.0f;
 
 	pressAnyKeyObjectPos_ = Vector3(0.0f, 10.0f, -120.0f);
@@ -57,7 +57,7 @@ void GameManager::Init()
 
 }
 
-void GameManager::Update()
+void GameManager::Update(bool isSoloMode)
 {
 
 	bool isGameOver = false;
@@ -70,19 +70,33 @@ void GameManager::Update()
 	Vector3 distance;
 	Vector3 easePos;
 	Vector3 easeTargetPos;
+
+
+
 	switch (status_)
 	{
 	case GameStatus::TITLE:
 		if (GameInput::Done(GameNum::SOLO) && !isInput_ && !Input::isKey(KEY_INPUT_ESCAPE))
 		{
-			ToIngame();
+			status_ = GameStatus::SELECT;
+			sounds_->Enter();
 		}
 		animationRate -= 0.1f;
 
 		animationRate = std::clamp(animationRate, 0.0f, 1.0f);
 		isSolo = (gameNumber == GameNum::SOLO);
+
+		if (gameNumber == GameNum::PLAYER2 && !isSoloMode)
+		{
+			ToIngame();
+		}
 		break;
 	case GameStatus::SELECT:
+
+		if (GameInput::Done(GameNum::SOLO) && !isInput_ && !Input::isKey(KEY_INPUT_ESCAPE))
+		{
+			ToIngame();
+		}
 		break;
 	case GameStatus::INGAME:
 
@@ -162,6 +176,7 @@ void GameManager::Update()
 
 	isNotAnimationEnd_ = false;
 	TitleObjectUpdate();
+	ModeSelectObjectUpdate();
 	scoreObjectUpdate();
 	PressAnyKeyUpdate();
 	AddTimeUpdate();
@@ -172,6 +187,10 @@ void GameManager::Update()
 
 void GameManager::TitleObjectUpdate()
 {
+	if (gameNumber == GameNum::PLAYER2)
+	{
+		titleObjectAnimationRate_ = 0.0f;
+	}
 
 	const float moveRate = 0.03f;
 	if (status_ == GameStatus::TITLE)
@@ -182,11 +201,33 @@ void GameManager::TitleObjectUpdate()
 	{
 		titleObjectAnimationRate_ -= moveRate;
 	}
+
+
 	if (titleObjectAnimationRate_ < 1.0f && titleObjectAnimationRate_ >= 0.0f)
 	{
 		isNotAnimationEnd_ = true;
 	}
 	titleObjectAnimationRate_ = clamp(titleObjectAnimationRate_, 0.0f, 1.0f);
+}
+
+void GameManager::ModeSelectObjectUpdate()
+{
+	if (gameNumber == GameNum::PLAYER2)
+	{
+		ModeAnimationRate_ = 0.0f;
+	}
+
+	const float moveRate = 0.03f;
+	if (status_ == GameStatus::SELECT)
+	{
+		ModeAnimationRate_ += moveRate;
+	}
+	else
+	{
+		ModeAnimationRate_ -= moveRate;
+	}
+
+	ModeAnimationRate_ = clamp(ModeAnimationRate_, 0.0f, 1.0f);
 }
 
 void GameManager::scoreObjectUpdate()
@@ -225,6 +266,11 @@ void GameManager::scoreObjectUpdate()
 
 void GameManager::PressAnyKeyUpdate()
 {
+	if (gameNumber == GameNum::PLAYER2)
+	{
+		pressAnyKeyObjectAnimationRate_ = 0.0f;
+	}
+
 	const float moveRate = 0.03f;
 	if ((status_ == GameStatus::TITLE) || (status_ == GameStatus::RESULT))
 	{
@@ -285,11 +331,11 @@ void GameManager::Draw()
 	}
 	scoreDraw();
 	ResultDraw();
-
+	ModeSelectDraw();
 	if (!isMenu)
 	{
 		TitleDraw();
-		PressAnyKeyDraw();
+		//PressAnyKeyDraw();
 	}
 	ComboObjectDraw();
 
@@ -438,7 +484,7 @@ void GameManager::Load()
 	string number = "number/number_";
 
 	int i = 0;
-	for (auto& e : numberObjects_)
+	for (auto &e : numberObjects_)
 	{
 		string path = baseName + number + to_string(i) + ".mv1";
 		e = MV1LoadModel(path.c_str());
@@ -452,6 +498,9 @@ void GameManager::Load()
 	timeTextObjectHandle_ = MV1LoadModel("Resources/time_ui/time_ui.mv1");
 	AddHandle_ = MV1LoadModel("Resources/add_sub/add.mv1");
 	SubHandle_ = MV1LoadModel("Resources/add_sub/sub.mv1");
+
+	ScoreModeHandle_ = MV1LoadModel("Resources/mode_select/score_mode.mv1");
+	VSModeHandle_ = MV1LoadModel("Resources/mode_select/vs_mode.mv1");
 
 	concentLineHandles_[0] = LoadGraph("Resources/Texture/concent_line_01.png");
 	concentLineHandles_[1] = LoadGraph("Resources/Texture/concent_line_02.png");
@@ -474,6 +523,59 @@ void GameManager::Load()
 
 	winHandle_ = MV1LoadModel("Resources/win/win.mv1");
 	loseHandle_ = MV1LoadModel("Resources/lose/lose.mv1");
+}
+
+void GameManager::ModeSelectDraw()
+{
+	Matrix4 cameraPosture = Posture((cameraBaseTargetPos_ - cameraBasePos_), Vector3(0.0f, 1.0f, 0.0f));
+	Matrix4 worldMat;
+
+	if (gameNumber == GameNum::SOLO)
+	{
+		worldMat = scale(Vector3(0.1f, 0.1f, 0.1f));
+	}
+	else
+	{
+		worldMat = scale(Vector3(0.06f, 0.06f, 0.06f));
+	}
+
+	worldMat *= cameraPosture;
+
+	SelectedModeObjectPos_.y = sin(level_ * (DX_PI_F / 180.0f)) * 2 + 40;
+	NotSelectedModeObjectPos_.y = 30;
+	SelectedModeObjectPos_.z = -100.0f;
+	NotSelectedModeObjectPos_.z = -80.0f;
+
+	Vector3 SelectedPos = SelectedModeObjectPos_;
+	Vector3 NotSelectedPos = NotSelectedModeObjectPos_;
+
+	Vector3 moveVec(0.0f, 100.0f, 0.0f);
+
+	moveVec = transform(moveVec, cameraPosture);
+	float easeRate = Easing::easeOutBack(ModeAnimationRate_);
+	SelectedPos += (moveVec * (1 - easeRate));
+	NotSelectedPos += (moveVec * (1 - easeRate));
+
+
+	float widthRate = 30.0f;
+	Vector3 ScoreModeObjectPos;
+	Vector3 VSModeObjectPos;
+	if (isSoloMode)
+	{
+		ScoreModeObjectPos = SelectedPos + Vector3(-widthRate, 0.0f, 0.0f);
+		VSModeObjectPos = NotSelectedPos + Vector3(widthRate, 0.0f, 0.0f);
+	}
+	else
+	{
+		ScoreModeObjectPos = NotSelectedPos + Vector3(-widthRate, 0.0f, 0.0f);
+		VSModeObjectPos = SelectedPos + Vector3(widthRate, 0.0f, 0.0f);
+	}
+
+	MV1SetMatrix(VSModeHandle_, worldMat * translate(VSModeObjectPos));
+	MV1SetMatrix(ScoreModeHandle_, worldMat * translate(ScoreModeObjectPos));
+
+	MV1DrawModel(VSModeHandle_);
+	MV1DrawModel(ScoreModeHandle_);
 }
 
 void GameManager::TitleDraw()
@@ -522,7 +624,7 @@ void GameManager::scoreDraw()
 
 		float Range = 0.2f;
 		float allFlowRate = scoreObjectAnimationRate_ * (1.0f + Range);
-		for (auto& e : rate)
+		for (auto &e : rate)
 		{
 			float RangeLag = Range / 11.0f;
 			e = allFlowRate - (i * RangeLag);
@@ -560,7 +662,7 @@ void GameManager::scoreDraw()
 			float addScoreEaseRate = Easing::EaseCalc(Easing::Out, Easing::Type::Cubic, addScoreAnimationRate_);
 			addScoreEaseRate = 1.0f + (0.2f * (1.0f - addScoreEaseRate));
 			float drawRate = scoreScale * addScoreEaseRate;
-			for (auto& e : scoreNums)
+			for (auto &e : scoreNums)
 			{
 
 				Matrix4 worldMat;
@@ -631,7 +733,7 @@ void GameManager::scoreDraw()
 		addComboEaseRate = 1.0f + (0.2f * (1.0f - addComboEaseRate));
 		float drawRate = scoreScale * addComboEaseRate;
 
-		for (auto& e : comboNums)
+		for (auto &e : comboNums)
 		{
 
 			Matrix4 worldMat;
@@ -711,7 +813,7 @@ void GameManager::scoreDraw()
 			float countdownEaseRate = Easing::EaseCalc(Easing::Out, Easing::Type::Cubic, countDownAnimationRate_);
 			countdownEaseRate = 1.0f + (0.2f * (1.0f - countdownEaseRate));
 			float drawRate = timeScale * countdownEaseRate * 2;
-			for (auto& e : timeNums)
+			for (auto &e : timeNums)
 			{
 
 				Matrix4 worldMat;
@@ -842,7 +944,7 @@ void GameManager::ResultDraw()
 
 		float Range = 0.1f;
 		float allFlowRate = scoreResultObjectAnimationRate_ * (1.0f + Range);
-		for (auto& e : rate)
+		for (auto &e : rate)
 		{
 			float RangeLag = Range / 11.0f;
 			e = allFlowRate - (i * RangeLag);
@@ -869,7 +971,7 @@ void GameManager::ResultDraw()
 
 				tmpScore /= 10;
 			}
-			for (auto& e : scoreNums)
+			for (auto &e : scoreNums)
 			{
 
 				Matrix4 worldMat;
@@ -1086,14 +1188,14 @@ int GameManager::GetCombo()
 	return combo;
 }
 
-void GameManager::SetSoundManager(SoundManager* sound)
+void GameManager::SetSoundManager(SoundManager *sound)
 {
 	sounds_ = sound;
 }
 
 void GameManager::ComboObjectUpdate()
 {
-	for (auto& e : comboPos)
+	for (auto &e : comboPos)
 	{
 		if (e.timer > 0)
 		{
@@ -1108,7 +1210,7 @@ void GameManager::ComboObjectDraw()
 	Vector3 moveVec = Vector3(0.0f, 20.0f, 0.0f);
 
 	float comboScale = 0.05f;
-	for (auto& e : comboPos)
+	for (auto &e : comboPos)
 	{
 		if (e.timer > 0)
 		{
@@ -1136,7 +1238,7 @@ void GameManager::ComboObjectDraw()
 
 				degetMoveCount = digitsCount;
 				degetMoveCount--;
-				for (auto& num : comboNums)
+				for (auto &num : comboNums)
 				{
 
 					Matrix4 worldMat;
@@ -1231,6 +1333,11 @@ int GameManager::RequestToPopAmbulance()
 	int tmpRequestToPopAmbulanceCount = requestToPopAmbulanceCount;
 	requestToPopAmbulanceCount = 0;
 	return tmpRequestToPopAmbulanceCount;
+}
+
+void GameManager::SetIsSoloMode(bool isSoloMode)
+{
+	this->isSoloMode = isSoloMode;
 }
 
 void GameManager::ToIngame()

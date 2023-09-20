@@ -27,8 +27,9 @@ public:
 	GameManager();
 	~GameManager();
 	void Init();
-	void Update();
+	void Update(bool isSoloMode);
 	void TitleObjectUpdate();
+	void ModeSelectObjectUpdate();
 	void scoreObjectUpdate();
 	void PressAnyKeyUpdate();
 	void Finalize();
@@ -49,6 +50,8 @@ public:
 
 	void SetDeadAnimationPos(Vector3 carPos);
 	void Load();
+
+	void ModeSelectDraw();
 
 	void TitleDraw();
 
@@ -100,6 +103,8 @@ public:
 	/// </summary>
 	/// <returns></returns>
 	int RequestToPopAmbulance();
+
+	void SetIsSoloMode(bool isSoloMode);
 private:
 	//sceneà⁄ìÆä÷êî
 	void ToIngame();
@@ -233,5 +238,13 @@ private:
 	/// </summary>
 	int requestToPopAmbulanceCount = 0;
 	bool isWin = true;
+
+	int VSModeHandle_ = -1;
+	int ScoreModeHandle_ = -1;
+	Vector3 SelectedModeObjectPos_;
+	Vector3 NotSelectedModeObjectPos_;
+	float ModeAnimationRate_ = 0.0f;
+
+	bool isSoloMode = true;
 };
 

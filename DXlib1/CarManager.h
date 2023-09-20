@@ -73,6 +73,8 @@ public:
 	Vector3 GetFirstCarPos();
 
 	bool sendIsTrackSpawn();
+
+	bool GetIsIngame();
 private:
 	void IngameUpdate();
 

@@ -14,6 +14,11 @@ public:
 	static bool Done(GameNum num);
 
 	static bool ChangeMode();
+
+	static bool Left();
+	static bool Right();
+
+
 private:
 
 };

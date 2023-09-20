@@ -17,11 +17,26 @@ void playManager::Init()
 
 void playManager::Update()
 {
-	if (a.GetGameStatus() == GameStatus::TITLE && GameInput::ChangeMode())
+	if (a.GetGameStatus() == GameStatus::TITLE)
 	{
-		PlayModeChange();
+		isSolo = true;
+		isSoloModeSelect = true;
 	}
 
+	if (a.GetGameStatus() == GameStatus::SELECT)
+	{
+		if (GameInput::Left())
+		{
+			isSoloModeSelect = true;
+		}
+
+		if (GameInput::Right())
+		{
+			isSoloModeSelect = false;
+		}
+	}
+
+	a.SetIsSoloMode(isSoloModeSelect);
 	if (isFinish)
 	{
 		a.ToResult();
@@ -29,6 +44,12 @@ void playManager::Update()
 		BLose = false;
 		ALose = false;
 		isFinish = false;
+	}
+
+	GameInput::Update();
+	if (a.GetGameStatus() == GameStatus::SELECT && GameInput::Done(GameNum::SOLO))
+	{
+		isSolo = isSoloModeSelect;
 	}
 	if (isSolo)
 	{
@@ -38,12 +59,12 @@ void playManager::Update()
 	{
 		a.SetGameNum(GameNum::PLAYER1);
 	}
-	GameInput::Update();
-	a.Update();
+
+	a.Update(true);
 	a.IngameDraw();
 	if (!isSolo)
 	{
-		b.Update();
+		b.Update(isSolo);
 		b.IngameDraw();
 		BLose = b.isGameOver();
 		ALose = a.isGameOver();

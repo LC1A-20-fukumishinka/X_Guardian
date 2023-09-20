@@ -156,7 +156,7 @@ void CarManager::SetSignal()
 
 	if (!isDeadAnimation_)
 	{
-		if (GameInput::Straight(gameNumber) || Input::isPad(XINPUT_BUTTON_DPAD_UP) || Input::isPad(XINPUT_BUTTON_Y) || Input::isPadThumb(XINPUT_THUMB_LEFTVERT) >= 0.5f)
+		if (GameInput::Straight(gameNumber))
 		{
 			inputSignal = MoveType::STRAIGHT;
 		}
@@ -715,6 +715,11 @@ bool CarManager::sendIsTrackSpawn()
 	bool tmpIsTrackSpawn = isTrackSpawn;
 	isTrackSpawn = false;
 	return tmpIsTrackSpawn;
+}
+
+bool CarManager::GetIsIngame()
+{
+	return isIngame_;
 }
 
 

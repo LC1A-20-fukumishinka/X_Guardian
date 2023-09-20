@@ -52,7 +52,7 @@ public:
 	void IngameDraw();
 
 	void Draw();
-	void Update();
+	void Update(bool isSoloMode);
 
 	bool GameEnd();
 
@@ -69,6 +69,8 @@ public:
 	int SendObstacles();
 
 	void ReceiveObstacles(int ReceiveObstaclesCount);
+
+	void SetIsSoloMode(bool isSoloMode);
 private:
 	void TitleUpdate();
 	void IngameUpdate();
@@ -150,5 +152,8 @@ public:
 
 	bool isHighSpeedMode_ = false;
 	angryParticle angryParticles;
+
+
+	int controllType = 0;
 };
 

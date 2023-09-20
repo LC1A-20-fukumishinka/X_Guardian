@@ -84,3 +84,13 @@ bool GameInput::ChangeMode()
 {
 	return Input::isKeyTrigger(KEY_INPUT_1);
 }
+
+bool GameInput::Left()
+{
+	return (Input::isKeyTrigger(KEY_INPUT_A) || Input::isKeyTrigger(KEY_INPUT_LEFT));
+}
+
+bool GameInput::Right()
+{
+	return (Input::isKeyTrigger(KEY_INPUT_D) || Input::isKeyTrigger(KEY_INPUT_RIGHT));
+}

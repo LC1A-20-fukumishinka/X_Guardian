@@ -85,7 +85,7 @@ Game::Game()
 	soundTimersMax_[static_cast<int>(TimerName::BROKEN)].Set(600, 1200);
 
 	int count = 0;
-	for (auto& e : soundTimers_)
+	for (auto &e : soundTimers_)
 	{
 		e = SetRandTimer(soundTimersMax_[count]);
 		e -= (120 * (count % 2));
@@ -93,7 +93,7 @@ Game::Game()
 	}
 
 	xGuardian.Init();
-	for (auto& e : isComboEffects)
+	for (auto &e : isComboEffects)
 	{
 		e = false;
 	}
@@ -197,7 +197,7 @@ void Game::Draw()
 	gameManager.FrameDraw();
 }
 
-void Game::Update()
+void Game::Update(bool isSoloMode)
 {
 	carManager.SetGameNumber(static_cast<GameNum>(gameNumber));
 	SetDrawScreen(screenNum);
@@ -220,6 +220,8 @@ void Game::Update()
 	gameManager.SetMenuDatas(isMenu, menuTextNumber);
 
 	if (isMenu) return;
+
+
 	switch (gameManager.GetStatus())
 	{
 	case GameStatus::TITLE:
@@ -239,8 +241,16 @@ void Game::Update()
 
 		break;
 	case GameStatus::SELECT:
+		carManager.Update();
 		break;
 	case GameStatus::INGAME:
+
+		//インゲームに入っているのにインゲーム状態になっていない場合
+		if (!carManager.GetIsIngame())
+		{
+			SceneChange();
+		}
+
 		IngameUpdate();
 		break;
 	case GameStatus::RESULT:
@@ -253,7 +263,7 @@ void Game::Update()
 	}
 
 	gameManager.CheckCarAllDead(carManager.GetIsAllCarDead());
-	gameManager.Update();
+	gameManager.Update(isSoloMode);
 	carManager.SetIsResult((gameManager.GetStatus() == GameStatus::RESULT));
 	if (OldScene != gameManager.GetStatus())
 	{
@@ -437,7 +447,7 @@ void Game::IngameUpdate()
 	if (spawnTimer <= 0)
 	{
 
-		bool isSoloHiSpeedMode = isHighSpeedMode_&& static_cast<GameNum>(gameNumber) == GameNum::SOLO;
+		bool isSoloHiSpeedMode = isHighSpeedMode_ && static_cast<GameNum>(gameNumber) == GameNum::SOLO;
 		carManager.AddEnemyCar(false, isSoloHiSpeedMode);
 		if (carManager.sendIsTrackSpawn())
 		{
@@ -464,7 +474,7 @@ void Game::IngameUpdate()
 	carManager.SetLevel(level);
 	carManager.Update();
 	std::vector<Vector3> passCarsPos = carManager.GetPassCars();
-	for (auto& e : passCarsPos)
+	for (auto &e : passCarsPos)
 	{
 		gameManager.PassCar(e, isHighSpeedMode_);
 	}
@@ -652,7 +662,7 @@ void Game::SceneChange()
 void Game::SoundUpdate()
 {
 	int count = 0;
-	for (auto& e : soundTimers_)
+	for (auto &e : soundTimers_)
 	{
 		e--;
 
@@ -733,6 +743,11 @@ void Game::ReceiveObstacles(int ReceiveObstaclesCount)
 	carManager.ReceiveCountPopAmbulance(ReceiveObstaclesCount);
 }
 
+void Game::SetIsSoloMode(bool isSoloMode)
+{
+	gameManager.SetIsSoloMode(isSoloMode);
+}
+
 bool Game::GameEnd()
 {
 	return GameEndFlag;
@@ -744,7 +759,7 @@ void Game::SetGameNum(GameNum num)
 	gameManager.SetGameNum(num);
 }
 
-void Game::SetSoundManager(SoundManager* sounds)
+void Game::SetSoundManager(SoundManager *sounds)
 {
 	this->sounds = sounds;
 	sounds->TitleVolume();
