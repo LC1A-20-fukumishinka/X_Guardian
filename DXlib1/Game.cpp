@@ -245,7 +245,6 @@ void Game::Update(bool isSoloMode)
 			carManager.AddEnemyCar(true, false);
 		}
 
-		isHighSpeedMode_ = Input::isKey(KEY_INPUT_0);
 
 		break;
 	case GameStatus::SELECT:
@@ -257,6 +256,7 @@ void Game::Update(bool isSoloMode)
 		if (!carManager.GetIsIngame())
 		{
 			SceneChange();
+			isHighSpeedMode_ = Input::isKey(KEY_INPUT_0);
 		}
 
 		IngameUpdate();
@@ -276,6 +276,7 @@ void Game::Update(bool isSoloMode)
 	if (OldScene != gameManager.GetStatus())
 	{
 		SceneChange();
+		isHighSpeedMode_ = Input::isKey(KEY_INPUT_0);
 	}
 	OldScene = gameManager.GetStatus();
 
@@ -418,6 +419,7 @@ void Game::IngameUpdate()
 		if (isHighSpeedMode_)
 		{
 			spawnTimerMax = 60;
+
 		}
 		else
 		{
@@ -482,8 +484,15 @@ void Game::IngameUpdate()
 
 	if (playerSpawnTimer <= 0)
 	{
-		float levelRate = static_cast<float>(level) / GameManager::gameLevelMax;
-		playerSpawnTimer = (SoloModeLimitMax * (1.0f - levelRate)) + (SoloModeLimitMin * levelRate);
+		if (isHighSpeedMode_)
+		{
+			playerSpawnTimer = 30;
+		}
+		else
+		{
+			float levelRate = static_cast<float>(level) / GameManager::gameLevelMax;
+			playerSpawnTimer = (SoloModeLimitMax * (1.0f - levelRate)) + (SoloModeLimitMin * levelRate);
+		}
 		carManager.AddPlayerCar(false);
 	}
 
