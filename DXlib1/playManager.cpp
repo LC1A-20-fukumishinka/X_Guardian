@@ -60,7 +60,7 @@ void playManager::Update()
 		a.SetGameNum(GameNum::PLAYER1);
 	}
 
-	a.Update(true);
+	a.Update(isSolo);
 	a.IngameDraw();
 	if (!isSolo)
 	{

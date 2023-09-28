@@ -604,6 +604,7 @@ void CarManager::AllDead()
 
 	float underFrameLine = -145.0f;
 	bool isBroken = false;
+	spawnAmbulanceCount = 0; 
 	for (auto& e : playerCars_)
 	{
 		if (e->GetIsAlive())

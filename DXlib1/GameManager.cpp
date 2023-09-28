@@ -88,7 +88,7 @@ void GameManager::Update(bool isSoloMode)
 		animationRate -= 0.1f;
 
 		animationRate = std::clamp(animationRate, 0.0f, 1.0f);
-		isSolo = (gameNumber == GameNum::SOLO);
+		isSolo = isSoloMode;
 
 		if (gameNumber == GameNum::PLAYER2 && !isSoloMode)
 		{
@@ -102,6 +102,7 @@ void GameManager::Update(bool isSoloMode)
 			modeSelected = true;
 			sounds_->Enter();
 		}
+
 		if (modeSelected && !isInput_ && !Input::isKey(KEY_INPUT_ESCAPE) && (baseScaleRate <= 0.0f))
 		{
 			ToIngame();
@@ -1424,6 +1425,7 @@ void GameManager::ToIngame()
 	elapsedTime_ = 0;
 	gameLevel_ = 0;
 	sounds_->IngameVolume();
+	requestToPopAmbulanceCount = 0;
 	if (gameNumber != GameNum::PLAYER2)
 	{
 		sounds_->BGM();
@@ -1480,11 +1482,13 @@ void GameManager::SetGameNum(GameNum num)
 	if (gameNumber == GameNum::PLAYER1)
 	{
 		frameHandle = P1frameHandle;
+
 	}
 	else if (gameNumber == GameNum::PLAYER2)
 	{
 		frameHandle = P2frameHandle;
 	}
+	isSolo = (gameNumber == GameNum::SOLO);
 }
 
 bool GameManager::GetisGameOver()
