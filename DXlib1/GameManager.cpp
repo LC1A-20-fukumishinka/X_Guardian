@@ -469,7 +469,7 @@ void GameManager::PassCar(Vector3 pos, bool SoloHardMode)
 		}
 		else
 		{
-			AddSec = 2.5f;
+			AddSec = 2.1f;
 		}
 		gameTimer_ -= static_cast<int>(60 * AddSec);
 		sounds_->AddTime();
@@ -716,7 +716,7 @@ void GameManager::scoreDraw()
 			int deget = 0;
 
 			std::vector<int> scoreNums;
-			scoreNums.resize(5);
+			scoreNums.resize(4);
 			int tmpScore = score;
 			for (int i = 1; i <= scoreNums.size(); i++)
 			{
@@ -741,7 +741,7 @@ void GameManager::scoreDraw()
 				worldMat *= cameraPosture;
 
 
-				Vector3 easePos = scoreNumberObjectPos_ + Vector3(-10.0f + ((125.0f * drawRate) * deget), 0.0f, 0.0f);
+				Vector3 easePos = scoreNumberObjectPos_ + Vector3(-8.5f + ((125.0f * drawRate) * deget), 0.0f, 0.0f);
 
 				easePos = transform(easePos, cameraPosture);
 
@@ -1030,7 +1030,7 @@ void GameManager::ResultDraw()
 			int i = 0;
 
 			std::vector<int> scoreNums;
-			scoreNums.resize(5);
+			scoreNums.resize(4);
 			int tmpScore = score;
 			for (int i = 1; i <= scoreNums.size(); i++)
 			{
@@ -1048,7 +1048,7 @@ void GameManager::ResultDraw()
 				worldMat *= cameraPosture;
 
 
-				Vector3 easePos = scoreResultNumberObjectPos_ + Vector3(-10.0f + (10.0f * i), 0.0f, 0.0f);
+				Vector3 easePos = scoreResultNumberObjectPos_ + Vector3(-5.0f + (10.0f * i), 0.0f, 0.0f);
 				float easeRate = Easing::easeOutBack(rate[i]);
 				easePos += (moveVec * (1 - easeRate));
 
