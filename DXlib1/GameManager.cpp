@@ -1431,6 +1431,7 @@ void GameManager::ToIngame()
 	gameLevel_ = 0;
 	sounds_->IngameVolume();
 	requestToPopAmbulanceCount = 0;
+	scoreResultObjectAnimationRate_ = 0.0f;
 	if (gameNumber != GameNum::PLAYER2)
 	{
 		sounds_->BGM();
