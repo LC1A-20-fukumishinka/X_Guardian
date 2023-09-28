@@ -1415,6 +1415,11 @@ bool GameManager::GetToIngameFlag()
 	return 	true;
 }
 
+bool GameManager::GetSelectMode()
+{
+	return leftModeScaleRate;
+}
+
 void GameManager::ToIngame()
 {
 	score = 0;

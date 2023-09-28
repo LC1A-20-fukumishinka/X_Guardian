@@ -666,6 +666,11 @@ void Game::SceneChange()
 	case GameStatus::INGAME:
 		carManager.AllDead();
 		carManager.Init();
+		if (static_cast<GameNum>(gameNumber) != GameNum::SOLO || !isSoloMode)
+		{
+			spawnTimer = VSModeTimerMax;
+			playerSpawnTimer = VSModeTimerMax;
+		}
 		break;
 	case GameStatus::RESULT:
 		carManager.EndGame();
@@ -763,6 +768,7 @@ void Game::ReceiveObstacles(int ReceiveObstaclesCount)
 
 void Game::SetIsSoloMode(bool isSoloMode)
 {
+	this->isSoloMode = isSoloMode;
 	gameManager.SetIsSoloMode(isSoloMode);
 }
 

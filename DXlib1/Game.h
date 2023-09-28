@@ -159,5 +159,7 @@ public:
 
 
 	int controllType = 0;
+
+	bool isSoloMode = true;
 };
 

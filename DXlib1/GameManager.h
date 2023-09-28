@@ -109,6 +109,8 @@ public:
 	void SetIsSoloMode(bool isSoloMode);
 
 	bool GetToIngameFlag();
+
+	bool GetSelectMode();
 private:
 	//sceneˆÚ“®ŠÖ”
 	void ToIngame();
